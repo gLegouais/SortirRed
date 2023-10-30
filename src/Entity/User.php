@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -40,9 +42,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?bool $isActive;
 
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Campus $campus = null;
+
+    #[ORM\OneToMany(mappedBy: 'organizer', targetEntity: Outing::class)]
+    private Collection $outings;
+
     public function __construct()
     {
         $this->isActive = true;
+        $this->outings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -158,6 +168,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsActive(bool $isActive): static
     {
         $this->isActive = $isActive;
+
+        return $this;
+    }
+
+    public function getCampus(): ?Campus
+    {
+        return $this->campus;
+    }
+
+    public function setCampus(?Campus $campus): static
+    {
+        $this->campus = $campus;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Outing>
+     */
+    public function getOutings(): Collection
+    {
+        return $this->outings;
+    }
+
+    public function addOuting(Outing $outing): static
+    {
+        if (!$this->outings->contains($outing)) {
+            $this->outings->add($outing);
+            $outing->setOrganizer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOuting(Outing $outing): static
+    {
+        if ($this->outings->removeElement($outing)) {
+            // set the owning side to null (unless already changed)
+            if ($outing->getOrganizer() === $this) {
+                $outing->setOrganizer(null);
+            }
+        }
 
         return $this;
     }
