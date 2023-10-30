@@ -1,0 +1,11 @@
+.navbar {
+    color: black;
+    background-color: indianred;
+}
+
+body {
+    background-color: antiquewhite;
+    background-size: cover;
+    height: 100vh;
+    margin: 0;
+}
