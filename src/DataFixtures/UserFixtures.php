@@ -4,13 +4,14 @@ namespace App\DataFixtures;
 
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 ;
 
-class UserFixtures extends Fixture
+class UserFixtures extends Fixture implements DependentFixtureInterface
 {
     public function __construct(private readonly UserPasswordHasherInterface $passwordHasher)
     {
@@ -18,6 +19,11 @@ class UserFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+
+        $campusList[] = $this->getReference('rennes');
+        $campusList[] = $this->getReference('nantes');
+        $campusList[] = $this->getReference('niort');
+
         $faker = Factory::create('fr_FR');
         $admin = new User();
         $admin->setRoles(['ROLE_ADMIN']);
@@ -27,7 +33,7 @@ class UserFixtures extends Fixture
         $admin->setEmail('gandalf@wizard.me');
         $admin->setFirstname('Gandalf');
         $admin->setLastname('Le Gris');
-        // ADD CAMPUS
+        $admin->setCampus($campusList[mt_rand(0, 2)]);
 
         $manager->persist($admin);
 
@@ -42,7 +48,7 @@ class UserFixtures extends Fixture
             $guest->setRoles(['ROLE_USER']);
             $passwordGuest = $this->passwordHasher->hashPassword($guest, '123456');
             $guest->setPassword($passwordGuest);
-            // ADD CAMPUS
+            $guest->setCampus($campusList[mt_rand(0, 2)]);
 
             $manager->persist($guest);
 
@@ -50,5 +56,12 @@ class UserFixtures extends Fixture
 
 
         $manager->flush();
+    }
+
+    public function getDependencies()
+    {
+        return [
+          CampusFixtures::class
+        ];
     }
 }
