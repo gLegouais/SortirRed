@@ -1,9 +1,30 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Sortie | {{ parent() }}
+{{ outing.name }} | {{ parent() }}
 {% endblock %}
 {% block body %}
-    <h1>Nom de ma sortie</h1>
-    {# todo: afficher le détail d'une sortie #}
+    <h1>{{ outing.name }}</h1>
+    <p>RDV le {{ outing.startDate | date('d/m/y')}}</p>
+    <p>Limite d'inscription : {{ outing.deadline | date('d/m/y')}}</p>
+    <p>Organisée par {{ outing.organizer.username }}</p>
+    <p> nbParticipants/ {{ outing.maxRegistered }}</p>
+
+    {# TODO : mettre une condition pour dire si on est inscrit à la sortie #}
+    <p>Vous êtes inscrits à la sortie ! </p>
+    <p>je veux m'inscrire ! </p>
+
+    {# TODO : mettre les actions (publier, modifier, se désister, etc) #}
+    <p>Divers liens à afficher (mettre des conditions)</p>
+
+    <td>{{ outing.name }}</td>
+    <td></td>
+    <td></td>
+
+    <td></td>
+    <td>inscrit ou non (x)</td>
+    <td></td>
+    <td>divers liens à afficher. Mettre les conditions plus tard.</td>
+
+
 {% endblock %}
