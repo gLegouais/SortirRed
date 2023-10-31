@@ -19,17 +19,25 @@
         </tr>
         </thead>
         <tbody>
+
         {% for outing in outings %}
         <tr>
             <td>{{ outing.name }}</td>
-            <td>{{ outing.startDate }}</td>
-            <td>{{ outing.deadline }}</td>
-            <td>{{ outing.participants|length}} / {{ outing.maxRegistered }}</td>
+            <td>{{ outing.startDate | date('d/m/y')}}</td>
+            <td>{{ outing.deadline | date('d/m/y')}}</td>
+            <td> nbParticipants/ {{ outing.maxRegistered }}</td>
+            <td></td>
+            <td>inscrit ou non (x)</td>
+            <td>{{ outing.organizer.username }}</td>
+            <td>divers liens à afficher. Mettre les conditions plus tard.</td>
+
         </tr>
         {% endfor %}
+
         </tbody>
     </table>
-
 {% endblock %}
 
-{% block title %} {{ parent() }} | Accueil {% endblock %}
+{% block title %}
+    {{ parent() }}
+{% endblock %}
