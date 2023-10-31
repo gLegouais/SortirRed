@@ -5,26 +5,22 @@
 {% endblock %}
 {% block body %}
     <h1>{{ outing.name }}</h1>
+    <p>{{ outing.status.label }}</p>
     <p>RDV le {{ outing.startDate | date('d/m/y')}}</p>
     <p>Limite d'inscription : {{ outing.deadline | date('d/m/y')}}</p>
     <p>Organisée par {{ outing.organizer.username }}</p>
-    <p> nbParticipants/ {{ outing.maxRegistered }}</p>
+    <p> {{ outing.participants|length}} / {{ outing.maxRegistered }}</p>
 
     {# TODO : mettre une condition pour dire si on est inscrit à la sortie #}
     <p>Vous êtes inscrits à la sortie ! </p>
-    <p>je veux m'inscrire ! </p>
 
     {# TODO : mettre les actions (publier, modifier, se désister, etc) #}
-    <p>Divers liens à afficher (mettre des conditions)</p>
-
-    <td>{{ outing.name }}</td>
-    <td></td>
-    <td></td>
-
-    <td></td>
-    <td>inscrit ou non (x)</td>
-    <td></td>
-    <td>divers liens à afficher. Mettre les conditions plus tard.</td>
+    <a href="" title="inscription">S'inscrire</a>
+    <a href="" title="desistement">Se désister</a>
+    <a href="" title="publication">Publier</a>
+    <a href="" title="modification">Modifier</a>
+    {# TODO : rajouter des conditions #}
+    <a href="{{ path('home_list') }}" title="Accueil">Retour à l'accueil</a>
 
 
 {% endblock %}

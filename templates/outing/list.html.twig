@@ -25,8 +25,8 @@
             <td>{{ outing.name }}</td>
             <td>{{ outing.startDate | date('d/m/y')}}</td>
             <td>{{ outing.deadline | date('d/m/y')}}</td>
-            <td> nbParticipants/ {{ outing.maxRegistered }}</td>
-            <td></td>
+            <td> {{ outing.participants|length}}/ {{ outing.maxRegistered }}</td>
+            <td>{{ outing.status.label }}</td>
             <td>inscrit ou non (x)</td>
             <td>{{ outing.organizer.username }}</td>
             {# TODO : Mettre les conditions plus tard. #}
