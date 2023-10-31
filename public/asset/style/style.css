@@ -59,3 +59,21 @@ footer {
     background-color: #C0C0C0;
     border-top: solid 2px #F7F7F7;
 }
+
+tr:has(th) {
+    background-color: #000080;
+    color: whitesmoke;
+    border-top: solid 4px #F7F7F7;
+    border-left: solid 4px #F7F7F7;
+    border-right: solid 4px darkgray;
+    border-bottom: solid 4px darkgray;
+}
+
+tr:has(td) {
+    background-color: #C0C0C0;
+    color: black;
+    border-top: solid 4px #F7F7F7;
+    border-left: solid 4px #F7F7F7;
+    border-right: solid 4px darkgray;
+    border-bottom: solid 4px darkgray;
+}

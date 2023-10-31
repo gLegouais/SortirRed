@@ -49,9 +49,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'organizer', targetEntity: Outing::class)]
     private Collection $outings;
 
+    #[ORM\Column(length: 15)]
+    private ?string $phone = null;
+
+    #[ORM\Column(length: 100)]
+    private ?string $profilePicture;
+
     public function __construct()
     {
         $this->isActive = true;
+        $this->profilePicture = 'defaultProfilePicture.png';
         $this->outings = new ArrayCollection();
     }
 
@@ -210,6 +217,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $outing->setOrganizer(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(string $phone): static
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getProfilePicture(): ?string
+    {
+        return $this->profilePicture;
+    }
+
+    public function setProfilePicture(string $profilePicture): static
+    {
+        $this->profilePicture = $profilePicture;
 
         return $this;
     }
