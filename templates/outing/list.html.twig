@@ -15,7 +15,7 @@
             <th>Etat</th>
             <th>Inscrit</th>
             <th>Organisateur</th>
-            <th>Actions</th> {# afficher inclus ? Ou juste publier / modifier / annuler / se désister / s'inscrire ? #}
+            <th>Actions</th>
         </tr>
         </thead>
         <tbody>
@@ -25,11 +25,19 @@
             <td>{{ outing.name }}</td>
             <td>{{ outing.startDate | date('d/m/y')}}</td>
             <td>{{ outing.deadline | date('d/m/y')}}</td>
-            <td> nbParticipants/ {{ outing.maxRegistered }}</td>
-            <td></td>
+            <td> {{ outing.participants|length}}/ {{ outing.maxRegistered }}</td>
+            <td>{{ outing.status.label }}</td>
             <td>inscrit ou non (x)</td>
             <td>{{ outing.organizer.username }}</td>
-            <td>divers liens à afficher. Mettre les conditions plus tard.</td>
+            {# TODO : Mettre les conditions plus tard. #}
+            <td>
+                <a href="{{ path('outing_show', {'id':outing.id}) }}" title="Détail d'une sortie">Afficher</a>
+                <a href="" title="inscription">S'inscrire</a>
+                <a href="" title="desistement">Se désister</a>
+                <a href="" title="publication">Publier</a>
+                <a href="" title="modification">Modifier</a>
+            </td>
+
 
         </tr>
         {% endfor %}
