@@ -44,7 +44,7 @@
 }
 
 body {
-    background-color: indianred;
+    background-image: url("../../asset/images/background.png");
     color: black;
     font-family: "Times New Roman", "Comic Sans MS", sans-serif;
 
@@ -60,7 +60,12 @@ footer {
     border-top: solid 2px #F7F7F7;
 }
 
-tr:has(th) {
+table {
+    border-right: solid 2px black;
+    border-bottom: solid 2px black;
+}
+
+.table-top {
     background-color: #000080;
     color: whitesmoke;
     border-top: solid 4px #F7F7F7;
@@ -69,7 +74,7 @@ tr:has(th) {
     border-bottom: solid 4px darkgray;
 }
 
-tr:has(td) {
+.table-rows {
     background-color: #C0C0C0;
     color: black;
     border-top: solid 4px #F7F7F7;

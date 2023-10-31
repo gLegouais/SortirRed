@@ -35,7 +35,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
         $admin->setFirstname('Gandalf');
         $admin->setLastname('Le Gris');
         $admin->setCampus($campusList[mt_rand(0, 2)]);
-        $admin->setProfilePicture('defaultProfilePicture.png');
+        $admin->setProfilePicture('defaultAdminPicture.png');
         $manager->persist($admin);
         $this -> addReference('gandalf', $admin);
 
