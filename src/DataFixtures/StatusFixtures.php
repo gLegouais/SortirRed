@@ -28,11 +28,6 @@ class StatusFixtures extends Fixture
 
         $ongoing = new Status();
         $ongoing -> setLabel('Ongoing');
-        $manager -> persist($open);
-        $this -> addReference('ongoing', $ongoing);
-
-        $ongoing = new Status();
-        $ongoing -> setLabel('Ongoing');
         $manager -> persist($ongoing);
         $this -> addReference('ongoing', $ongoing);
 

@@ -34,6 +34,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
         $admin->setFirstname('Gandalf');
         $admin->setLastname('Le Gris');
         $admin->setCampus($campusList[mt_rand(0, 2)]);
+        $this -> addReference('gandalf', $admin);
 
         $manager->persist($admin);
 
@@ -49,6 +50,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
             $passwordGuest = $this->passwordHasher->hashPassword($guest, '123456');
             $guest->setPassword($passwordGuest);
             $guest->setCampus($campusList[mt_rand(0, 2)]);
+            $this -> addReference('user' . $i, $guest);
 
             $manager->persist($guest);
 
