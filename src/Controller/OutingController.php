@@ -29,6 +29,7 @@ class OutingController extends AbstractController
             throw $this->createNotFoundException("cette sortie n'existe pas");
         }
 
+        dump($outing ->getParticipants()[0]->getUsername());
        return $this->render('outing/show.html.twig', [
            'outing' => $outing
        ]);

@@ -1,26 +1,53 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-{{ outing.name }} | {{ parent() }}
+    {{ outing.name }} | {{ parent() }}
 {% endblock %}
 {% block body %}
     <h1>{{ outing.name }}</h1>
     <p>{{ outing.status.label }}</p>
-    <p>RDV le {{ outing.startDate | date('d/m/y')}}</p>
-    <p>Limite d'inscription : {{ outing.deadline | date('d/m/y')}}</p>
+    <p>RDV le {{ outing.startDate | date('d/m/y') }}</p>
+    <p>Limite d'inscription : {{ outing.deadline | date('d/m/y') }}</p>
     <p>Organisée par {{ outing.organizer.username }}</p>
-    <p> {{ outing.participants|length}} / {{ outing.maxRegistered }}</p>
-
+    <p> {{ outing.participants|length }} / {{ outing.maxRegistered }}</p>
+    <p>
+    Participants :
+    </p>
+{% set isRegistered = false %}
+    <ul>
+        {% for participant in outing.participants %}
+            {% set isRegistered = isRegistered or (participant == app.user) %}
+        <li>
+            {{ participant.username }}
+        </li>
+        {% endfor %}
+    </ul>
     {# TODO : mettre une condition pour dire si on est inscrit à la sortie #}
     <p>Vous êtes inscrits à la sortie ! </p>
 
     {# TODO : mettre les actions (publier, modifier, se désister, etc) #}
-    <a href="" title="inscription">S'inscrire</a>
-    <a href="" title="desistement">Se désister</a>
-    <a href="" title="publication">Publier</a>
-    <a href="" title="modification">Modifier</a>
-    {# TODO : rajouter des conditions #}
-    <a href="{{ path('home_list') }}" title="Accueil">Retour à l'accueil</a>
+    {# TODO : rajouter des conditions : les liens s'affichent seulement selon si on est l'orga, etc #}
 
+    {% if outing.organizer != app.user and  not isRegistered %} {# rajouter la condition "si on n'est PAS déjà inscrit") #}
+    <a href="" title="inscription">S'inscrire</a>
+    {% endif %}
+
+    {% if outing.organizer != app.user and  isRegistered %} {# rajouter la condition "si on est déjà inscrit") #}
+    <a href="" title="desistement">Se désister</a>
+    {% endif %}
+
+    {# si la personne connectée est la personne qui a créé la sortie #}
+    {% if outing.organizer == app.user %}
+        <a href="" title="modification">Modifier</a>
+    {% endif %}
+
+    {# si le status de la sortie est created#}
+    {% if outing.organizer == app.user and outing.status.label == 'Created' %}
+        <a href="" title="publication">Publier</a>
+    {% endif %}
+
+    <p>
+        <a href="{{ path('home_list') }}" title="Accueil">Retour à l'accueil</a>
+    </p>
 
 {% endblock %}
