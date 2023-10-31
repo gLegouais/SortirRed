@@ -1,3 +1,18 @@
+#logo {
+    width: 30%;
+    height: auto;
+    border-top: solid 2px #F7F7F7;
+    border-left: solid 2px #F7F7F7;
+    border-right: solid 2px black;
+    border-bottom: solid 2px black;
+}
+#logo:hover {
+    border-top: solid 2px black;
+    border-left: solid 2px black;
+    border-right: solid 2px #F7F7F7;
+    border-bottom: solid 2px #F7F7F7;
+}
+
 .navbar {
     background-color: #C0C0C0;
     border-bottom: solid 2px #F7F7F7;
@@ -5,25 +20,33 @@
 
 .nav-item {
 
-    margin: 0px 2px 0px 2px;
+    margin: 0 2px 0 2px;
 }
 
 .nav-link {
-    border: ridge 2px black;
+    border-top: solid 2px #F7F7F7;
+    border-left: solid 2px #F7F7F7;
+    border-right: solid 2px black;
+    border-bottom: solid 2px black;
     color: black;
-    font-family: ms sans-serif;
-    margin: 0px 5px 0px 5px;
+    font-family: "Times New Roman", "Comic Sans MS", sans-serif;
+    margin: 0 5px 0 5px;
+    width: 150px;
 }
 
 .nav-item:hover > a{
     background-color: #000080;
     color:whitesmoke;
+    border-top: solid 2px black;
+    border-left: solid 2px black;
+    border-right: solid 2px #F7F7F7;
+    border-bottom: solid 2px #F7F7F7;
 }
 
 body {
     background-color: indianred;
     color: black;
-    font-family: ms sans-serif;
+    font-family: "Times New Roman", "Comic Sans MS", sans-serif;
 
     min-height: 100vh;
     display: flex;
