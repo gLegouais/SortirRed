@@ -7,7 +7,7 @@
 
     <table class="table-sm table-bordered mb-3"> {# à quoi correspond la class #}
         <thead>
-        <tr>
+        <tr class="table-top">
             <th>Nom de la sortie</th>
             <th>Date de la sortie</th>
             <th>Clôture</th>
@@ -21,7 +21,7 @@
         <tbody>
 
         {% for outing in outings %}
-        <tr>
+        <tr class="table-rows">
             <td>{{ outing.name }}</td>
             <td>{{ outing.startDate | date('d/m/y')}}</td>
             <td>{{ outing.deadline | date('d/m/y')}}</td>
