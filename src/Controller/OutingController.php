@@ -15,7 +15,7 @@ class OutingController extends AbstractController
     public function listOuting(OutingRepository $outingRepository): Response
     {
         $outings = $outingRepository->findAll();
-        return $this->render('home.html.twig', [
+        return $this->render('main/home.html.twig', [
         'outings' => $outings
         ]);
     }
@@ -24,7 +24,7 @@ class OutingController extends AbstractController
     #[Route('/sortie/{id}', name: 'outing_show', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function showOuting(int $id): Response
     {
-        return $this->render('outing/show.html.twig.html.twig');
+        return $this->render('outing/show.html.twig');
     }
 
 

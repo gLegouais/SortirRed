@@ -24,8 +24,9 @@
             <td>{{ outing.name }}</td>
             <td>{{ outing.startDate }}</td>
             <td>{{ outing.deadline }}</td>
-            <td>{{ count (outing.participants)}} / {{ outing.maxRegistered }}</td>
+            <td>{{ outing.participants|length}} / {{ outing.maxRegistered }}</td>
         </tr>
+        {% endfor %}
         </tbody>
     </table>
 
