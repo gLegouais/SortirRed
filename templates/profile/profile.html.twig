@@ -4,9 +4,10 @@
 
 {% block body %}
     <h1>{{ user.username }}</h1>
+    <img src="{{asset(app)}}">
     Prénom : {{ user.firstname }}
     Nom : {{ user.lastname }}
-    Téléphone :
+    Téléphone : {{ user.phone }}
     Email : {{ user.email }}
-    Campus : {{ user.campus }}
+    Campus : {{ user.campus.name }}
 {% endblock %}
