@@ -11,39 +11,33 @@
     <p>Organisée par {{ outing.organizer.username }}</p>
     <p> {{ outing.participants|length }} / {{ outing.maxRegistered }}</p>
     <p>
-    Participants :
+        Participants :
     </p>
-{% set isRegistered = false %}
+    {% set isRegistered = false %}
     <ul>
         {% for participant in outing.participants %}
             {% set isRegistered = isRegistered or (participant == app.user) %}
-        <li>
-            {{ participant.username }}
-        </li>
+            <li>
+                {{ participant.username }}
+            </li>
         {% endfor %}
     </ul>
-    {# TODO : mettre une condition pour dire si on est inscrit à la sortie #}
-    <p>Vous êtes inscrits à la sortie ! </p>
 
-    {# TODO : mettre les actions (publier, modifier, se désister, etc) #}
-    {# TODO : rajouter des conditions : les liens s'affichent seulement selon si on est l'orga, etc #}
-
-    {% if outing.organizer != app.user and  not isRegistered %} {# rajouter la condition "si on n'est PAS déjà inscrit") #}
-    <a href="" title="inscription">S'inscrire</a>
+    {% if outing.organizer != app.user and  not isRegistered %}
+        <p><a href="" title="inscription">S'inscrire</a></p>
     {% endif %}
 
-    {% if outing.organizer != app.user and  isRegistered %} {# rajouter la condition "si on est déjà inscrit") #}
-    <a href="" title="desistement">Se désister</a>
+    {% if isRegistered %}
+        <p>Vous êtes inscrits à la sortie ! </p>
+        <p><a href="" title="desistement">Se désister</a></p>
     {% endif %}
 
-    {# si la personne connectée est la personne qui a créé la sortie #}
     {% if outing.organizer == app.user %}
-        <a href="" title="modification">Modifier</a>
+        <p><a href="" title="modification">Modifier</a></p>
     {% endif %}
 
-    {# si le status de la sortie est created#}
     {% if outing.organizer == app.user and outing.status.label == 'Created' %}
-        <a href="" title="publication">Publier</a>
+        <p><a href="" title="publication">Publier</a></p>
     {% endif %}
 
     <p>

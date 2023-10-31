@@ -9,8 +9,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class OutingController extends AbstractController
 {
-    //route : juste sur l'accueil ? (pas de page outing)
-    //return : 'home' car c'est sur la page d'accueil ?
     #[Route('/', name: 'home_list', methods: ['GET'])]
     public function listOuting(OutingRepository $outingRepository): Response
     {
@@ -20,7 +18,6 @@ class OutingController extends AbstractController
         ]);
     }
 
-    //route pour afficher le détail d'une sortie (selon l'id)
     #[Route('/sortie/{id}', name: 'outing_show', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function showOuting(int $id, OutingRepository $outingRepository): Response
     {
