@@ -40,6 +40,7 @@ class OutingType extends AbstractType
                 'label' => 'Ville',
                 'class' => City::class,
                 'choice_label' => 'name',
+                'mapped' => false,
                 'placeholder' => '-- Choisir une ville --'
             ])
         ;
