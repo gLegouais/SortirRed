@@ -1,7 +1,33 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Accueil</h1>
+    <h1>Liste des sorties</h1>
+
+    {# affichage de toutes les sorties, peu importe le status #}
+
+    <table class="table-sm table-bordered"> {# à quoi correspond la class #}
+        <thead>
+        <tr>
+            <th>Nom de la sortie</th>
+            <th>Date de la sortie</th>
+            <th>Clôture</th>
+            <th>Inscrits / Places</th>
+            <th>Etat</th>
+            <th>Inscrit</th>
+            <th>Organisateur</th>
+            <th>Actions</th> {# afficher inclus ? Ou juste publier / modifier / annuler / se désister / s'inscrire ? #}
+        </tr>
+        </thead>
+        <tbody>
+        {% for outing in outings %}
+        <tr>
+            <td>{{ outing.name }}</td>
+            <td>{{ outing.startDate }}</td>
+            <td>{{ outing.deadline }}</td>
+            <td>nbparticipant / {{ outing. }}</td>
+        </tr>
+        </tbody>
+    </table>
 
 {% endblock %}
 
