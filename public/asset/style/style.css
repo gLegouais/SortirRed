@@ -1,3 +1,18 @@
+#logo {
+    width: 30%;
+    height: auto;
+    border-top: solid 2px #F7F7F7;
+    border-left: solid 2px #F7F7F7;
+    border-right: solid 2px black;
+    border-bottom: solid 2px black;
+}
+#logo:hover {
+    border-top: solid 2px black;
+    border-left: solid 2px black;
+    border-right: solid 2px #F7F7F7;
+    border-bottom: solid 2px #F7F7F7;
+}
+
 .navbar {
     background-color: #C0C0C0;
     border-bottom: solid 2px #F7F7F7;
@@ -9,10 +24,14 @@
 }
 
 .nav-link {
-    border: ridge 2px black;
+    border-top: solid 2px #F7F7F7;
+    border-left: solid 2px #F7F7F7;
+    border-right: solid 2px black;
+    border-bottom: solid 2px black;
     color: black;
     font-family: ms sans-serif;
     margin: 0px 5px 0px 5px;
+    width: 150px;
 }
 
 .nav-item:hover > a{
