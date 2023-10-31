@@ -1,13 +1,41 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello ProfileController!{% endblock %}
+{% block title %}Bienvenue {{ user.username }} !{% endblock %}
 
 {% block body %}
     <h1>{{ user.username }}</h1>
-    <img src="{{asset(app)}}">
-    Prénom : {{ user.firstname }}
-    Nom : {{ user.lastname }}
-    Téléphone : {{ user.phone }}
-    Email : {{ user.email }}
-    Campus : {{ user.campus.name }}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <img src="{{asset(app_profile_picture_directory ~ '/' ~ user.profilePicture)}}">
+            </div>
+            <div class="col">
+                <div class="container">
+                    <div class="row">
+                        <div class="col">Prénom :</div>
+                        <div class="col">{{ user.firstname }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">Nom :</div>
+                        <div class="col">{{ user.lastname }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">Téléphone :</div>
+                        <div class="col">{{ user.phone }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">Email :</div>
+                        <div class="col">{{ user.email }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">Campus :</div>
+                        <div class="col">{{ user.campus.name }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if app.user.id == user.id %}
+        <a href="{{ path('update_user', {'id': app.user.id}) }}">Modifier</a>
+    {% endif %}
 {% endblock %}
