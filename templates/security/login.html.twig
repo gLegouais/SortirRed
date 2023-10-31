@@ -20,6 +20,10 @@
     <label for="inputPassword">Password</label>
     <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
 
+    <label>
+        <input type="checkbox" name="_remember_me"/> Se souvenir de moi
+    </label>
+
     <input type="hidden" name="_csrf_token"
            value="{{ csrf_token('authenticate') }}"
     >
