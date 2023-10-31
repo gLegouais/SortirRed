@@ -26,10 +26,10 @@ class OutingFixtures extends Fixture implements DependentFixtureInterface
 
         $smoke = new Outing();
         $smoke -> setName('Atelier pour te faire des ronds de fumées');
-        $dateStart = '2023-11-30';
+        $dateStart = new \DateTimeImmutable('2023-10-30');
         $smoke -> setStartDate($dateStart);
         $smoke -> setDuration(30);
-        $deadline = '2023-11-01';
+        $deadline = new \DateTimeImmutable('2023-11-01');
         $smoke -> setDeadline($deadline);
         $smoke -> setMaxRegistered(9);
         $smoke -> setDescription('Apprends à communiquer de façon créative avec tes amis au camping');
@@ -41,16 +41,18 @@ class OutingFixtures extends Fixture implements DependentFixtureInterface
         for($i = 0; $i <= 29; $i++){
             $fakeOuting = new Outing();
             $fakeOuting -> setName($faker -> realText(30));
-            $fakeOuting -> setStartDate($faker -> dateTimeBetween('now', '+2 months'));
+            $startDate = $faker -> dateTimeBetween('now', '+2 months');
+            $fakeOuting -> setStartDate(\DateTimeImmutable::createFromMutable($startDate));
             $fakeOuting -> setDuration(mt_rand(1, 360));
-            $fakeOuting -> setDeadline($faker -> dateTimeBetween('- 4 months', 'now'));
+            $endDate = $faker -> dateTimeBetween('- 4 months', 'now');
+            $fakeOuting -> setDeadline(\DateTimeImmutable::createFromMutable($endDate));
             $fakeOuting -> setMaxRegistered(mt_rand(1, 20));
             $fakeOuting -> setDescription($faker -> realText(250));
-            $fakeOuting -> setStatus($this -> getReference($statusList[mt_rand(0, 6)]));
+            $fakeOuting -> setStatus(($statusList[mt_rand(0, 5)]));
             $fakeOuting -> setLocation($this -> getReference('location' . mt_rand(1, 30)));
             $fakeOuting -> setOrganizer($this -> getReference('user' . mt_rand(1, 50)));
 
-            $this -> persist($fakeOuting);
+            $manager -> persist($fakeOuting);
 
         }
 

@@ -12,17 +12,17 @@ class CampusFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $nantes = new Campus();
-        $nantes -> setLabel('Nantes');
+        $nantes -> setName('Nantes');
         $manager -> persist($nantes);
         $this -> addReference('nantes', $nantes);
 
         $rennes = new Campus();
-        $rennes -> setLabel('Rennes');
+        $rennes -> setName('Rennes');
         $manager -> persist($rennes);
         $this -> addReference('rennes', $rennes);
 
         $niort = new Campus();
-        $niort -> setLabel('Niort');
+        $niort -> setName('Niort');
         $manager -> persist($niort);
         $this -> addReference('niort', $niort);
 
