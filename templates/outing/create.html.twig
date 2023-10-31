@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Créer une sortie | {{ parent() }}
+{% endblock %}
+
+
+
+{% block body %}
+
+    <h1>Créer une sortie</h1>
+    <p>Campus : {{ app.user.campus.name }}</p>
+    <div id="js-data" data-cities-locations="{{ jsonCities }}"></div>
+    {{ form_start(outingForm) }}
+    <div class="row w-75 d-flex justify-content-between">
+    <div class="container col-6 mx-auto">
+    {{ form_row(outingForm.name) }}
+    {{ form_row(outingForm.startDate) }}
+    {{ form_row(outingForm.deadline) }}
+    {{ form_row(outingForm.maxRegistered) }}
+    {{ form_row(outingForm.duration) }}
+    {{ form_row(outingForm.description) }}
+    </div>
+    <div class="container col-6 mx-auto">
+    {{ form_row(outingForm.campus, {value : app.user.campus.id}) }}
+    {{ form_row(outingForm.city) }}
+    </div>
+    </div>
+    {{ form_end(outingForm) }}
+
+{% endblock %}
+
