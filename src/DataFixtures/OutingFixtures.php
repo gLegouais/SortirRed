@@ -36,6 +36,7 @@ class OutingFixtures extends Fixture implements DependentFixtureInterface
         $smoke -> setStatus($this -> getReference('open'));
         $smoke -> setLocation($this -> getReference('location1'));
         $smoke -> setOrganizer($this -> getReference('gandalf'));
+        $smoke -> setCampus($this->getReference('gandalf')->getCampus());
         $manager -> persist($smoke);
 
         for($i = 0; $i <= 29; $i++){
@@ -51,6 +52,7 @@ class OutingFixtures extends Fixture implements DependentFixtureInterface
             $fakeOuting -> setStatus(($statusList[mt_rand(0, 5)]));
             $fakeOuting -> setLocation($this -> getReference('location' . mt_rand(1, 30)));
             $fakeOuting -> setOrganizer($this -> getReference('user' . mt_rand(1, 50)));
+            $fakeOuting -> setCampus($this->getReference('user' . mt_rand(1, 50))->getCampus());
 
             $manager -> persist($fakeOuting);
 

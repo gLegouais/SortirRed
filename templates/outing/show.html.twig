@@ -1,26 +1,56 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-{{ outing.name }} | {{ parent() }}
+    {{ outing.name }} | {{ parent() }}
 {% endblock %}
 {% block body %}
     <h1>{{ outing.name }}</h1>
-    <p>{{ outing.status.label }}</p>
-    <p>RDV le {{ outing.startDate | date('d/m/y')}}</p>
-    <p>Limite d'inscription : {{ outing.deadline | date('d/m/y')}}</p>
+    <p>Statut : {{ outing.status.label }}</p>
+    <p>RDV le {{ outing.startDate | date('d/m/y') }} à {{ outing.startDate | date('H:i') }}</p>
+    <p>Durée : {{ outing.duration }}minutes</p>
+    <p>Date limite d'inscription : {{ outing.deadline | date('d/m/y') }}</p>
+    <p>Description et infos : </p>
+    <p>{{ outing.description }}</p>
     <p>Organisée par {{ outing.organizer.username }}</p>
-    <p> {{ outing.participants|length}} / {{ outing.maxRegistered }}</p>
+    <p>Nombre de places : {{ outing.participants|length }} / {{ outing.maxRegistered }}</p>
+    <p>Campus : {{ outing.campus.name }}</p>
+    <p>Lieu : {{ outing.location.name }}</p>
+    <p>{{ outing.location.street }}</p>
+    <p>{{ outing.location.city.postcode }} {{ outing.location.city.name }}</p>
+    <p>Latitude : {{ outing.location.latitude }}</p>
+    <p>Longitude : {{ outing.location.longitude }}</p>
+    <p>
+        Liste des participants :
+    </p>
+    {% set isRegistered = false %}
+    <ul>
+        {% for participant in outing.participants %}
+            {% set isRegistered = isRegistered or (participant == app.user) %}
+            <li>
+                {{ participant.username }}
+            </li>
+        {% endfor %}
+    </ul>
 
-    {# TODO : mettre une condition pour dire si on est inscrit à la sortie #}
-    <p>Vous êtes inscrits à la sortie ! </p>
+    {% if outing.organizer != app.user and  not isRegistered %}
+        <p><a href="" title="inscription">S'inscrire</a></p>
+    {% endif %}
 
-    {# TODO : mettre les actions (publier, modifier, se désister, etc) #}
-    <a href="" title="inscription">S'inscrire</a>
-    <a href="" title="desistement">Se désister</a>
-    <a href="" title="publication">Publier</a>
-    <a href="" title="modification">Modifier</a>
-    {# TODO : rajouter des conditions #}
-    <a href="{{ path('home_list') }}" title="Accueil">Retour à l'accueil</a>
+    {% if isRegistered %}
+        <p>Vous êtes inscrits à la sortie ! </p>
+        <p><a href="" title="desistement">Se désister</a></p>
+    {% endif %}
 
+    {% if outing.organizer == app.user %}
+        <p><a href="" title="modification">Modifier</a></p>
+    {% endif %}
+
+    {% if outing.organizer == app.user and outing.status.label == 'Created' %}
+        <p><a href="" title="publication">Publier</a></p>
+    {% endif %}
+
+    <p>
+        <a href="{{ path('home_list') }}" title="Accueil">Retour à l'accueil</a>
+    </p>
 
 {% endblock %}

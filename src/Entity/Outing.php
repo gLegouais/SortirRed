@@ -48,6 +48,10 @@ class Outing
     #[ORM\ManyToMany(targetEntity: User::class)]
     private Collection $participants;
 
+    #[ORM\ManyToOne(inversedBy: 'outings')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Campus $campus = null;
+
     public function __construct()
     {
         $this->participants = new ArrayCollection();
@@ -186,6 +190,18 @@ class Outing
     public function removeParticipant(User $participant): static
     {
         $this->participants->removeElement($participant);
+
+        return $this;
+    }
+
+    public function getCampus(): ?Campus
+    {
+        return $this->campus;
+    }
+
+    public function setCampus(?Campus $campus): static
+    {
+        $this->campus = $campus;
 
         return $this;
     }
