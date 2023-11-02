@@ -24,11 +24,13 @@ class OutingType extends AbstractType
             ])
             ->add('startDate', DateTimeType::class, [
                 'label' => 'Date et heure de la sortie',
-                'widget' => 'single_text'
+                'widget' => 'single_text',
+                'input' => 'datetime_immutable'
             ])
             ->add('deadline', DateTimeType::class, [
                 'label' => 'Date limite d\'inscription',
-                'widget' => 'single_text'
+                'widget' => 'single_text',
+                'input' => 'datetime_immutable'
             ])
             ->add('maxRegistered', IntegerType::class, [
                 'label' => 'Nombre de places'
@@ -43,7 +45,6 @@ class OutingType extends AbstractType
                 'label' => 'Campus',
                 'class' => Campus::class,
                 'choice_label' => 'name',
-                'mapped' => false
             ])
             ->add('city', EntityType::class, [
                 'label' => 'Ville',
