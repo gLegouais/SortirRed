@@ -21,9 +21,13 @@ class Campus
     #[ORM\OneToMany(mappedBy: 'campus', targetEntity: User::class)]
     private Collection $users;
 
+    #[ORM\OneToMany(mappedBy: 'campus', targetEntity: Outing::class)]
+    private Collection $outings;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->outings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -67,6 +71,36 @@ class Campus
             // set the owning side to null (unless already changed)
             if ($user->getCampus() === $this) {
                 $user->setCampus(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Outing>
+     */
+    public function getOutings(): Collection
+    {
+        return $this->outings;
+    }
+
+    public function addOuting(Outing $outing): static
+    {
+        if (!$this->outings->contains($outing)) {
+            $this->outings->add($outing);
+            $outing->setCampus($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOuting(Outing $outing): static
+    {
+        if ($this->outings->removeElement($outing)) {
+            // set the owning side to null (unless already changed)
+            if ($outing->getCampus() === $this) {
+                $outing->setCampus(null);
             }
         }
 

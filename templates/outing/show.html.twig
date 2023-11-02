@@ -5,13 +5,22 @@
 {% endblock %}
 {% block body %}
     <h1>{{ outing.name }}</h1>
-    <p>{{ outing.status.label }}</p>
-    <p>RDV le {{ outing.startDate | date('d/m/y') }}</p>
-    <p>Limite d'inscription : {{ outing.deadline | date('d/m/y') }}</p>
+    <p>Statut : {{ outing.status.label }}</p>
+    <p>RDV le {{ outing.startDate | date('d/m/y') }} à {{ outing.startDate | date('H:i') }}</p>
+    <p>Durée : {{ outing.duration }}minutes</p>
+    <p>Date limite d'inscription : {{ outing.deadline | date('d/m/y') }}</p>
+    <p>Description et infos : </p>
+    <p>{{ outing.description }}</p>
     <p>Organisée par {{ outing.organizer.username }}</p>
-    <p> {{ outing.participants|length }} / {{ outing.maxRegistered }}</p>
+    <p>Nombre de places : {{ outing.participants|length }} / {{ outing.maxRegistered }}</p>
+    <p>Campus : {{ outing.campus.name }}</p>
+    <p>Lieu : {{ outing.location.name }}</p>
+    <p>{{ outing.location.street }}</p>
+    <p>{{ outing.location.city.postcode }} {{ outing.location.city.name }}</p>
+    <p>Latitude : {{ outing.location.latitude }}</p>
+    <p>Longitude : {{ outing.location.longitude }}</p>
     <p>
-        Participants :
+        Liste des participants :
     </p>
     {% set isRegistered = false %}
     <ul>
