@@ -19,6 +19,7 @@ citySelect.addEventListener('change', function () {
     const locationSelect = document.createElement('select');
     locationSelect.id = 'locationSelect';
     locationSelect.name = 'locationSelect';
+    locationSelect.className = 'form-select';
 
     let locationsArray = genParsedLocationData();
     let zipcode = '';
@@ -29,6 +30,7 @@ citySelect.addEventListener('change', function () {
             option.value = loc.id;
             option.id = loc.id;
             option.innerText = loc.name;
+
             locationSelect.appendChild(option);
         }
     }
@@ -50,6 +52,7 @@ citySelect.addEventListener('change', function () {
     locationDiv.appendChild(locationSelect);
     let locationDetailDiv = document.createElement('div');
     locationDetailDiv.id = 'locationDetailDiv';
+    locationDetailDiv.className = 'mt-3'
     locationDiv.appendChild(locationDetailDiv);
     locationSelect.addEventListener('change', function () {
         let locationId = locationSelect.value;
