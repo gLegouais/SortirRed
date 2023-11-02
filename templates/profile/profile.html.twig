@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bienvenue {{ user.username }} !{% endblock %}
+
+{% block body %}
+    <h1>{{ user.username }}</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <img src="{{asset(app_profile_picture_directory ~ '/' ~ user.profilePicture)}}">
+            </div>
+            <div class="col">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-2">Prénom:</div>
+                        <div class="col">{{ user.firstname }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">Nom:</div>
+                        <div class="col">{{ user.lastname }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">Téléphone:</div>
+                        <div class="col">{{ user.phone }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">Email:</div>
+                        <div class="col">{{ user.email }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">Campus:</div>
+                        <div class="col">{{ user.campus.name }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if app.user.id == user.id %}
+        <a href="{{ path('update_user', {'id': app.user.id}) }}">Modifier</a>
+    {% endif %}
+{% endblock %}

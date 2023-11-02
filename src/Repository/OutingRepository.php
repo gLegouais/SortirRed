@@ -21,6 +21,21 @@ class OutingRepository extends ServiceEntityRepository
         parent::__construct($registry, Outing::class);
     }
 
+    public function findOutings(): ?array
+    {
+        $qb = $this -> createQueryBuilder('o');
+        $qb -> join('o.status', 's')
+            -> addSelect('s');
+        $qb -> join('o.location', 'l')
+            -> addSelect('l');
+        $qb -> join('o.organizer', 'org')
+            -> addSelect('org');
+        $qb -> andWhere('o.status != 13');
+
+        $query = $qb -> getQuery();
+        return $query -> getResult();
+    }
+
 //    /**
 //     * @return Outing[] Returns an array of Outing objects
 //     */
