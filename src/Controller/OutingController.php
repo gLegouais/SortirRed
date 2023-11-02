@@ -33,9 +33,9 @@ class OutingController extends AbstractController
             $archiveDate = $endDate -> modify('+' . 30 . 'days');
 
             if($outing -> getStatus() ->getLabel() != 'Created' && $outing -> getStatus() -> getLabel() != 'Cancelled'){
-                if($currentDate < $deadline){
+                if($currentDate < $deadline && (count($outing->getParticipants())) < $outing->getMaxRegistered()){
                     $outing -> setStatus($status -> findOneBy(['label' => 'Open']));
-                }elseif ($currentDate < $starDate){
+                }elseif ($currentDate < $starDate || (count($outing->getParticipants())) == $outing->getMaxRegistered()){
                     $outing -> setStatus($status -> findOneBy(['label' => 'Closed']));
                 }elseif ($currentDate < $endDate){
                     $outing -> setStatus($status -> findOneBy(['label' => 'Ongoing']));
@@ -100,25 +100,24 @@ class OutingController extends AbstractController
         ]);
     }
 
-    //route pour s'inscrire
-    //Ce que je fais n'a aucun sens. Je ne sais plus ce que je récupère, comment et pourquoi
-    //Je cherche à appeler une fonction de Outing.php ; comment faire ?
-    // Comment faire passer des paramètres dans mes deux fonctions ?
-    //quel return vu que c'est une collection ? Juste $participant ou autre chose ?
-    //La syntaxe me pose de gros problèmes ici
-    //quelle route, vu que je reste sur ma page d'accueil (il faut juste cliquer sur le lien pour être inscrit)
-
+    //pour mes conditions : quelles actions doivent être mises dans mes conditions ? la fonction addParticipant,
+    //ou aussi le addFlash (probablement), le persist, le flush (probablement pas) ?
     #[Route('/inscription/{id}', name: 'outing_inscription', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
     public function inscription(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response //id de ma sortie ?
     {
-        $outing = $outingRepository->find($id); //pour retrouver l'id de ma sortie ?
+        $outing = $outingRepository->find($id);
+        //compter le nombre de participants
+        if ($outing->getStatus()->getLabel() == 'Open' && (count($outing->getParticipants())) < $outing->getMaxRegistered()){
+
         $outing->addParticipant($this->getUser()); //id de mon participant
         $this->addFlash('success', 'Vous avez été inscrit à la sortie');
+        }
 
         $em->persist($outing);
         $em->flush();
 
         return $this->redirectToRoute('home_list');
+
     }
 
     #[Route('/withdrawal/{id}', name: 'outing_withdrawal', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
@@ -131,6 +130,7 @@ class OutingController extends AbstractController
         $em->persist($outing);
         $em->flush();
 
+        //comment faire mon return selon que l'on soit sur la home_list ou le outing_show ?
         return $this->redirectToRoute('home_list');
 
     }

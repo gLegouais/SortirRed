@@ -22,7 +22,7 @@
 
     {% set isRegistered = false %}
     <table class="table-sm table-bordered mb-3">
-        <p>Liste des participants</p>
+        <p>Liste des participants : </p>
         <thead>
         <tr class="table-top">
             <th>Pseudo</th>
@@ -35,19 +35,19 @@
 
             <tr class="table-rows">
                 <td>{{ participant.username }}</td>
-                <td>{{ participant.lastname }} {{ participant.firstname }}</td>
+                <td>{{ participant.firstname }} {{ participant.lastname }}</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
     {% if outing.organizer != app.user and  not isRegistered %}
-        <p><a href="" title="inscription">S'inscrire</a></p>
+        <p><a href="{{ path('outing_inscription', {'id': outing.id}) }}" title="inscription">S'inscrire</a></p>
     {% endif %}
 
     {% if isRegistered %}
         <p>Vous êtes inscrits à la sortie ! </p>
-        <p><a href="" title="desistement">Se désister</a></p>
+        <p><a href="{{ path('outing_withdrawal', {'id': outing.id}) }}" title="desistement">Se désister</a></p>
     {% endif %}
 
     {% if outing.organizer == app.user %}
