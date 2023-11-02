@@ -64,6 +64,7 @@ class OutingController extends AbstractController
             $location = $locationRepository->find($locationId);
             $outing->setLocation($location);
             $outing->setOrganizer($this->getUser());
+            $outing->addParticipant($outing->getOrganizer());
             $outing->setStatus($statusRepository->findOneBy(['label' => 'Created']));
             $manager->persist($outing);
             $manager->flush();
