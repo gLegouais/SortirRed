@@ -23,14 +23,18 @@ class ProfileController extends AbstractController
     }
 
     #[Route('/{id}/update', name: 'update_user', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-    public function updateProfile(User $user, Request $request, EntityManagerInterface $em) : Response
+    public function updateProfile(User $user, Request $request, EntityManagerInterface $em, ProfilePicManager $profilePic) : Response
     {
         $profileForm = $this -> createForm(ProfileType::class, $user);
         $profileForm -> handleRequest($request);
 
-        //Todo: Gérer les images cf bucket-list
-
         if($profileForm -> isSubmitted() && $profileForm -> isValid()){
+            $image = $profileForm -> get('profilePicture') -> getData();
+            if(($profileForm -> has('deleteImage') && $profileForm['deleteImage'] -> getData()) || $image)
+            {
+                $profilePic -> delete($user -> getProfilePicture(), $this -> getParameter('app.profile_picture_directory'));
+            }
+
             $em -> persist($user);
             $em -> flush();
 
