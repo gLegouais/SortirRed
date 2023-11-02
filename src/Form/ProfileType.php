@@ -45,7 +45,8 @@ class ProfileType extends AbstractType
                 'options' => ['attr' => ['class' => 'password-field']],
                 'required' => true,
                 'first_options' => ['label' => 'Mot de passe:'],
-                'second_options' => ['label' => 'Confirmation']
+                'second_options' => ['label' => 'Confirmation'],
+                'mapped' => false,
             ])
 
             ->add('campus', EntityType::class, [
