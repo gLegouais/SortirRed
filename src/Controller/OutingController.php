@@ -74,29 +74,37 @@ class OutingController extends AbstractController
         Request                $request,
         EntityManagerInterface $manager,
         CityRepository         $cityRepository,
-        LocationRepository     $locationRepository
+        LocationRepository     $locationRepository,
+        StatusRepository $statusRepository
     ): Response
     {
         $cities = $cityRepository->findAll();
-        $citiesXLocation = [];
-        foreach ($cities as $city) {
-            $citiesXLocation[$city->getName()] = $locationRepository->findBy(['city' => $city]);
-        }
+        $locations = $locationRepository->findAll();
+
+
 
         $outing = new Outing();
         $outingForm = $this->createForm(OutingType::class, $outing);
         $outingForm->handleRequest($request);
 
         if ($outingForm->isSubmitted() && $outingForm->isValid()) {
+            $locationId = $request->get('locationSelect');
+            $location = $locationRepository->find($locationId);
+            $outing->setLocation($location);
+            $outing->setOrganizer($this->getUser());
+            $outing->addParticipant($outing->getOrganizer());
+            $outing->setStatus($statusRepository->findOneBy(['label' => 'Created']));
             $manager->persist($outing);
-            return $this->redirectToRoute('home_list');
+            $manager->flush();
+
+            return $this->redirectToRoute('outing_show', ['id' => $outing->getId()]);
         }
 
-        $jsonCities = json_encode($citiesXLocation);
 
         return $this->render('outing/create.html.twig', [
             'outingForm' => $outingForm,
-            'jsonCities' => $jsonCities
+            'cities' => $cities,
+            'locations' => $locations
         ]);
     }
 
