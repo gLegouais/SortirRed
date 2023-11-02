@@ -41,7 +41,8 @@
         </tbody>
     </table>
 
-    {% if outing.organizer != app.user and  not isRegistered %}
+    {#{% if outing.organizer != app.user and  not isRegistered %}#}
+    {% if app.user != isRegistered %}
         <p><a href="{{ path('outing_inscription', {'id': outing.id}) }}" title="inscription">S'inscrire</a></p>
     {% endif %}
 

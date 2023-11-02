@@ -45,12 +45,14 @@
                         <a href="{{ path('outing_withdrawal', {'id': outing.id}) }}" title="desistement">Se désister</a>
                     {% endif %}
 
-                    {% if outing.organizer == app.user %}
+                    {% if (outing.organizer == app.user) and (outing.status.label =='Open' or outing.status.label == 'Closed')%}
                         <a href="" title="modification">Modifier</a>
+                        <a href="" title="annulation">Annuler la sortie</a>
                     {% endif %}
 
                     {% if outing.organizer == app.user and outing.status.label == 'Created' %}
                         <a href="" title="publication">Publier</a>
+                        <a href="" title="suppression">Supprimer le projet</a>
                     {% endif %}
 
                 </td>
