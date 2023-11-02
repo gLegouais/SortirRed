@@ -44,7 +44,7 @@
 }
 
 body {
-    background-color: indianred;
+    background-image: url("../../asset/images/background.png");
     color: black;
     font-family: "Times New Roman", "Comic Sans MS", sans-serif;
 

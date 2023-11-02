@@ -31,7 +31,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
         $password = $this->passwordHasher->hashPassword($admin, 'totoro');
         $admin->setPassword($password);
         $admin->setEmail('gandalf@wizard.me');
-        $admin->setPhone($faker->phoneNumber());
+        $admin->setPhone('0' . $faker->numerify('#########'));
         $admin->setFirstname('Gandalf');
         $admin->setLastname('Le Gris');
         $admin->setCampus($campusList[mt_rand(0, 2)]);
@@ -46,7 +46,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
             $lastname = $faker->lastName();
             $guest->setLastname($lastname);
             $guest->setEmail($firstname . '.' . $lastname . mt_rand(2015, 2023) . '@campus-eni.fr');
-            $guest->setPhone($faker->phoneNumber());
+            $guest->setPhone('0' . $faker->numerify('#########'));
             $guest->setUsername($faker->unique()->userName());
             $guest->setRoles(['ROLE_USER']);
             $passwordGuest = $this->passwordHasher->hashPassword($guest, '123456');
