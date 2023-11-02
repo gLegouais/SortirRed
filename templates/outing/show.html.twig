@@ -23,14 +23,25 @@
         Liste des participants :
     </p>
     {% set isRegistered = false %}
-    <ul>
+    <table class="table-sm table-bordered mb-3">
+        <caption>Liste des participants</caption> {# todo : à mettre au-dessus de l'entête du tableau (css ?)#}
+        <thead>
+        <tr class="table-top">
+            <th>Pseudo</th>
+            <th>Nom</th>
+        </tr>
+        </thead>
+        <tbody>
         {% for participant in outing.participants %}
             {% set isRegistered = isRegistered or (participant == app.user) %}
-            <li>
-                {{ participant.username }}
-            </li>
+
+            <tr class="table-rows">
+                <td>{{ participant.username }}</td>
+                <td>{{ participant.lastname }} {{ participant.firstname }}</td>
+            </tr>
         {% endfor %}
-    </ul>
+        </tbody>
+    </table>
 
     {% if outing.organizer != app.user and  not isRegistered %}
         <p><a href="" title="inscription">S'inscrire</a></p>
