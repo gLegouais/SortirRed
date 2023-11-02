@@ -5,10 +5,12 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\ProfileType;
 use App\Repository\UserRepository;
+use App\Services\ProfilePicManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ProfileController extends AbstractController
@@ -23,16 +25,21 @@ class ProfileController extends AbstractController
     }
 
     #[Route('/{id}/update', name: 'update_user', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-    public function updateProfile(User $user, Request $request, EntityManagerInterface $em, ProfilePicManager $profilePic) : Response
+    public function updateProfile(User $user, Request $request, EntityManagerInterface $em, ProfilePicManager $profilePic, UserPasswordHasherInterface $passwordHasher) : Response
     {
         $profileForm = $this -> createForm(ProfileType::class, $user);
         $profileForm -> handleRequest($request);
 
         if($profileForm -> isSubmitted() && $profileForm -> isValid()){
+            $user -> setPassword($passwordHasher -> hashPassword($user, $profileForm -> get('password') -> getData()));
+
             $image = $profileForm -> get('profilePicture') -> getData();
             if(($profileForm -> has('deleteImage') && $profileForm['deleteImage'] -> getData()) || $image)
             {
                 $profilePic -> delete($user -> getProfilePicture(), $this -> getParameter('app.profile_picture_directory'));
+                if($image){
+                    $user -> setProfilePicture($profilePic -> upload($image));
+                }
             }
 
             $em -> persist($user);
