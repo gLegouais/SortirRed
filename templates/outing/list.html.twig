@@ -8,7 +8,7 @@
 
     {# affichage de toutes les sorties, peu importe le status #}
 
-    <table class="table-sm table-bordered mb-3"> {# à quoi correspond la class #}
+    <table class="table-sm table-bordered mb-3">
         <thead>
         <tr class="table-top">
             <th>Nom de la sortie</th>
@@ -24,38 +24,38 @@
         <tbody>
 
         {% for outing in outings %}
+            {% set isRegistered = false %}
+            {% for participant in outing.participants %}
+                {% set isRegistered = isRegistered or (participant == app.user) %}
+            {% endfor %}
             <tr class="table-rows">
                 <td>{{ outing.name }}</td>
                 <td>{{ outing.startDate | date('d/m/y') }}</td>
                 <td>{{ outing.deadline | date('d/m/y') }}</td>
                 <td> {{ outing.participants|length }}/ {{ outing.maxRegistered }}</td>
                 <td>{{ outing.status.label }}</td>
-                <td>inscrit ou non (x){#  {% if isRegistered %}X{% endif %}#}</td>
+                <td>{% if isRegistered %}X{% endif %}</td>
                 <td>{{ outing.organizer.username }}</td>
                 <td>
                     <a href="{{ path('outing_show', {'id':outing.id}) }}" title="Détail d'une sortie">Afficher</a>
 
-                    {% set isRegistered = false %}
-                    {% for participant in outing.participants %}
-                        {% set isRegistered = isRegistered or (participant == app.user) %}
-                    {% endfor %}
-
-                    {% if outing.organizer != app.user and  not isRegistered %}
-                        <a href="" title="inscription">S'inscrire</a>
+                    {% if (app.user != isRegistered) and (outing.status.label =='Open') %}
+                        <a href="{{ path('outing_inscription', {'id': outing.id}) }}" title="inscription">S'inscrire</a>
                     {% endif %}
 
                     {% if isRegistered %}
-                        <a href="" title="desistement">Se désister</a>
+                        <a href="{{ path('outing_withdrawal', {'id': outing.id}) }}" title="desistement">Se désister</a>
                     {% endif %}
 
-                    {% if outing.organizer == app.user %}
+                    {% if (outing.organizer == app.user) and (outing.status.label =='Open' or outing.status.label == 'Closed')%}
                         <a href="" title="modification">Modifier</a>
+                        <a href="" title="annulation">Annuler la sortie</a>
                     {% endif %}
 
                     {% if outing.organizer == app.user and outing.status.label == 'Created' %}
                         <a href="" title="publication">Publier</a>
+                        <a href="" title="suppression">Supprimer le projet</a>
                     {% endif %}
-
                 </td>
 
 

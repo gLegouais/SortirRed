@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Outing;
+use App\Entity\User;
 use App\Form\OutingType;
 use App\Repository\CityRepository;
 use App\Repository\LocationRepository;
@@ -23,28 +24,28 @@ class OutingController extends AbstractController
 
         $outings = $outingRepository->findOutings();
 
-        foreach($outings as $outing){
-            $deadline = $outing -> getDeadline();
-            $starDate = $outing -> getStartDate();
-            $duration = $outing -> getDuration();
+        foreach ($outings as $outing) {
+            $deadline = $outing->getDeadline();
+            $starDate = $outing->getStartDate();
+            $duration = $outing->getDuration();
 
-            $endDate = $currentDate -> modify('+' . $duration . 'days');
-            $archiveDate = $endDate -> modify('+' . 30 . 'days');
+            $endDate = $currentDate->modify('+' . $duration . 'days');
+            $archiveDate = $endDate->modify('+' . 30 . 'days');
 
-            if($outing -> getStatus() ->getLabel() != 'Created' && $outing -> getStatus() -> getLabel() != 'Cancelled'){
-                if($currentDate < $deadline){
-                    $outing -> setStatus($status -> findOneBy(['label' => 'Open']));
-                }elseif ($currentDate < $starDate){
-                    $outing -> setStatus($status -> findOneBy(['label' => 'Closed']));
-                }elseif ($currentDate < $endDate){
-                    $outing -> setStatus($status -> findOneBy(['label' => 'Ongoing']));
-                }elseif($currentDate >= $archiveDate){
-                    $outing -> setStatus($status -> findOneBy(['label' => 'Archived']));
-                }else{
-                    $outing -> setStatus($status -> findOneBy(['label' => 'Finished']));
+            if ($outing->getStatus()->getLabel() != 'Created' && $outing->getStatus()->getLabel() != 'Cancelled') {
+                if ($currentDate < $deadline && (count($outing->getParticipants())) < $outing->getMaxRegistered()) {
+                    $outing->setStatus($status->findOneBy(['label' => 'Open']));
+                } elseif ($currentDate < $starDate || (count($outing->getParticipants())) == $outing->getMaxRegistered()) {
+                    $outing->setStatus($status->findOneBy(['label' => 'Closed']));
+                } elseif ($currentDate < $endDate) {
+                    $outing->setStatus($status->findOneBy(['label' => 'Ongoing']));
+                } elseif ($currentDate >= $archiveDate) {
+                    $outing->setStatus($status->findOneBy(['label' => 'Archived']));
+                } else {
+                    $outing->setStatus($status->findOneBy(['label' => 'Finished']));
                 }
-                $em -> persist($outing);
-                $em -> flush();
+                $em->persist($outing);
+                $em->flush();
             }
         }
 
@@ -53,7 +54,6 @@ class OutingController extends AbstractController
         ]);
     }
 
-    //route pour afficher le détail d'une sortie (selon l'id)
     #[Route('/sortie/{id}', name: 'outing_show', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function showOuting(int $id, OutingRepository $outingRepository): Response
     {
@@ -75,12 +75,11 @@ class OutingController extends AbstractController
         EntityManagerInterface $manager,
         CityRepository         $cityRepository,
         LocationRepository     $locationRepository,
-        StatusRepository $statusRepository
+        StatusRepository       $statusRepository
     ): Response
     {
         $cities = $cityRepository->findAll();
         $locations = $locationRepository->findAll();
-
 
 
         $outing = new Outing();
@@ -107,4 +106,42 @@ class OutingController extends AbstractController
             'locations' => $locations
         ]);
     }
-}//fin class OutingController
+
+    //pour mes conditions : quelles actions doivent être mises dans mes conditions ? la fonction addParticipant,
+    //ou aussi le addFlash (probablement), le persist, le flush (probablement pas) ?
+    #[Route('/inscription/{id}', name: 'outing_inscription', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    public function inscription(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response //id de ma sortie ?
+    {
+        $outing = $outingRepository->find($id);
+        if (($outing->getStatus()->getLabel() == 'Open') && ((count($outing->getParticipants())) < $outing->getMaxRegistered())) {
+
+            $outing->addParticipant($this->getUser());
+            $this->addFlash('success', 'Vous avez été inscrit à la sortie');
+        }
+
+        $em->persist($outing);
+        $em->flush();
+
+        return $this->redirectToRoute('home_list');
+
+    }
+
+    #[Route('/withdrawal/{id}', name: 'outing_withdrawal', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    public function withdrawal(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response
+    {
+        $outing = $outingRepository->find($id);
+        if ($outing->getStatus()->getLabel() == 'Open' or $outing->getStatus()->getLabel() == 'Close') {
+            $outing->removeParticipant($this->getUser());
+            $this->addFlash('success', "Vous êtes désinscrit de la sortie");
+        }
+
+        $em->persist($outing);
+        $em->flush();
+
+        //comment faire mon return selon que l'on soit sur la home_list ou le outing_show ?
+        return $this->redirectToRoute('home_list');
+
+    }
+
+
+}//fin public class
