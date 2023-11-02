@@ -24,28 +24,28 @@ class OutingController extends AbstractController
 
         $outings = $outingRepository->findOutings();
 
-        foreach($outings as $outing){
-            $deadline = $outing -> getDeadline();
-            $starDate = $outing -> getStartDate();
-            $duration = $outing -> getDuration();
+        foreach ($outings as $outing) {
+            $deadline = $outing->getDeadline();
+            $starDate = $outing->getStartDate();
+            $duration = $outing->getDuration();
 
-            $endDate = $currentDate -> modify('+' . $duration . 'days');
-            $archiveDate = $endDate -> modify('+' . 30 . 'days');
+            $endDate = $currentDate->modify('+' . $duration . 'days');
+            $archiveDate = $endDate->modify('+' . 30 . 'days');
 
-            if($outing -> getStatus() ->getLabel() != 'Created' && $outing -> getStatus() -> getLabel() != 'Cancelled'){
-                if($currentDate < $deadline && (count($outing->getParticipants())) < $outing->getMaxRegistered()){
-                    $outing -> setStatus($status -> findOneBy(['label' => 'Open']));
-                }elseif ($currentDate < $starDate || (count($outing->getParticipants())) == $outing->getMaxRegistered()){
-                    $outing -> setStatus($status -> findOneBy(['label' => 'Closed']));
-                }elseif ($currentDate < $endDate){
-                    $outing -> setStatus($status -> findOneBy(['label' => 'Ongoing']));
-                }elseif($currentDate >= $archiveDate){
-                    $outing -> setStatus($status -> findOneBy(['label' => 'Archived']));
-                }else{
-                    $outing -> setStatus($status -> findOneBy(['label' => 'Finished']));
+            if ($outing->getStatus()->getLabel() != 'Created' && $outing->getStatus()->getLabel() != 'Cancelled') {
+                if ($currentDate < $deadline && (count($outing->getParticipants())) < $outing->getMaxRegistered()) {
+                    $outing->setStatus($status->findOneBy(['label' => 'Open']));
+                } elseif ($currentDate < $starDate || (count($outing->getParticipants())) == $outing->getMaxRegistered()) {
+                    $outing->setStatus($status->findOneBy(['label' => 'Closed']));
+                } elseif ($currentDate < $endDate) {
+                    $outing->setStatus($status->findOneBy(['label' => 'Ongoing']));
+                } elseif ($currentDate >= $archiveDate) {
+                    $outing->setStatus($status->findOneBy(['label' => 'Archived']));
+                } else {
+                    $outing->setStatus($status->findOneBy(['label' => 'Finished']));
                 }
-                $em -> persist($outing);
-                $em -> flush();
+                $em->persist($outing);
+                $em->flush();
             }
         }
 
@@ -75,12 +75,11 @@ class OutingController extends AbstractController
         EntityManagerInterface $manager,
         CityRepository         $cityRepository,
         LocationRepository     $locationRepository,
-        StatusRepository $statusRepository
+        StatusRepository       $statusRepository
     ): Response
     {
         $cities = $cityRepository->findAll();
         $locations = $locationRepository->findAll();
-
 
 
         $outing = new Outing();
@@ -114,11 +113,10 @@ class OutingController extends AbstractController
     public function inscription(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response //id de ma sortie ?
     {
         $outing = $outingRepository->find($id);
-        //compter le nombre de participants
-        if ($outing->getStatus()->getLabel() == 'Open' && (count($outing->getParticipants())) < $outing->getMaxRegistered()){
+        if (($outing->getStatus()->getLabel() == 'Open') && ((count($outing->getParticipants())) < $outing->getMaxRegistered())) {
 
-        $outing->addParticipant($this->getUser()); //id de mon participant
-        $this->addFlash('success', 'Vous avez été inscrit à la sortie');
+            $outing->addParticipant($this->getUser());
+            $this->addFlash('success', 'Vous avez été inscrit à la sortie');
         }
 
         $em->persist($outing);
@@ -132,8 +130,10 @@ class OutingController extends AbstractController
     public function withdrawal(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response
     {
         $outing = $outingRepository->find($id);
-        $outing->removeParticipant($this->getUser());
-        $this->addFlash('success', "Vous êtes désinscrit de la sortie");
+        if ($outing->getStatus()->getLabel() == 'Open' or $outing->getStatus()->getLabel() == 'Close') {
+            $outing->removeParticipant($this->getUser());
+            $this->addFlash('success', "Vous êtes désinscrit de la sortie");
+        }
 
         $em->persist($outing);
         $em->flush();

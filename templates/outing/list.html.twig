@@ -21,23 +21,22 @@
         <tbody>
 
         {% for outing in outings %}
+            {% set isRegistered = false %}
+            {% for participant in outing.participants %}
+                {% set isRegistered = isRegistered or (participant == app.user) %}
+            {% endfor %}
             <tr class="table-rows">
                 <td>{{ outing.name }}</td>
                 <td>{{ outing.startDate | date('d/m/y') }}</td>
                 <td>{{ outing.deadline | date('d/m/y') }}</td>
                 <td> {{ outing.participants|length }}/ {{ outing.maxRegistered }}</td>
                 <td>{{ outing.status.label }}</td>
-                <td>inscrit ou non (x){#  {% if isRegistered %}X{% endif %}#}</td>
+                <td>{% if isRegistered %}X{% endif %}</td>
                 <td>{{ outing.organizer.username }}</td>
                 <td>
                     <a href="{{ path('outing_show', {'id':outing.id}) }}" title="Détail d'une sortie">Afficher</a>
 
-                    {% set isRegistered = false %}
-                    {% for participant in outing.participants %}
-                        {% set isRegistered = isRegistered or (participant == app.user) %}
-                    {% endfor %}
-
-                    {% if app.user != isRegistered %}
+                    {% if (app.user != isRegistered) and (outing.status.label =='Open') %}
                         <a href="{{ path('outing_inscription', {'id': outing.id}) }}" title="inscription">S'inscrire</a>
                     {% endif %}
 
@@ -54,7 +53,6 @@
                         <a href="" title="publication">Publier</a>
                         <a href="" title="suppression">Supprimer le projet</a>
                     {% endif %}
-
                 </td>
 
 

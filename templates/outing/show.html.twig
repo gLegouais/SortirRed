@@ -9,8 +9,7 @@
     <p>RDV le {{ outing.startDate | date('d/m/y') }} à {{ outing.startDate | date('H:i') }}</p>
     <p>Durée : {{ outing.duration }}minutes</p>
     <p>Date limite d'inscription : {{ outing.deadline | date('d/m/y') }}</p>
-    <p>Description et infos : </p>
-    <p>{{ outing.description }}</p>
+    <p>Description et infos : {{ outing.description }}</p>
     <p>Organisée par {{ outing.organizer.username }}</p>
     <p>Nombre de places : {{ outing.participants|length }} / {{ outing.maxRegistered }}</p>
     <p>Campus : {{ outing.campus.name }}</p>
