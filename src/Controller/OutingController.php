@@ -56,6 +56,10 @@ class OutingController extends AbstractController
             $citiesXLocation[$city->getName()] = $locationRepository->findBy(['city' => $city]);
         }
 
+        dump($citiesXLocation);
+
+        dump(json_encode($citiesXLocation));
+
         $outing = new Outing();
         $outingForm = $this->createForm(OutingType::class, $outing);
         $outingForm->handleRequest($request);
@@ -65,11 +69,10 @@ class OutingController extends AbstractController
             return $this->redirectToRoute('home_list');
         }
 
-        $jsonCities = json_encode($citiesXLocation);
 
         return $this->render('outing/create.html.twig', [
             'outingForm' => $outingForm,
-            'jsonCities' => $jsonCities
+            'citiesXLocation' => $citiesXLocation
         ]);
     }
 }//fin class OutingController
