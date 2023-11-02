@@ -41,6 +41,11 @@ class StatusFixtures extends Fixture
         $manager -> persist($cancelled);
         $this -> addReference('cancelled', $cancelled);
 
+        $archived = new Status();
+        $archived -> setLabel('Archived');
+        $manager -> persist($archived);
+        $this -> addReference('archived', $archived);
+
         $manager->flush();
     }
 }
