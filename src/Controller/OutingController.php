@@ -17,9 +17,37 @@ use Symfony\Component\Routing\Annotation\Route;
 class OutingController extends AbstractController
 {
     #[Route('/', name: 'home_list', methods: ['GET'])]
-    public function listOuting(OutingRepository $outingRepository): Response
+    public function listOuting(OutingRepository $outingRepository, StatusRepository $status, EntityManagerInterface $em): Response
     {
-        $outings = $outingRepository->findAll();
+        $currentDate = new \DateTimeImmutable();
+
+        $outings = $outingRepository->findOutings();
+
+        foreach($outings as $outing){
+            $deadline = $outing -> getDeadline();
+            $starDate = $outing -> getStartDate();
+            $duration = $outing -> getDuration();
+
+            $endDate = $currentDate -> modify('+' . $duration . 'days');
+            $archiveDate = $endDate -> modify('+' . 30 . 'days');
+
+            if($outing -> getStatus() ->getLabel() != 'Created' && $outing -> getStatus() -> getLabel() != 'Cancelled'){
+                if($currentDate < $deadline){
+                    $outing -> setStatus($status -> findOneBy(['label' => 'Open']));
+                }elseif ($currentDate < $starDate){
+                    $outing -> setStatus($status -> findOneBy(['label' => 'Closed']));
+                }elseif ($currentDate < $endDate){
+                    $outing -> setStatus($status -> findOneBy(['label' => 'Ongoing']));
+                }elseif($currentDate >= $archiveDate){
+                    $outing -> setStatus($status -> findOneBy(['label' => 'Archived']));
+                }else{
+                    $outing -> setStatus($status -> findOneBy(['label' => 'Finished']));
+                }
+                $em -> persist($outing);
+                $em -> flush();
+            }
+        }
+
         return $this->render('outing/list.html.twig', [
             'outings' => $outings
         ]);

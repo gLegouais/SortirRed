@@ -15,7 +15,7 @@
                         <a class="nav-link" href="{{ path('home_list') }}">Accueil</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="">Mon profil</a>
+                        <a class="nav-link" href="{{ path('user_profile', {'id': app.user.id}) }}">Mon profil</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ path('app_logout') }}">Se déconnecter</a>
