@@ -37,7 +37,7 @@
                         {% set isRegistered = isRegistered or (participant == app.user) %}
                     {% endfor %}
 
-                    {% if outing.organizer != app.user and  not isRegistered %}
+                    {% if app.user != isRegistered %}
                         <a href="{{ path('outing_inscription', {'id': outing.id}) }}" title="inscription">S'inscrire</a>
                     {% endif %}
 
