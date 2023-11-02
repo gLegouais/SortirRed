@@ -19,12 +19,10 @@
     <p>{{ outing.location.city.postcode }} {{ outing.location.city.name }}</p>
     <p>Latitude : {{ outing.location.latitude }}</p>
     <p>Longitude : {{ outing.location.longitude }}</p>
-    <p>
-        Liste des participants :
-    </p>
+
     {% set isRegistered = false %}
     <table class="table-sm table-bordered mb-3">
-        <caption>Liste des participants</caption> {# todo : à mettre au-dessus de l'entête du tableau (css ?)#}
+        <p>Liste des participants</p>
         <thead>
         <tr class="table-top">
             <th>Pseudo</th>

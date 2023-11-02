@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Outing;
+use App\Entity\User;
 use App\Form\OutingType;
 use App\Repository\CityRepository;
 use App\Repository\LocationRepository;
@@ -69,4 +70,41 @@ class OutingController extends AbstractController
             'jsonCities' => $jsonCities
         ]);
     }
-}
+
+    //route pour s'inscrire
+    //Ce que je fais n'a aucun sens. Je ne sais plus ce que je récupère, comment et pourquoi
+    //Je cherche à appeler une fonction de Outing.php ; comment faire ?
+    // Comment faire passer des paramètres dans mes deux fonctions ?
+    //quel return vu que c'est une collection ? Juste $participant ou autre chose ?
+    //La syntaxe me pose de gros problèmes ici
+    //quelle route, vu que je reste sur ma page d'accueil (il faut juste cliquer sur le lien pour être inscrit)
+
+    #[Route('/inscription/{id}', name: 'outing_inscription', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    public function inscription(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response //id de ma sortie ?
+    {
+        $outing = $outingRepository->find($id); //pour retrouver l'id de ma sortie ?
+        $outing->addParticipant($this->getUser()); //id de mon participant
+        $this->addFlash('success', 'Vous avez été inscrit à la sortie');
+
+        $em->persist($outing);
+        $em->flush();
+
+        return $this->redirectToRoute('home_list');
+    }
+
+    #[Route('/withdrawal/{id}', name: 'outing_withdrawal', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    public function withdrawal(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response
+    {
+        $outing = $outingRepository->find($id);
+        $outing->removeParticipant($this->getUser());
+        $this->addFlash('success', "Vous êtes désinscrit de la sortie");
+
+        $em->persist($outing);
+        $em->flush();
+
+        return $this->redirectToRoute('home_list');
+
+    }
+
+
+}//fin public class

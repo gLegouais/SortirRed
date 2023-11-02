@@ -38,11 +38,11 @@
                     {% endfor %}
 
                     {% if outing.organizer != app.user and  not isRegistered %}
-                        <a href="" title="inscription">S'inscrire</a>
+                        <a href="{{ path('outing_inscription', {'id': outing.id}) }}" title="inscription">S'inscrire</a>
                     {% endif %}
 
                     {% if isRegistered %}
-                        <a href="" title="desistement">Se désister</a>
+                        <a href="{{ path('outing_withdrawal', {'id': outing.id}) }}" title="desistement">Se désister</a>
                     {% endif %}
 
                     {% if outing.organizer == app.user %}
