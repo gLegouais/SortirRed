@@ -7,6 +7,7 @@ use App\Form\OutingType;
 use App\Repository\CityRepository;
 use App\Repository\LocationRepository;
 use App\Repository\OutingRepository;
+use App\Repository\StatusRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,32 +46,36 @@ class OutingController extends AbstractController
         Request                $request,
         EntityManagerInterface $manager,
         CityRepository         $cityRepository,
-        LocationRepository     $locationRepository
+        LocationRepository     $locationRepository,
+        StatusRepository $statusRepository
     ): Response
     {
         $cities = $cityRepository->findAll();
-        $citiesXLocation = [];
-        foreach ($cities as $city) {
-            $citiesXLocation[$city->getName()] = $locationRepository->findBy(['city' => $city]);
-        }
+        $locations = $locationRepository->findAll();
 
-        dump($citiesXLocation);
 
-        dump(json_encode($citiesXLocation));
 
         $outing = new Outing();
         $outingForm = $this->createForm(OutingType::class, $outing);
         $outingForm->handleRequest($request);
 
         if ($outingForm->isSubmitted() && $outingForm->isValid()) {
+            $locationId = $request->get('locationSelect');
+            $location = $locationRepository->find($locationId);
+            $outing->setLocation($location);
+            $outing->setOrganizer($this->getUser());
+            $outing->setStatus($statusRepository->findOneBy(['label' => 'Created']));
             $manager->persist($outing);
-            return $this->redirectToRoute('home_list');
+            $manager->flush();
+
+            return $this->redirectToRoute('outing_show', ['id' => $outing->getId()]);
         }
 
 
         return $this->render('outing/create.html.twig', [
             'outingForm' => $outingForm,
-            'citiesXLocation' => $citiesXLocation
+            'cities' => $cities,
+            'locations' => $locations
         ]);
     }
 }//fin class OutingController
