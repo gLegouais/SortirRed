@@ -142,7 +142,6 @@ class OutingController extends AbstractController
                 $outing->setStatus($statusRepository->findOneBy(['label' => 'Created']));
                 $outing->setLocation($location);
                 $outing->setOrganizer($this->getUser());
-                $outing->addParticipant($outing->getOrganizer());
                 $outing->setCampus($outingCreateModel->getCampus());
 
                 $manager->persist($outing);
@@ -168,11 +167,13 @@ class OutingController extends AbstractController
     //pour mes conditions : quelles actions doivent être mises dans mes conditions ? la fonction addParticipant,
     //ou aussi le addFlash (probablement), le persist, le flush (probablement pas) ?
     #[Route('/inscription/{id}', name: 'outing_inscription', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-    public function inscription(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response //id de ma sortie ?
+    public function inscription(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response
     {
         $outing = $outingRepository->find($id);
-        if (($outing->getStatus()->getLabel() == 'Open') && ((count($outing->getParticipants())) < $outing->getMaxRegistered())) {
-
+        if (
+            ($outing->getStatus()->getLabel() == 'Open') &&
+            ((count($outing->getParticipants())) < $outing->getMaxRegistered())
+        ) {
             $outing->addParticipant($this->getUser());
             $this->addFlash('success', 'Vous avez été inscrit à la sortie');
         }
@@ -210,6 +211,7 @@ class OutingController extends AbstractController
     {
         $outing = $outingRepository->find($id);
         if($outing->getStatus()->getLabel() == 'Created'){
+            $outing->addParticipant($outing->getOrganizer());
             $outing->setStatus($statusRepository->findOneBy(['label' => 'Open']));
             $this->addFlash('success', 'Votre proposition de sortie a été publiée !');
         }
