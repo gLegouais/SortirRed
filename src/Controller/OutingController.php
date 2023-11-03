@@ -47,7 +47,7 @@ class OutingController extends AbstractController
 
             if ($outing->getStatus()->getLabel() != 'Created' && $outing->getStatus()->getLabel() != 'Cancelled') {
                 if ($currentDate < $deadline && (count($outing->getParticipants())) < $outing->getMaxRegistered()) {
-                    $outing->setStatus($status->findOneBy(['label' => 'Open']));
+                    $outing->setStatus($outing->getStatus()->getLabel() == 'Open');
                 } elseif (
                     $currentDate < $starDate ||
                     (count($outing->getParticipants())) == $outing->getMaxRegistered()

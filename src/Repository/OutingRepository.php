@@ -32,19 +32,9 @@ class OutingRepository extends ServiceEntityRepository
             -> addSelect('l');
         $qb -> join('o.organizer', 'org')
             -> addSelect('org');
+        $qb -> leftJoin('o.participants', 'p')
+            -> addSelect('p');
         $qb -> andWhere('o.status != 13');
-
-        $query = $qb -> getQuery();
-        return $query -> getResult();
-    }
-
-    public function findByCampus(int $id): ?array
-    {
-        $qb = $this -> createQueryBuilder('o');
-        $qb -> join('o.campus', 'c')
-            -> addSelect('c');
-        $qb -> andWhere('c.id = :id')
-            -> setParameter('id', $id);
 
         $query = $qb -> getQuery();
         return $query -> getResult();
