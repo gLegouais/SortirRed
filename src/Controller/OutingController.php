@@ -25,15 +25,15 @@ class OutingController extends AbstractController
 {
     #[Route('/', name: 'home_list', methods: ['GET', 'POST'])]
     public function listOuting(
-        OutingRepository $outingRepository,
-        StatusRepository $status,
+        OutingRepository       $outingRepository,
+        StatusRepository       $status,
         EntityManagerInterface $em,
-        Request $request
+        Request                $request
     ): Response
     {
         $searchOutingFormModel = new SearchOutingFormModel();
-        $searchForm = $this -> createForm(SearchOutingType::class, $searchOutingFormModel);
-        $searchForm -> handleRequest($request);
+        $searchForm = $this->createForm(SearchOutingType::class, $searchOutingFormModel);
+        $searchForm->handleRequest($request);
         $outingCampus = null;
 
         $currentDate = new \DateTimeImmutable();
@@ -70,10 +70,10 @@ class OutingController extends AbstractController
 
         // if form submitted
         // $outings = requete sql
-        if($searchForm -> isSubmitted() && $searchForm -> isValid()){
-            $outings = $outingRepository -> findByCampus($searchOutingFormModel -> getCampus() -> getId());
-            if(!$outings){
-                throw $this -> createNotFoundException('Pas de sortie prévue sur ce campus');
+        if ($searchForm->isSubmitted() && $searchForm->isValid()) {
+            $outings = $outingRepository->findByCampus($searchOutingFormModel->getCampus()->getId());
+            if (!$outings) {
+                throw $this->createNotFoundException('Pas de sortie prévue sur ce campus');
             }
         }
 
@@ -207,13 +207,13 @@ class OutingController extends AbstractController
 
     #[Route('/publication/{id}', name: 'outing_publication', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])] //besoin d'un get et d'un post ?
     public function publication(
-        int $id,
-        OutingRepository $outingRepository,
-        StatusRepository $statusRepository,
+        int                    $id,
+        OutingRepository       $outingRepository,
+        StatusRepository       $statusRepository,
         EntityManagerInterface $em): Response
     {
         $outing = $outingRepository->find($id);
-        if($outing->getStatus()->getLabel() == 'Created'){
+        if ($outing->getStatus()->getLabel() == 'Created') {
             $outing->addParticipant($outing->getOrganizer());
             $outing->setStatus($statusRepository->findOneBy(['label' => 'Open']));
             $this->addFlash('success', 'Votre proposition de sortie a été publiée !');
@@ -226,34 +226,46 @@ class OutingController extends AbstractController
 
     }
 
-#[Route('/cancellation/{id}', name: 'outing_cancellation', requirements:['id'=>'\d+'], methods: ['GET', 'POST'])]
-public function cancellation(
-    int $id,
-    OutingRepository $outingRepository,
-    StatusRepository $statusRepository,
-    EntityManagerInterface $em): Response
-{
-    $outing = $outingRepository->find($id);
-    if(($outing->getStatus()->getLabel()=='Open') || ($outing->getStatus()->getLabel()=='Closed')){
-        $outing->setStatus($statusRepository->findOneBy(['label' => 'Cancelled']));
-        //todo : retirer tous les participants de la sortie (y compris le créateur) //clear
-        $participants = $outing->getParticipants();
-        $participants->clear();
-        $this->addFlash('success', 'Vous avez supprimé votre proposition de sortie !');
-    }
-    $em->persist($outing);
-    $em->flush();
+    #[Route('/cancellation/{id}', name: 'outing_cancellation', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    public function cancellation(
+        int                    $id,
+        OutingRepository       $outingRepository,
+        StatusRepository       $statusRepository,
+        EntityManagerInterface $em): Response
+    {
+        $outing = $outingRepository->find($id);
+        if (($outing->getStatus()->getLabel() == 'Open') || ($outing->getStatus()->getLabel() == 'Closed')) {
+            $outing->setStatus($statusRepository->findOneBy(['label' => 'Cancelled']));
+            //todo : retirer tous les participants de la sortie (y compris le créateur) //clear
+            $participants = $outing->getParticipants();
+            $participants->clear();
+            $this->addFlash('success', 'Vous avez supprimé votre proposition de sortie !');
+        }
+        $em->persist($outing);
+        $em->flush();
 
-    return $this->redirectToRoute('home_list');
-}
+        return $this->redirectToRoute('home_list');
+    }
+
     #[Route('/campus/{id}', name: 'search_campus', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function findByCampus(int $id, OutingRepository $outingRepository): Response
     {
-        $outingCampus = $outingRepository -> findByCampus($id);
-        if(!$outingCampus){
-            throw $this -> createNotFoundException('Pas de sortie prévue sur ce campus');
+        $outingCampus = $outingRepository->findByCampus($id);
+        if (!$outingCampus) {
+            throw $this->createNotFoundException('Pas de sortie prévue sur ce campus');
         }
-        return $this -> render('outing/list.html.twig');
+        return $this->render('outing/list.html.twig');
     }
 
+    #[Route('/removal/{id}', name: 'removal_outing', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function removal(
+        int $id,
+        OutingRepository $outingRepository): Response
+    {
+        $outing = $outingRepository->find($id);
+        if ($outing->getStatus()->getLabel() == 'Created' && ) {
+            $this->addFlash('success', 'Votre proposition de sortie a été publiée !');
+        }
+        return $this->render('outing/list.html.twig');
+    }
 }//fin public class
