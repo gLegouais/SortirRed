@@ -5,7 +5,10 @@ namespace App\Controller;
 use App\Entity\Location;
 use App\Entity\Outing;
 use App\Entity\User;
+use App\Form\Model\SearchOutingFormModel;
 use App\Form\OutingType;
+use App\Form\SearchOutingType;
+use App\Repository\CampusRepository;
 use App\Repository\CityRepository;
 use App\Repository\LocationRepository;
 use App\Repository\OutingRepository;
@@ -18,9 +21,25 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class OutingController extends AbstractController
 {
-    #[Route('/', name: 'home_list', methods: ['GET'])]
-    public function listOuting(OutingRepository $outingRepository, StatusRepository $status, EntityManagerInterface $em): Response
+    #[Route('/', name: 'home_list', methods: ['GET', 'POST'])]
+    public function listOuting(
+        OutingRepository $outingRepository,
+        StatusRepository $status,
+        EntityManagerInterface $em,
+        SearchOutingFormModel $searchOutingFormModel,
+        Request $request
+    ): Response
     {
+        $searchForm = $this -> createForm(SearchOutingType::class, $searchOutingFormModel);
+        $searchForm -> handleRequest($request);
+
+        if($searchForm -> isSubmitted() && $searchForm -> isValid()){
+            $outingCampus = $outingRepository -> findByCampus($searchOutingFormModel -> getCampus() -> getId());
+            if(!$outingCampus){
+                throw $this -> createNotFoundException('Pas de sortie prévue sur ce campus');
+            }
+        }
+
         $currentDate = new \DateTimeImmutable();
 
         $outings = $outingRepository->findOutings();
@@ -51,7 +70,9 @@ class OutingController extends AbstractController
         }
 
         return $this->render('outing/list.html.twig', [
-            'outings' => $outings
+            'outings' => $outings,
+            'searchForm' => $searchForm,
+            'outingCampus' => $outingCampus
         ]);
     }
 
@@ -174,5 +195,14 @@ class OutingController extends AbstractController
 
     }
 
+    #[Route('/campus/{id}', name: 'search_campus', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function findByCampus(int $id, OutingRepository $outingRepository): Response
+    {
+        $outingCampus = $outingRepository -> findByCampus($id);
+        if(!$outingCampus){
+            throw $this -> createNotFoundException('Pas de sortie prévue sur ce campus');
+        }
+        return $this -> render('outing/list.html.twig');
+    }
 
 }//fin public class

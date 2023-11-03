@@ -36,6 +36,18 @@ class OutingRepository extends ServiceEntityRepository
         return $query -> getResult();
     }
 
+    public function findByCampus(int $id): ?array
+    {
+        $qb = $this -> createQueryBuilder('o');
+        $qb -> join('o.campus', 'c')
+            -> addSelect('c');
+        $qb -> andWhere('c.id = :id')
+            -> setParameter('id', $id);
+
+        $query = $qb -> getQuery();
+        return $query -> getResult();
+    }
+
 //    /**
 //     * @return Outing[] Returns an array of Outing objects
 //     */
