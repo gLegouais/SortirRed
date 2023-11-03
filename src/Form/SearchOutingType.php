@@ -23,11 +23,11 @@ class SearchOutingType extends AbstractType
                 'class' => Campus::class,
                 'choice_label' => 'name',
                 'required' => false,
-                'placeholder' => 'Sélection du campus'
+                'placeholder' => 'Sélection du campus',
             ])
             ->add('name', TextType::class,[
                 'label' => 'Le nom de la sortie contient : ',
-                'required' => false
+                'required' => false,
             ])
             ->add('startDate', DateTimeType::class, [
                 'label' => 'Entre ',

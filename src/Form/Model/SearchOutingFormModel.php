@@ -3,12 +3,13 @@
 namespace App\Form\Model;
 
 use App\Entity\Campus;
+use App\Entity\Outing;
 use DateTimeImmutable;
 
 class SearchOutingFormModel
 {
-    private Campus $campus;
-    private string $name;
+    private ?Campus $campus;
+    private ?string $name;
     private DateTimeImmutable $startDate;
     private DateTimeImmutable $endDate;
     private bool $outingOrganizer;
@@ -16,22 +17,22 @@ class SearchOutingFormModel
     private bool $outingNotEnlisted;
     private bool $outingFinished;
 
-    public function getCampus(): Campus
+    public function getCampus(): ?Campus
     {
         return $this->campus;
     }
 
-    public function setCampus($campus): void
+    public function setCampus(?Campus $campus): void
     {
         $this->campus = $campus;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function setName($name): void
+    public function setName(?string $name): void
     {
         $this->name = $name;
     }

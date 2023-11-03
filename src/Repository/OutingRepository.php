@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Outing;
+use App\Entity\User;
+use App\Form\Model\SearchOutingFormModel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -48,26 +50,52 @@ class OutingRepository extends ServiceEntityRepository
         return $query -> getResult();
     }
 
-    public function findByName($inputedName): ?array
+    public function filterOutings(SearchOutingFormModel $formModel, User $user): ?array
     {
-        $qb = $this -> createQueryBuilder('o');
-        $qb -> andWhere('o.name LIKE :inputedName')
-            -> setParameter('inputedName', '%' . $inputedName . '%');
+        $qb = $this->createQueryBuilder('outing');
+        if ($formModel->getCampus()) {
+            $qb->andWhere('outing.campus_id = :campusId')
+                ->setParameter('campusId', $formModel->getCampus()->getId());
+        }
+        if ($formModel->getName()) {
+            $qb->andWhere('outing.name LIKE :name')
+                ->setParameter('name', '%' . $formModel->getName() . '%');
+        }
+        if ($formModel->getStartDate()) {
+            $qb->andWhere('outing.startDate >= :startDate')
+                ->setParameter('startDate', $formModel->getStartDate());
+        }
+        if ($formModel->getEndDate()) {
+            $qb->andWhere('outing.startDate <= :endDate')
+                ->setParameter('endDate', $formModel->getEndDate());
+        }
+        if ($formModel->getOutingOrganizer()) {
+            $qb->andWhere('outing.organizer = :organizer')
+                ->setParameter('organizer', $user->getId());
+        }
+        if ($formModel->getOutingEnlisted()) {
+            $qb->join('outing.participants', 'p')
+                ->addSelect('p')
+                ->andWhere('p.id = :userID')
+                ->setParameter('userID', $user->getId());
+        }
+        if ($formModel->getOutingNotEnlisted()) {
+            $qb->join('outing.participants', 'p')
+                ->addSelect('p')
+                ->andWhere('p.id != :userID')
+                ->setParameter('userID', $user->getId());
+        }
+//        if ($formModel->getOutingFinished()) {
+//            $qb->join('outing.status', 's')
+//                ->addSelect('s')
+//                ->andWhere('outing.status = :status')
+//                ->setParameter('status', )
+//        }
 
-        $query = $qb -> getQuery();
-        return $query -> getResult();
+        $query = $qb->getQuery();
+        return $query->getResult();
     }
 
-    public function findByDateBetween($firstDate, $secondDate): ?array
-    {
-        $qb = $this -> createQueryBuilder('o');
-        $qb -> andWhere('o.startDate BETWEEN :firstDate AND :secondDate')
-            -> setParameter('firstDate', $firstDate)
-            -> setParameter('secondDate', $secondDate);
-
-        $query = $qb -> getQuery();
-        return $query -> getResult();
-    }
 //    /**
 //     * @return Outing[] Returns an array of Outing objects
 //     */
