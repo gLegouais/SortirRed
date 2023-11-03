@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Location;
 use App\Entity\Outing;
 use App\Entity\User;
+use App\Form\Model\OutingTypeModel;
 use App\Form\Model\SearchOutingFormModel;
 use App\Form\OutingType;
 use App\Form\SearchOutingType;
@@ -26,20 +28,13 @@ class OutingController extends AbstractController
         OutingRepository $outingRepository,
         StatusRepository $status,
         EntityManagerInterface $em,
-        SearchOutingFormModel $searchOutingFormModel,
         Request $request
     ): Response
     {
+        $searchOutingFormModel = new SearchOutingFormModel();
         $searchForm = $this -> createForm(SearchOutingType::class, $searchOutingFormModel);
         $searchForm -> handleRequest($request);
         $outingCampus = null;
-
-        if($searchForm -> isSubmitted() && $searchForm -> isValid()){
-            $outingCampus = $outingRepository -> findByCampus($searchOutingFormModel -> getCampus() -> getId());
-            if(!$outingCampus){
-                throw $this -> createNotFoundException('Pas de sortie prévue sur ce campus');
-            }
-        }
 
         $currentDate = new \DateTimeImmutable();
 
@@ -70,10 +65,18 @@ class OutingController extends AbstractController
             }
         }
 
+        // if form submitted
+        // $outings = requete sql
+        if($searchForm -> isSubmitted() && $searchForm -> isValid()){
+            $outings = $outingRepository -> findByCampus($searchOutingFormModel -> getCampus() -> getId());
+            if(!$outings){
+                throw $this -> createNotFoundException('Pas de sortie prévue sur ce campus');
+            }
+        }
+
         return $this->render('outing/list.html.twig', [
             'outings' => $outings,
-            'searchForm' => $searchForm,
-            'outingCampus' => $outingCampus
+            'searchForm' => $searchForm
         ]);
     }
 
@@ -105,30 +108,48 @@ class OutingController extends AbstractController
         $locations = $locationRepository->findAll();
 
 
-        $outing = new Outing();
-        $location = new Location();
-        $outingForm = $this->createForm(OutingType::class, $outing);
+        $outingCreateModel = new OutingTypeModel();
+
+        $outingForm = $this->createForm(OutingType::class, $outingCreateModel);
         $outingForm->handleRequest($request);
 
         if ($outingForm->isSubmitted() && $outingForm->isValid()) {
             try {
-                $locationId = $request->get('locationSelect');
-                if ($locationId) {
-                    $location = $locationRepository->find($locationId);
-                } else {
-                    $location->setName($request->get('name'));
-                    $location->setStreet($request->get('locatiion[street]'));
-                    $location->setCity($request->get('city'));
-                    $location->setLatitude(1.250);
-                    $location->setLongitude(-1.250);
+
+                $location = $locationRepository->findOneBy([
+                    'name' => $outingCreateModel->getLocation()->getName(),
+                    'street' => $outingCreateModel->getLocation()->getStreet()
+                ]);
+
+                if (!$location) {
+                    $location = new Location();
+                    $location->setName($outingCreateModel->getLocation()->getName());
+                    $location->setStreet($outingCreateModel->getLocation()->getStreet());
+                    $location->setCity($outingCreateModel->getCity());
+                    $location->setLatitude(1.500);
+                    $location->setLongitude(-1.500);
+
+                    $manager->persist($location);
+
+                    $manager->flush();
                 }
-                $manager->persist($location);
+
+                $outing = new Outing();
+                $outing->setName($outingCreateModel->getName());
+                $outing->setStartDate($outingCreateModel->getStartDate());
+                $outing->setDuration($outingCreateModel->getDuration());
+                $outing->setDeadline($outingCreateModel->getDeadline());
+                $outing->setMaxRegistered($outingCreateModel->getMaxRegistered());
+                $outing->setDescription($outingCreateModel->getDescription());
+                $outing->setStatus($statusRepository->findOneBy(['label' => 'Created']));
                 $outing->setLocation($location);
                 $outing->setOrganizer($this->getUser());
-                $outing->addParticipant($outing->getOrganizer());
-                $outing->setStatus($statusRepository->findOneBy(['label' => 'Created']));
+                $outing->setCampus($outingCreateModel->getCampus());
+
                 $manager->persist($outing);
+
                 $manager->flush();
+
                 $this->addFlash('success', 'La sortie a été créée avec succès.');
                 return $this->redirectToRoute('outing_show', ['id' => $outing->getId()]);
             } catch (Exception $e) {
@@ -146,11 +167,13 @@ class OutingController extends AbstractController
     }
 
     #[Route('/inscription/{id}', name: 'outing_inscription', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-    public function inscription(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response //id de ma sortie ?
+    public function inscription(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response
     {
         $outing = $outingRepository->find($id);
-        if (($outing->getStatus()->getLabel() == 'Open') && ((count($outing->getParticipants())) < $outing->getMaxRegistered())) {
-
+        if (
+            ($outing->getStatus()->getLabel() == 'Open') &&
+            ((count($outing->getParticipants())) < $outing->getMaxRegistered())
+        ) {
             $outing->addParticipant($this->getUser());
             $this->addFlash('success', 'Vous avez été inscrit à la sortie');
         }
@@ -188,6 +211,7 @@ class OutingController extends AbstractController
     {
         $outing = $outingRepository->find($id);
         if($outing->getStatus()->getLabel() == 'Created'){
+            $outing->addParticipant($outing->getOrganizer());
             $outing->setStatus($statusRepository->findOneBy(['label' => 'Open']));
             $this->addFlash('success', 'Votre proposition de sortie a été publiée !');
         }
