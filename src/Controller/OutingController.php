@@ -4,7 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Outing;
 use App\Entity\User;
+use App\Form\Model\SearchOutingFormModel;
 use App\Form\OutingType;
+use App\Form\SearchOutingType;
+use App\Repository\CampusRepository;
 use App\Repository\CityRepository;
 use App\Repository\LocationRepository;
 use App\Repository\OutingRepository;
@@ -17,9 +20,25 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class OutingController extends AbstractController
 {
-    #[Route('/', name: 'home_list', methods: ['GET'])]
-    public function listOuting(OutingRepository $outingRepository, StatusRepository $status, EntityManagerInterface $em): Response
+    #[Route('/', name: 'home_list', methods: ['GET', 'POST'])]
+    public function listOuting(
+        OutingRepository $outingRepository,
+        StatusRepository $status,
+        EntityManagerInterface $em,
+        SearchOutingFormModel $searchOutingFormModel,
+        Request $request
+    ): Response
     {
+        $searchForm = $this -> createForm(SearchOutingType::class, $searchOutingFormModel);
+        $searchForm -> handleRequest($request);
+
+        if($searchForm -> isSubmitted() && $searchForm -> isValid()){
+            $outingCampus = $outingRepository -> findByCampus($searchOutingFormModel -> getCampus() -> getId());
+            if(!$outingCampus){
+                throw $this -> createNotFoundException('Pas de sortie prévue sur ce campus');
+            }
+        }
+
         $currentDate = new \DateTimeImmutable();
 
         $outings = $outingRepository->findOutings();
@@ -50,7 +69,9 @@ class OutingController extends AbstractController
         }
 
         return $this->render('outing/list.html.twig', [
-            'outings' => $outings
+            'outings' => $outings,
+            'searchForm' => $searchForm,
+            'outingCampus' => $outingCampus
         ]);
     }
 
@@ -83,22 +104,37 @@ class OutingController extends AbstractController
 
 
         $outing = new Outing();
+        $location = new Location();
         $outingForm = $this->createForm(OutingType::class, $outing);
         $outingForm->handleRequest($request);
 
         if ($outingForm->isSubmitted() && $outingForm->isValid()) {
-            $locationId = $request->get('locationSelect');
-            $location = $locationRepository->find($locationId);
-            $outing->setLocation($location);
-            $outing->setOrganizer($this->getUser());
-            $outing->addParticipant($outing->getOrganizer());
-            $outing->setStatus($statusRepository->findOneBy(['label' => 'Created']));
-            $manager->persist($outing);
-            $manager->flush();
+            try {
+                $locationId = $request->get('locationSelect');
+                if ($locationId) {
+                    $location = $locationRepository->find($locationId);
+                } else {
+                    $location->setName($request->get('name'));
+                    $location->setStreet($request->get('locatiion[street]'));
+                    $location->setCity($request->get('city'));
+                    $location->setLatitude(1.250);
+                    $location->setLongitude(-1.250);
+                }
+                $manager->persist($location);
+                $outing->setLocation($location);
+                $outing->setOrganizer($this->getUser());
+                $outing->addParticipant($outing->getOrganizer());
+                $outing->setStatus($statusRepository->findOneBy(['label' => 'Created']));
+                $manager->persist($outing);
+                $manager->flush();
+                $this->addFlash('success', 'La sortie a été créée avec succès.');
+                return $this->redirectToRoute('outing_show', ['id' => $outing->getId()]);
+            } catch (Exception $e) {
+                $this->addFlash('danger', 'Une erreur est survenue lors de la création de la sortie');
+                return $this->redirectToRoute('outing_create');
+            }
 
-            return $this->redirectToRoute('outing_show', ['id' => $outing->getId()]);
         }
-
 
         return $this->render('outing/create.html.twig', [
             'outingForm' => $outingForm,
@@ -158,7 +194,9 @@ class OutingController extends AbstractController
         $em->persist($outing);
         $em->flush();
 
+        //comment faire mon return selon que l'on soit sur la home_list ou le outing_show ?
         return $this->redirectToRoute('home_list');
+
     }
 
 #[Route('/cancellation/{id}', name: 'outing_cancellation', requirements:['id'=>'\d+'], methods: ['GET', 'POST'])]
@@ -179,5 +217,14 @@ public function cancellation(
 
     return $this->redirectToRoute('home_list');
 }
+    #[Route('/campus/{id}', name: 'search_campus', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function findByCampus(int $id, OutingRepository $outingRepository): Response
+    {
+        $outingCampus = $outingRepository -> findByCampus($id);
+        if(!$outingCampus){
+            throw $this -> createNotFoundException('Pas de sortie prévue sur ce campus');
+        }
+        return $this -> render('outing/list.html.twig');
+    }
 
 }//fin public class

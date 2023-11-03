@@ -1,6 +1,8 @@
 const citySelect = document.getElementById('outing_city');
 const locationXCityData = document.getElementsByClassName('locationsData');
 const locationDiv = document.getElementById('location');
+const locationForm = document.getElementById('locationForm');
+locationForm.style.display = 'none';
 
 citySelect.addEventListener('change', function () {
     let city = this.value;
@@ -8,6 +10,7 @@ citySelect.addEventListener('change', function () {
         locationDiv.removeChild(document.getElementById('locationSelectLabel'));
         locationDiv.removeChild(document.getElementById('locationSelect'));
         locationDiv.removeChild(document.getElementById('locationDetailDiv'));
+        locationDiv.removeChild(document.getElementById('addLocation'));
     }
 
     const locationSelectLabel = document.createElement('label');
@@ -20,6 +23,28 @@ citySelect.addEventListener('change', function () {
     locationSelect.id = 'locationSelect';
     locationSelect.name = 'locationSelect';
     locationSelect.className = 'form-select';
+
+    const addLocation = document.createElement('button');
+    addLocation.type = 'button';
+    addLocation.dataToggle = 'modal';
+    addLocation.dataTarget = '#exampleModalCenter'
+    addLocation.innerHTML = '<i class="bi bi-plus-circle"></i>';
+    addLocation.id = 'addLocation';
+    addLocation.className = 'btn btn-secondary mt-2';
+
+    addLocation.addEventListener('click', function () {
+
+        locationForm.style.display = 'block';
+        locationSelect.disabled = true;
+        if (document.getElementById('locationDetailDiv')) {
+            document.getElementById('locationDetailDiv').innerHTML = "";
+            locationDiv.removeChild(document.getElementById('locationSelectLabel'));
+            locationDiv.removeChild(document.getElementById('locationSelect'));
+            locationDiv.removeChild(document.getElementById('locationDetailDiv'));
+            locationDiv.removeChild(document.getElementById('addLocation'));
+        }
+
+    });
 
     let locationsArray = genParsedLocationData();
     let zipcode = '';
@@ -50,6 +75,10 @@ citySelect.addEventListener('change', function () {
         locationSelect.insertAdjacentElement('afterbegin', option);
     }
     locationDiv.appendChild(locationSelect);
+    if (!document.getElementById('addLocation')) {
+        locationDiv.appendChild(addLocation);
+    }
+
     let locationDetailDiv = document.createElement('div');
     locationDetailDiv.id = 'locationDetailDiv';
     locationDetailDiv.className = 'mt-3'
