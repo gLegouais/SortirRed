@@ -2,7 +2,37 @@
 
 {% block body %}
 
-    {{ form_start() }}
+    <div class="container" style="border: green solid 4px">
+        {{ form_start(searchForm) }}
+        <div class="row align-items-center">
+            <div class="col-5 mx-auto">
+                <div class="container">
+                    <div class="col">
+                        {{ form_row(searchForm.campus) }}
+                        {{ form_row(searchForm.name) }}
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            {{ form_row(searchForm.startDate) }}
+                        </div>
+                        <div class="col">
+                            {{ form_row(searchForm.endDate) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 mx-auto">
+                {{ form_row(searchForm.outingOrganizer) }}
+                {{ form_row(searchForm.outingEnlisted) }}
+                {{ form_row(searchForm.outingNotEnlisted) }}
+                {{ form_row(searchForm.outingFinished) }}
+            </div>
+            <div class="col-3 mx-auto">
+                <button>Rechercher</button>
+            </div>
+        </div>
+        {{ form_end(searchForm) }}
+    </div>
 
     <h1>Liste des sorties</h1>
 

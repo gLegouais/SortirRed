@@ -4,11 +4,12 @@ namespace App\Form;
 
 use App\Entity\Campus;
 use App\Form\Model\SearchOutingFormModel;
-use Doctrine\DBAL\Types\TextType;
+
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -21,7 +22,8 @@ class SearchOutingType extends AbstractType
                 'label' => 'Campus',
                 'class' => Campus::class,
                 'choice_label' => 'name',
-                'required' => false
+                'required' => false,
+                'placeholder' => 'Sélection du campus'
             ])
             ->add('name', TextType::class,[
                 'label' => 'Le nom de la sortie contient : ',
@@ -29,11 +31,15 @@ class SearchOutingType extends AbstractType
             ])
             ->add('startDate', DateTimeType::class, [
                 'label' => 'Entre ',
-                'required' => false
+                'required' => false,
+                'widget' => 'single_text',
+                'input' => 'datetime_immutable'
             ])
             ->add('endDate', DateTimeType::class, [
                 'label' => ' et ',
-                'required' => false
+                'required' => false,
+                'widget' => 'single_text',
+                'input' => 'datetime_immutable'
             ])
             ->add('outingOrganizer', CheckboxType::class, [
                 'label' => 'Sorties dont je suis l\'organisateur/trice',

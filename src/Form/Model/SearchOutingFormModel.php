@@ -47,11 +47,6 @@ class SearchOutingFormModel
 
     public function getEndDate()
     {
-//        $outing = new Outing();
-//        $starDate = $outing->getStartDate();
-//        $duration = $outing->getDuration();
-//
-//        $endDate = $starDate->modify('+' . $duration . 'days');
         return $this -> endDate;
     }
 
