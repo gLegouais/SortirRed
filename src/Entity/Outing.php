@@ -206,10 +206,17 @@ class Outing
         return $this;
     }
 
-    //Est-ce que cette fonction change bien le statut de ma sortie ?
+    //INUTILE ?
     public function publish():static
     {
         $this->getStatus()->setLabel('Open');
+        return $this;
+    }
+
+    //le statut 'Open' ou 'Closed' est modifié en Cancelled dans ma bdd -_-
+    public function cancelOuting():static
+    {
+        $this->getStatus()->setLabel('Cancelled');
         return $this;
     }
 

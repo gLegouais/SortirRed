@@ -46,7 +46,7 @@
 
                     {% if (outing.organizer == app.user) and (outing.status.label =='Open' or outing.status.label == 'Closed')%}
                         <a href="" title="modification">Modifier</a>
-                        <a href="" title="annulation">Annuler la sortie</a>
+                        <a href="{{ path('outing_cancellation', {'id':outing.id}) }}" title="annulation">Annuler la sortie</a>
                     {% endif %}
 
                     {% if outing.organizer == app.user and outing.status.label == 'Created' %}

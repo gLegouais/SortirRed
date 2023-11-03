@@ -144,11 +144,15 @@ class OutingController extends AbstractController
     }
 
     #[Route('/publication/{id}', name: 'outing_publication', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])] //besoin d'un get et d'un post ?
-    public function publication(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response
+    public function publication(
+        int $id,
+        OutingRepository $outingRepository,
+        StatusRepository $statusRepository,
+        EntityManagerInterface $em): Response
     {
         $outing = $outingRepository->find($id);
         if($outing->getStatus()->getLabel() == 'Created'){
-            $outing->publish();
+            $outing->setStatus($statusRepository->findOneBy(['label' => 'Open'])); //est-ce que ça change bien mon statut ?
             $this->addFlash('success', 'Votre proposition de sortie a été publiée !');
         }
         $em->persist($outing);
@@ -157,5 +161,23 @@ class OutingController extends AbstractController
         return $this->redirectToRoute('home_list');
     }
 
+#[Route('/cancellation/{id}', name: 'outing_cancellation', requirements:['id'=>'\d+'], methods: ['GET', 'POST'])]
+public function cancellation(
+    int $id,
+    OutingRepository $outingRepository,
+    StatusRepository $statusRepository,
+    EntityManagerInterface $em): Response
+{
+    $outing = $outingRepository->find($id);
+    if(($outing->getStatus()->getLabel()=='Open') || ($outing->getStatus()->getLabel()=='Closed')){
+        $outing->setStatus($statusRepository->findOneBy(['label' => 'Cancelled']));
+        $this->addFlash('success', 'Vous avez supprimé votre proposition de sortie !');
+        //todo : retirer tous les participants de la sortie (y compris le créateur)
+    }
+    $em->persist($outing);
+    $em->flush();
+
+    return $this->redirectToRoute('home_list');
+}
 
 }//fin public class
