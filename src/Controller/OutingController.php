@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Location;
 use App\Entity\Outing;
 use App\Entity\User;
+use App\Form\Model\OutingTypeModel;
 use App\Form\Model\SearchOutingFormModel;
 use App\Form\OutingType;
 use App\Form\SearchOutingType;
@@ -104,30 +105,21 @@ class OutingController extends AbstractController
         $locations = $locationRepository->findAll();
 
 
-        $outing = new Outing();
-        $location = new Location();
-        $outingForm = $this->createForm(OutingType::class, $outing);
+        $outingCreateModel = new OutingTypeModel();
+
+        $outingForm = $this->createForm(OutingType::class, $outingCreateModel);
         $outingForm->handleRequest($request);
 
         if ($outingForm->isSubmitted() && $outingForm->isValid()) {
             try {
-                $locationId = $request->get('locationSelect');
-                if ($locationId) {
-                    $location = $locationRepository->find($locationId);
-                } else {
-                    $location->setName($request->get('name'));
-                    $location->setStreet($request->get('locatiion[street]'));
-                    $location->setCity($request->get('city'));
-                    $location->setLatitude(1.250);
-                    $location->setLongitude(-1.250);
-                }
-                $manager->persist($location);
-                $outing->setLocation($location);
+                dump($outingCreateModel);
+
+                $outing = new Outing();
+
                 $outing->setOrganizer($this->getUser());
                 $outing->addParticipant($outing->getOrganizer());
                 $outing->setStatus($statusRepository->findOneBy(['label' => 'Created']));
-                $manager->persist($outing);
-                $manager->flush();
+
                 $this->addFlash('success', 'La sortie a été créée avec succès.');
                 return $this->redirectToRoute('outing_show', ['id' => $outing->getId()]);
             } catch (Exception $e) {

@@ -2,6 +2,8 @@ const citySelect = document.getElementById('outing_city');
 const locationXCityData = document.getElementsByClassName('locationsData');
 const locationDiv = document.getElementById('location');
 const locationForm = document.getElementById('locationForm');
+const locationNameInput = document.getElementById('outing_location_name');
+const locationStreetInput = document.getElementById('outing_location_street');
 locationForm.style.display = 'none';
 
 citySelect.addEventListener('change', function () {
@@ -88,9 +90,11 @@ citySelect.addEventListener('change', function () {
         for (let loc of locationsArray) {
             if (loc.id === locationId) {
                 locationDetailDiv.innerHTML = '';
+                locationNameInput.value = loc.name;
 
                 let street = document.createElement('p');
                 street.innerText = 'Rue : ' + loc.street;
+                locationStreetInput.value = loc.street;
                 locationDetailDiv.appendChild(street);
 
                 let postcode = document.createElement('p');

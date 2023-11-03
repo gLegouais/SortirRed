@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Campus;
 use App\Entity\City;
 use App\Entity\Outing;
+use App\Form\Model\OutingTypeModel;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -56,7 +57,7 @@ class OutingType extends AbstractType
             ])
             ->add('location', LocationType::class, [
                 'label' => 'Nouveau lieu',
-                'by_reference' => false
+                'required' => false
             ])
         ;
     }
@@ -64,7 +65,7 @@ class OutingType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Outing::class,
+            'data_class' => OutingTypeModel::class,
         ]);
     }
 }
