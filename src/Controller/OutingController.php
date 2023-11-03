@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Location;
 use App\Entity\Outing;
 use App\Entity\User;
+use App\Form\Model\OutingTypeModel;
 use App\Form\Model\SearchOutingFormModel;
 use App\Form\OutingType;
 use App\Form\SearchOutingType;
@@ -12,6 +14,7 @@ use App\Repository\CityRepository;
 use App\Repository\LocationRepository;
 use App\Repository\OutingRepository;
 use App\Repository\StatusRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,6 +34,7 @@ class OutingController extends AbstractController
         $searchOutingFormModel = new SearchOutingFormModel();
         $searchForm = $this -> createForm(SearchOutingType::class, $searchOutingFormModel);
         $searchForm -> handleRequest($request);
+        $outingCampus = null;
 
         $currentDate = new \DateTimeImmutable();
 
@@ -104,30 +108,48 @@ class OutingController extends AbstractController
         $locations = $locationRepository->findAll();
 
 
-        $outing = new Outing();
-        $location = new Location();
-        $outingForm = $this->createForm(OutingType::class, $outing);
+        $outingCreateModel = new OutingTypeModel();
+
+        $outingForm = $this->createForm(OutingType::class, $outingCreateModel);
         $outingForm->handleRequest($request);
 
         if ($outingForm->isSubmitted() && $outingForm->isValid()) {
             try {
-                $locationId = $request->get('locationSelect');
-                if ($locationId) {
-                    $location = $locationRepository->find($locationId);
-                } else {
-                    $location->setName($request->get('name'));
-                    $location->setStreet($request->get('locatiion[street]'));
-                    $location->setCity($request->get('city'));
-                    $location->setLatitude(1.250);
-                    $location->setLongitude(-1.250);
+
+                $location = $locationRepository->findOneBy([
+                    'name' => $outingCreateModel->getLocation()->getName(),
+                    'street' => $outingCreateModel->getLocation()->getStreet()
+                ]);
+
+                if (!$location) {
+                    $location = new Location();
+                    $location->setName($outingCreateModel->getLocation()->getName());
+                    $location->setStreet($outingCreateModel->getLocation()->getStreet());
+                    $location->setCity($outingCreateModel->getCity());
+                    $location->setLatitude(1.500);
+                    $location->setLongitude(-1.500);
+
+                    $manager->persist($location);
+
+                    $manager->flush();
                 }
-                $manager->persist($location);
+
+                $outing = new Outing();
+                $outing->setName($outingCreateModel->getName());
+                $outing->setStartDate($outingCreateModel->getStartDate());
+                $outing->setDuration($outingCreateModel->getDuration());
+                $outing->setDeadline($outingCreateModel->getDeadline());
+                $outing->setMaxRegistered($outingCreateModel->getMaxRegistered());
+                $outing->setDescription($outingCreateModel->getDescription());
+                $outing->setStatus($statusRepository->findOneBy(['label' => 'Created']));
                 $outing->setLocation($location);
                 $outing->setOrganizer($this->getUser());
-                $outing->addParticipant($outing->getOrganizer());
-                $outing->setStatus($statusRepository->findOneBy(['label' => 'Created']));
+                $outing->setCampus($outingCreateModel->getCampus());
+
                 $manager->persist($outing);
+
                 $manager->flush();
+
                 $this->addFlash('success', 'La sortie a été créée avec succès.');
                 return $this->redirectToRoute('outing_show', ['id' => $outing->getId()]);
             } catch (Exception $e) {
@@ -144,14 +166,14 @@ class OutingController extends AbstractController
         ]);
     }
 
-    //pour mes conditions : quelles actions doivent être mises dans mes conditions ? la fonction addParticipant,
-    //ou aussi le addFlash (probablement), le persist, le flush (probablement pas) ?
     #[Route('/inscription/{id}', name: 'outing_inscription', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-    public function inscription(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response //id de ma sortie ?
+    public function inscription(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response
     {
         $outing = $outingRepository->find($id);
-        if (($outing->getStatus()->getLabel() == 'Open') && ((count($outing->getParticipants())) < $outing->getMaxRegistered())) {
-
+        if (
+            ($outing->getStatus()->getLabel() == 'Open') &&
+            ((count($outing->getParticipants())) < $outing->getMaxRegistered())
+        ) {
             $outing->addParticipant($this->getUser());
             $this->addFlash('success', 'Vous avez été inscrit à la sortie');
         }
@@ -189,6 +211,7 @@ class OutingController extends AbstractController
     {
         $outing = $outingRepository->find($id);
         if($outing->getStatus()->getLabel() == 'Created'){
+            $outing->addParticipant($outing->getOrganizer());
             $outing->setStatus($statusRepository->findOneBy(['label' => 'Open']));
             $this->addFlash('success', 'Votre proposition de sortie a été publiée !');
         }
@@ -205,13 +228,17 @@ public function cancellation(
     int $id,
     OutingRepository $outingRepository,
     StatusRepository $statusRepository,
+    UserRepository $userRepository, //pour pouvoir accèder à ma collection de participants ??
+    //de toute façon, c'est inutile car c'est une collection, pas un attribut de type User?
     EntityManagerInterface $em): Response
 {
     $outing = $outingRepository->find($id);
     if(($outing->getStatus()->getLabel()=='Open') || ($outing->getStatus()->getLabel()=='Closed')){
         $outing->setStatus($statusRepository->findOneBy(['label' => 'Cancelled']));
+        //todo : retirer tous les participants de la sortie (y compris le créateur) //clear
+        $participants = $outing->getParticipants();
+        $participants->clear();
         $this->addFlash('success', 'Vous avez supprimé votre proposition de sortie !');
-        //todo : retirer tous les participants de la sortie (y compris le créateur)
     }
     $em->persist($outing);
     $em->flush();
