@@ -19,8 +19,6 @@ class OutingTypeModel
     private City $city;
     private User $user;
     private Location $location;
-    private string $locationName;
-    private string $adress;
 
     public function getName(): string
     {
@@ -121,37 +119,5 @@ class OutingTypeModel
     {
         $this->user = $user;
     }
-
-    public function getLocationId(): int
-    {
-        return $this->locationId;
-    }
-
-    public function setLocationId(int $locationId): void
-    {
-        $this->locationId = $locationId;
-    }
-
-    public function getLocationName(): string
-    {
-        return $this->locationName;
-    }
-
-    public function setLocationName(string $locationName): void
-    {
-        $this->locationName = $locationName;
-    }
-
-    public function getAdress(): string
-    {
-        return $this->adress;
-    }
-
-    public function setAdress(string $adress): void
-    {
-        $this->adress = $adress;
-    }
-
-
 
 }
