@@ -48,7 +48,26 @@ class OutingRepository extends ServiceEntityRepository
         return $query -> getResult();
     }
 
+    public function findByName($inputedName): ?array
+    {
+        $qb = $this -> createQueryBuilder('o');
+        $qb -> andWhere('o.name LIKE :inputedName')
+            -> setParameter('inputedName', '%' . $inputedName . '%');
 
+        $query = $qb -> getQuery();
+        return $query -> getResult();
+    }
+
+    public function findByDateBetween($firstDate, $secondDate): ?array
+    {
+        $qb = $this -> createQueryBuilder('o');
+        $qb -> andWhere('o.startDate BETWEEN :firstDate AND :secondDate')
+            -> setParameter('firstDate', $firstDate)
+            -> setParameter('secondDate', $secondDate);
+
+        $query = $qb -> getQuery();
+        return $query -> getResult();
+    }
 //    /**
 //     * @return Outing[] Returns an array of Outing objects
 //     */

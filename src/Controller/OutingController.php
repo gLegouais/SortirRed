@@ -4,17 +4,14 @@ namespace App\Controller;
 
 use App\Entity\Location;
 use App\Entity\Outing;
-use App\Entity\User;
 use App\Form\Model\OutingTypeModel;
 use App\Form\Model\SearchOutingFormModel;
 use App\Form\OutingType;
 use App\Form\SearchOutingType;
-use App\Repository\CampusRepository;
 use App\Repository\CityRepository;
 use App\Repository\LocationRepository;
 use App\Repository\OutingRepository;
 use App\Repository\StatusRepository;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,7 +31,6 @@ class OutingController extends AbstractController
         $searchOutingFormModel = new SearchOutingFormModel();
         $searchForm = $this -> createForm(SearchOutingType::class, $searchOutingFormModel);
         $searchForm -> handleRequest($request);
-        $outingCampus = null;
 
         $currentDate = new \DateTimeImmutable();
 
@@ -68,12 +64,12 @@ class OutingController extends AbstractController
             }
         }
 
-        // if form submitted
-        // $outings = requete sql
         if($searchForm -> isSubmitted() && $searchForm -> isValid()){
-            $outings = $outingRepository -> findByCampus($searchOutingFormModel -> getCampus() -> getId());
+//            $outings = $outingRepository -> findByCampus($searchOutingFormModel -> getCampus() -> getId());
+//            $outings = $outingRepository -> findByName($searchOutingFormModel -> getName());
+            $outings = $outingRepository -> findByDateBetween($searchOutingFormModel -> getStartDate(), $searchOutingFormModel -> getEndDate());
             if(!$outings){
-                throw $this -> createNotFoundException('Pas de sortie prévue sur ce campus');
+                $this -> addFlash('danger', 'Pas de sortie prévue sur ce campus');
             }
         }
 
@@ -226,34 +222,25 @@ class OutingController extends AbstractController
 
     }
 
-#[Route('/cancellation/{id}', name: 'outing_cancellation', requirements:['id'=>'\d+'], methods: ['GET', 'POST'])]
-public function cancellation(
-    int $id,
-    OutingRepository $outingRepository,
-    StatusRepository $statusRepository,
-    EntityManagerInterface $em): Response
-{
-    $outing = $outingRepository->find($id);
-    if(($outing->getStatus()->getLabel()=='Open') || ($outing->getStatus()->getLabel()=='Closed')){
-        $outing->setStatus($statusRepository->findOneBy(['label' => 'Cancelled']));
-        //todo : retirer tous les participants de la sortie (y compris le créateur) //clear
-        $participants = $outing->getParticipants();
-        $participants->clear();
-        $this->addFlash('success', 'Vous avez supprimé votre proposition de sortie !');
-    }
-    $em->persist($outing);
-    $em->flush();
-
-    return $this->redirectToRoute('home_list');
-}
-    #[Route('/campus/{id}', name: 'search_campus', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function findByCampus(int $id, OutingRepository $outingRepository): Response
+    #[Route('/cancellation/{id}', name: 'outing_cancellation', requirements:['id'=>'\d+'], methods: ['GET', 'POST'])]
+    public function cancellation(
+        int $id,
+        OutingRepository $outingRepository,
+        StatusRepository $statusRepository,
+        EntityManagerInterface $em): Response
     {
-        $outingCampus = $outingRepository -> findByCampus($id);
-        if(!$outingCampus){
-            throw $this -> createNotFoundException('Pas de sortie prévue sur ce campus');
+        $outing = $outingRepository->find($id);
+        if(($outing->getStatus()->getLabel()=='Open') || ($outing->getStatus()->getLabel()=='Closed')){
+            $outing->setStatus($statusRepository->findOneBy(['label' => 'Cancelled']));
+            //todo : retirer tous les participants de la sortie (y compris le créateur) //clear
+            $participants = $outing->getParticipants();
+            $participants->clear();
+            $this->addFlash('success', 'Vous avez supprimé votre proposition de sortie !');
         }
-        return $this -> render('outing/list.html.twig');
+        $em->persist($outing);
+        $em->flush();
+
+        return $this->redirectToRoute('home_list');
     }
 
 }//fin public class
