@@ -12,6 +12,7 @@ use App\Repository\CityRepository;
 use App\Repository\LocationRepository;
 use App\Repository\OutingRepository;
 use App\Repository\StatusRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,6 +32,7 @@ class OutingController extends AbstractController
     {
         $searchForm = $this -> createForm(SearchOutingType::class, $searchOutingFormModel);
         $searchForm -> handleRequest($request);
+        $outingCampus = null;
 
         if($searchForm -> isSubmitted() && $searchForm -> isValid()){
             $outingCampus = $outingRepository -> findByCampus($searchOutingFormModel -> getCampus() -> getId());
@@ -143,8 +145,6 @@ class OutingController extends AbstractController
         ]);
     }
 
-    //pour mes conditions : quelles actions doivent être mises dans mes conditions ? la fonction addParticipant,
-    //ou aussi le addFlash (probablement), le persist, le flush (probablement pas) ?
     #[Route('/inscription/{id}', name: 'outing_inscription', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
     public function inscription(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response //id de ma sortie ?
     {
@@ -204,13 +204,17 @@ public function cancellation(
     int $id,
     OutingRepository $outingRepository,
     StatusRepository $statusRepository,
+    UserRepository $userRepository, //pour pouvoir accèder à ma collection de participants ??
+    //de toute façon, c'est inutile car c'est une collection, pas un attribut de type User?
     EntityManagerInterface $em): Response
 {
     $outing = $outingRepository->find($id);
     if(($outing->getStatus()->getLabel()=='Open') || ($outing->getStatus()->getLabel()=='Closed')){
         $outing->setStatus($statusRepository->findOneBy(['label' => 'Cancelled']));
+        //todo : retirer tous les participants de la sortie (y compris le créateur) //clear
+        $participants = $outing->getParticipants();
+        $participants->clear();
         $this->addFlash('success', 'Vous avez supprimé votre proposition de sortie !');
-        //todo : retirer tous les participants de la sortie (y compris le créateur)
     }
     $em->persist($outing);
     $em->flush();
