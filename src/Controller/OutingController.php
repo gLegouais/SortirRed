@@ -25,10 +25,10 @@ class OutingController extends AbstractController
         OutingRepository $outingRepository,
         StatusRepository $status,
         EntityManagerInterface $em,
-        SearchOutingFormModel $searchOutingFormModel,
         Request $request
     ): Response
     {
+        $searchOutingFormModel = new SearchOutingFormModel();
         $searchForm = $this -> createForm(SearchOutingType::class, $searchOutingFormModel);
         $searchForm -> handleRequest($request);
 
