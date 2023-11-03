@@ -152,7 +152,7 @@ class OutingController extends AbstractController
     {
         $outing = $outingRepository->find($id);
         if($outing->getStatus()->getLabel() == 'Created'){
-            $outing->setStatus($statusRepository->findOneBy(['label' => 'Open'])); //est-ce que ça change bien mon statut ?
+            $outing->setStatus($statusRepository->findOneBy(['label' => 'Open']));
             $this->addFlash('success', 'Votre proposition de sortie a été publiée !');
         }
         $em->persist($outing);
