@@ -67,10 +67,12 @@ class OutingController extends AbstractController
 
         // if form submitted
         // $outings = requete sql
-        if ($searchForm->isSubmitted() && $searchForm->isValid()) {
-            $outings = $outingRepository->findByCampus($searchOutingFormModel->getCampus()->getId());
-            if (!$outings) {
-                throw $this->createNotFoundException('Pas de sortie prévue sur ce campus');
+        if($searchForm -> isSubmitted() && $searchForm -> isValid()) {
+            //dd($searchOutingFormModel);
+            // $outings = $outingRepository -> findByCampus($searchOutingFormModel -> getCampus() -> getId());
+            $outings = $outingRepository->filterOutings($searchOutingFormModel, $this->getUser());
+            if(!$outings){
+                $this -> addFlash('danger', 'Pas de sortie prévue sur ce campus');
             }
         }
 
@@ -217,7 +219,7 @@ class OutingController extends AbstractController
     ): Response
     {
         $outing = $outingRepository->find($id);
-        if ($outing->getStatus()->getLabel() == 'Created') {
+        if($outing->getStatus()->getLabel() == 'Created'){
             $outing->addParticipant($outing->getOrganizer());
             $outing->setStatus($statusRepository->findOneBy(['label' => 'Open']));
             $this->addFlash('success', 'Votre proposition de sortie a été publiée !');
