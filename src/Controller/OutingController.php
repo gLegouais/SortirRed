@@ -185,8 +185,13 @@ class OutingController extends AbstractController
 
     }
 
-    #[Route('/withdrawal/{id}', name: 'outing_withdrawal', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-    public function withdrawal(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response
+    #[Route('/withdrawal/{id}', name: 'outing_withdrawal', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function withdrawal(
+        int $id,
+        OutingRepository $outingRepository,
+        EntityManagerInterface $em,
+        Request $request
+    ): Response
     {
         $outing = $outingRepository->find($id);
         if ($outing->getStatus()->getLabel() == 'Open' || $outing->getStatus()->getLabel() == 'Close') {
@@ -197,9 +202,8 @@ class OutingController extends AbstractController
         $em->persist($outing);
         $em->flush();
 
-        return $this->redirectToRoute('home_list');
-        //todo : faire en sorte qu'on soit redirigé vers la page d'accueil si on vient de là,
-        // sur le détail si on vient de là. (referer)
+        $referer = $request->headers->get('referer');
+        return $this->redirect($referer);
 
     }
 
@@ -208,7 +212,9 @@ class OutingController extends AbstractController
         int $id,
         OutingRepository $outingRepository,
         StatusRepository $statusRepository,
-        EntityManagerInterface $em): Response
+        EntityManagerInterface $em,
+        Request $request
+    ): Response
     {
         $outing = $outingRepository->find($id);
         if($outing->getStatus()->getLabel() == 'Created'){
@@ -219,8 +225,8 @@ class OutingController extends AbstractController
         $em->persist($outing);
         $em->flush();
 
-        //comment faire mon return selon que l'on soit sur la home_list ou le outing_show ?
-        return $this->redirectToRoute('home_list');
+        $referer = $request->headers->get('referer');
+        return $this->redirect($referer);
 
     }
 
