@@ -18,6 +18,7 @@ class OutingType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Nom de la sortie'
@@ -52,6 +53,10 @@ class OutingType extends AbstractType
                 'choice_label' => 'name',
                 'mapped' => false,
                 'placeholder' => '-- Choisir une ville --'
+            ])
+            ->add('location', LocationType::class, [
+                'label' => 'Nouveau lieu',
+                'by_reference' => false
             ])
         ;
     }

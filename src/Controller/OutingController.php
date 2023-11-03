@@ -102,24 +102,38 @@ class OutingController extends AbstractController
         $cities = $cityRepository->findAll();
         $locations = $locationRepository->findAll();
 
-
         $outing = new Outing();
+        $location = new Location();
         $outingForm = $this->createForm(OutingType::class, $outing);
         $outingForm->handleRequest($request);
 
         if ($outingForm->isSubmitted() && $outingForm->isValid()) {
-            $locationId = $request->get('locationSelect');
-            $location = $locationRepository->find($locationId);
-            $outing->setLocation($location);
-            $outing->setOrganizer($this->getUser());
-            $outing->addParticipant($outing->getOrganizer());
-            $outing->setStatus($statusRepository->findOneBy(['label' => 'Created']));
-            $manager->persist($outing);
-            $manager->flush();
+            try {
+                $locationId = $request->get('locationSelect');
+                if ($locationId) {
+                    $location = $locationRepository->find($locationId);
+                } else {
+                    $location->setName($request->get('name'));
+                    $location->setStreet($request->get('locatiion[street]'));
+                    $location->setCity($request->get('city'));
+                    $location->setLatitude(1.250);
+                    $location->setLongitude(-1.250);
+                }
+                $manager->persist($location);
+                $outing->setLocation($location);
+                $outing->setOrganizer($this->getUser());
+                $outing->addParticipant($outing->getOrganizer());
+                $outing->setStatus($statusRepository->findOneBy(['label' => 'Created']));
+                $manager->persist($outing);
+                $manager->flush();
+                $this->addFlash('success', 'La sortie a été créée avec succès.');
+                return $this->redirectToRoute('outing_show', ['id' => $outing->getId()]);
+            } catch (Exception $e) {
+                $this->addFlash('danger', 'Une erreur est survenue lors de la création de la sortie');
+                return $this->redirectToRoute('outing_create');
+            }
 
-            return $this->redirectToRoute('outing_show', ['id' => $outing->getId()]);
         }
-
 
         return $this->render('outing/create.html.twig', [
             'outingForm' => $outingForm,
@@ -156,6 +170,22 @@ class OutingController extends AbstractController
             $this->addFlash('success', "Vous êtes désinscrit de la sortie");
         }
 
+        $em->persist($outing);
+        $em->flush();
+
+        return $this->redirectToRoute('home_list');
+        //todo : faire en sorte qu'on soit redirigé vers la page d'accueil si on vient de là, sur le détail si on vient de là. (referer)
+
+    }
+
+    #[Route('/publication/{id}', name: 'outing_publication', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])] //besoin d'un get et d'un post ?
+    public function publication(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response
+    {
+        $outing = $outingRepository->find($id);
+        if($outing->getStatus()->getLabel() == 'Created'){
+            $outing->publish();
+            $this->addFlash('success', 'Votre proposition de sortie a été publiée !');
+        }
         $em->persist($outing);
         $em->flush();
 
