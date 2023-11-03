@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Location;
 use App\Entity\Outing;
 use App\Entity\User;
 use App\Form\OutingType;
