@@ -51,7 +51,10 @@ class OutingController extends AbstractController
             if ($outing->getStatus()->getLabel() != 'Created' && $outing->getStatus()->getLabel() != 'Cancelled') {
                 if ($currentDate < $deadline && (count($outing->getParticipants())) < $outing->getMaxRegistered()) {
                     $outing->setStatus($status->findOneBy(['label' => 'Open']));
-                } elseif ($currentDate < $starDate || (count($outing->getParticipants())) == $outing->getMaxRegistered()) {
+                } elseif (
+                    $currentDate < $starDate ||
+                    (count($outing->getParticipants())) == $outing->getMaxRegistered()
+                ) {
                     $outing->setStatus($status->findOneBy(['label' => 'Closed']));
                 } elseif ($currentDate < $endDate) {
                     $outing->setStatus($status->findOneBy(['label' => 'Ongoing']));
@@ -228,8 +231,6 @@ public function cancellation(
     int $id,
     OutingRepository $outingRepository,
     StatusRepository $statusRepository,
-    UserRepository $userRepository, //pour pouvoir accèder à ma collection de participants ??
-    //de toute façon, c'est inutile car c'est une collection, pas un attribut de type User?
     EntityManagerInterface $em): Response
 {
     $outing = $outingRepository->find($id);
