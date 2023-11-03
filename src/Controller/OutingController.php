@@ -138,9 +138,23 @@ class OutingController extends AbstractController
         $em->persist($outing);
         $em->flush();
 
-        //comment faire mon return selon que l'on soit sur la home_list ou le outing_show ?
         return $this->redirectToRoute('home_list');
+        //todo : faire en sorte qu'on soit redirigé vers la page d'accueil si on vient de là, sur le détail si on vient de là. (referer)
 
+    }
+
+    #[Route('/publication/{id}', name: 'outing_publication', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])] //besoin d'un get et d'un post ?
+    public function publication(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response
+    {
+        $outing = $outingRepository->find($id);
+        if($outing->getStatus()->getLabel() == 'Created'){
+            $outing->publish();
+            $this->addFlash('success', 'Votre proposition de sortie a été publiée !');
+        }
+        $em->persist($outing);
+        $em->flush();
+
+        return $this->redirectToRoute('home_list');
     }
 
 
