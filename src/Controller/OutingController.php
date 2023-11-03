@@ -67,10 +67,12 @@ class OutingController extends AbstractController
 
         // if form submitted
         // $outings = requete sql
-        if($searchForm -> isSubmitted() && $searchForm -> isValid()){
-            $outings = $outingRepository -> findByCampus($searchOutingFormModel -> getCampus() -> getId());
+        if($searchForm -> isSubmitted() && $searchForm -> isValid()) {
+            //dd($searchOutingFormModel);
+            // $outings = $outingRepository -> findByCampus($searchOutingFormModel -> getCampus() -> getId());
+            $outings = $outingRepository->filterOutings($searchOutingFormModel, $this->getUser());
             if(!$outings){
-                throw $this -> createNotFoundException('Pas de sortie prévue sur ce campus');
+                $this -> addFlash('danger', 'Pas de sortie prévue sur ce campus');
             }
         }
 

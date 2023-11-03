@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Outing;
+use App\Entity\User;
+use App\Form\Model\SearchOutingFormModel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -46,6 +48,52 @@ class OutingRepository extends ServiceEntityRepository
 
         $query = $qb -> getQuery();
         return $query -> getResult();
+    }
+
+    public function filterOutings(SearchOutingFormModel $formModel, User $user): ?array
+    {
+        $qb = $this->createQueryBuilder('outing');
+        if ($formModel->getCampus()) {
+            $qb->andWhere('outing.campus_id = :campusId')
+                ->setParameter('campusId', $formModel->getCampus()->getId());
+        }
+        if ($formModel->getName()) {
+            $qb->andWhere('outing.name LIKE :name')
+                ->setParameter('name', '%' . $formModel->getName() . '%');
+        }
+        if ($formModel->getStartDate()) {
+            $qb->andWhere('outing.startDate >= :startDate')
+                ->setParameter('startDate', $formModel->getStartDate());
+        }
+        if ($formModel->getEndDate()) {
+            $qb->andWhere('outing.startDate <= :endDate')
+                ->setParameter('endDate', $formModel->getEndDate());
+        }
+        if ($formModel->getOutingOrganizer()) {
+            $qb->andWhere('outing.organizer = :organizer')
+                ->setParameter('organizer', $user->getId());
+        }
+        if ($formModel->getOutingEnlisted()) {
+            $qb->join('outing.participants', 'p')
+                ->addSelect('p')
+                ->andWhere('p.id = :userID')
+                ->setParameter('userID', $user->getId());
+        }
+        if ($formModel->getOutingNotEnlisted()) {
+            $qb->join('outing.participants', 'p')
+                ->addSelect('p')
+                ->andWhere('p.id != :userID')
+                ->setParameter('userID', $user->getId());
+        }
+//        if ($formModel->getOutingFinished()) {
+//            $qb->join('outing.status', 's')
+//                ->addSelect('s')
+//                ->andWhere('outing.status = :status')
+//                ->setParameter('status', )
+//        }
+
+        $query = $qb->getQuery();
+        return $query->getResult();
     }
 
 //    /**
