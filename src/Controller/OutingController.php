@@ -27,19 +27,12 @@ class OutingController extends AbstractController
         OutingRepository $outingRepository,
         StatusRepository $status,
         EntityManagerInterface $em,
-        SearchOutingFormModel $searchOutingFormModel,
         Request $request
     ): Response
     {
+        $searchOutingFormModel = new SearchOutingFormModel();
         $searchForm = $this -> createForm(SearchOutingType::class, $searchOutingFormModel);
         $searchForm -> handleRequest($request);
-
-        if($searchForm -> isSubmitted() && $searchForm -> isValid()){
-            $outingCampus = $outingRepository -> findByCampus($searchOutingFormModel -> getCampus() -> getId());
-            if(!$outingCampus){
-                throw $this -> createNotFoundException('Pas de sortie prévue sur ce campus');
-            }
-        }
 
         $currentDate = new \DateTimeImmutable();
 
@@ -70,10 +63,18 @@ class OutingController extends AbstractController
             }
         }
 
+        // if form submitted
+        // $outings = requete sql
+        if($searchForm -> isSubmitted() && $searchForm -> isValid()){
+            $outings = $outingRepository -> findByCampus($searchOutingFormModel -> getCampus() -> getId());
+            if(!$outings){
+                throw $this -> createNotFoundException('Pas de sortie prévue sur ce campus');
+            }
+        }
+
         return $this->render('outing/list.html.twig', [
             'outings' => $outings,
-            'searchForm' => $searchForm,
-            'outingCampus' => $outingCampus
+            'searchForm' => $searchForm
         ]);
     }
 

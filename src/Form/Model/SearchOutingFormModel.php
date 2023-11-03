@@ -2,20 +2,22 @@
 
 namespace App\Form\Model;
 
+use App\Entity\Campus;
 use App\Entity\Outing;
+use DateTimeImmutable;
 
 class SearchOutingFormModel
 {
-    private $campus;
-    private $name;
-    private $startDate;
-    private $endDate;
-    private $outingOrganizer;
-    private $outingEnlisted;
-    private $outingNotEnlisted;
-    private $outingFinished;
+    private Campus $campus;
+    private string $name;
+    private dateTimeImmutable $startDate;
+    private dateTimeImmutable $endDate;
+    private bool $outingOrganizer;
+    private bool $outingEnlisted;
+    private bool $outingNotEnlisted;
+    private bool $outingFinished;
 
-    public function getCampus()
+    public function getCampus(): Campus
     {
         return $this->campus;
     }
@@ -25,7 +27,7 @@ class SearchOutingFormModel
         $this->campus = $campus;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -35,7 +37,7 @@ class SearchOutingFormModel
         $this->name = $name;
     }
 
-    public function getStartDate()
+    public function getStartDate(): DateTimeImmutable
     {
         return $this->startDate;
     }
@@ -45,7 +47,7 @@ class SearchOutingFormModel
         $this->startDate = $startDate;
     }
 
-    public function getEndDate()
+    public function getEndDate(): DateTimeImmutable
     {
         return $this -> endDate;
     }
@@ -55,7 +57,7 @@ class SearchOutingFormModel
         $this -> endDate = $endDate;
     }
 
-    public function getOutingOrganizer()
+    public function getOutingOrganizer(): bool
     {
         return $this->outingOrganizer;
     }
@@ -65,7 +67,7 @@ class SearchOutingFormModel
         $this->outingOrganizer = $outingOrganizer;
     }
 
-    public function getOutingEnlisted()
+    public function getOutingEnlisted(): bool
     {
         return $this->outingEnlisted;
     }
@@ -75,7 +77,7 @@ class SearchOutingFormModel
         $this->outingEnlisted = $outingEnlisted;
     }
 
-    public function getOutingNotEnlisted()
+    public function getOutingNotEnlisted(): bool
     {
         return $this->outingNotEnlisted;
     }
@@ -85,7 +87,7 @@ class SearchOutingFormModel
         $this->outingNotEnlisted = $outingNotEnlisted;
     }
 
-    public function getOutingFinished()
+    public function getOutingFinished(): bool
     {
         return $this->outingFinished;
     }
