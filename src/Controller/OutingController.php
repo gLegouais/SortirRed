@@ -4,19 +4,17 @@ namespace App\Controller;
 
 use App\Entity\Location;
 use App\Entity\Outing;
-use App\Entity\User;
 use App\Form\Model\OutingTypeModel;
 use App\Form\Model\SearchOutingFormModel;
 use App\Form\OutingType;
 use App\Form\SearchOutingType;
-use App\Repository\CampusRepository;
 use App\Repository\CityRepository;
 use App\Repository\LocationRepository;
 use App\Repository\OutingRepository;
 use App\Repository\StatusRepository;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -34,7 +32,6 @@ class OutingController extends AbstractController
         $searchOutingFormModel = new SearchOutingFormModel();
         $searchForm = $this -> createForm(SearchOutingType::class, $searchOutingFormModel);
         $searchForm -> handleRequest($request);
-        $outingCampus = null;
 
         $currentDate = new \DateTimeImmutable();
 
@@ -192,7 +189,7 @@ class OutingController extends AbstractController
     public function withdrawal(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response
     {
         $outing = $outingRepository->find($id);
-        if ($outing->getStatus()->getLabel() == 'Open' or $outing->getStatus()->getLabel() == 'Close') {
+        if ($outing->getStatus()->getLabel() == 'Open' || $outing->getStatus()->getLabel() == 'Close') {
             $outing->removeParticipant($this->getUser());
             $this->addFlash('success', "Vous êtes désinscrit de la sortie");
         }
@@ -201,11 +198,12 @@ class OutingController extends AbstractController
         $em->flush();
 
         return $this->redirectToRoute('home_list');
-        //todo : faire en sorte qu'on soit redirigé vers la page d'accueil si on vient de là, sur le détail si on vient de là. (referer)
+        //todo : faire en sorte qu'on soit redirigé vers la page d'accueil si on vient de là,
+        // sur le détail si on vient de là. (referer)
 
     }
 
-    #[Route('/publication/{id}', name: 'outing_publication', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])] //besoin d'un get et d'un post ?
+    #[Route('/publication/{id}', name: 'outing_publication', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function publication(
         int $id,
         OutingRepository $outingRepository,
@@ -226,19 +224,16 @@ class OutingController extends AbstractController
 
     }
 
-#[Route('/cancellation/{id}', name: 'outing_cancellation', requirements:['id'=>'\d+'], methods: ['GET', 'POST'])]
+#[Route('/cancellation/{id}', name: 'outing_cancellation', requirements:['id'=>'\d+'], methods: ['GET'])]
 public function cancellation(
     int $id,
     OutingRepository $outingRepository,
     StatusRepository $statusRepository,
-    UserRepository $userRepository, //pour pouvoir accèder à ma collection de participants ??
-    //de toute façon, c'est inutile car c'est une collection, pas un attribut de type User?
     EntityManagerInterface $em): Response
 {
     $outing = $outingRepository->find($id);
     if(($outing->getStatus()->getLabel()=='Open') || ($outing->getStatus()->getLabel()=='Closed')){
         $outing->setStatus($statusRepository->findOneBy(['label' => 'Cancelled']));
-        //todo : retirer tous les participants de la sortie (y compris le créateur) //clear
         $participants = $outing->getParticipants();
         $participants->clear();
         $this->addFlash('success', 'Vous avez supprimé votre proposition de sortie !');
