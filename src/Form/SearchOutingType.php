@@ -33,13 +33,15 @@ class SearchOutingType extends AbstractType
                 'label' => 'Entre ',
                 'required' => false,
                 'widget' => 'single_text',
-                'input' => 'datetime_immutable'
+                'input' => 'datetime_immutable',
+                'mapped' => false
             ])
             ->add('endDate', DateTimeType::class, [
                 'label' => ' et ',
                 'required' => false,
                 'widget' => 'single_text',
-                'input' => 'datetime_immutable'
+                'input' => 'datetime_immutable',
+                'mapped' => false
             ])
             ->add('outingOrganizer', CheckboxType::class, [
                 'label' => 'Sorties dont je suis l\'organisateur/trice',

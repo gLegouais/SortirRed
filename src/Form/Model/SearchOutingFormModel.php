@@ -3,15 +3,14 @@
 namespace App\Form\Model;
 
 use App\Entity\Campus;
-use App\Entity\Outing;
 use DateTimeImmutable;
 
 class SearchOutingFormModel
 {
     private Campus $campus;
     private string $name;
-    private dateTimeImmutable $startDate;
-    private dateTimeImmutable $endDate;
+    private DateTimeImmutable $startDate;
+    private DateTimeImmutable $endDate;
     private bool $outingOrganizer;
     private bool $outingEnlisted;
     private bool $outingNotEnlisted;

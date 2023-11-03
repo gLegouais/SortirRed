@@ -48,6 +48,7 @@ class OutingRepository extends ServiceEntityRepository
         return $query -> getResult();
     }
 
+
 //    /**
 //     * @return Outing[] Returns an array of Outing objects
 //     */
