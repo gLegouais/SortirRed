@@ -228,8 +228,6 @@ public function cancellation(
     int $id,
     OutingRepository $outingRepository,
     StatusRepository $statusRepository,
-    UserRepository $userRepository, //pour pouvoir accèder à ma collection de participants ??
-    //de toute façon, c'est inutile car c'est une collection, pas un attribut de type User?
     EntityManagerInterface $em): Response
 {
     $outing = $outingRepository->find($id);
