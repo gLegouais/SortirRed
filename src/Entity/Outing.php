@@ -206,12 +206,6 @@ class Outing
         return $this;
     }
 
-    //Est-ce que cette fonction change bien le statut de ma sortie ?
-    public function publish():static
-    {
-        $this->getStatus()->setLabel('Open');
-        return $this;
-    }
 
 
 }//fin public class
