@@ -9,8 +9,7 @@
     <p>RDV le {{ outing.startDate | date('d/m/y') }} à {{ outing.startDate | date('H:i') }}</p>
     <p>Durée : {{ outing.duration }}minutes</p>
     <p>Date limite d'inscription : {{ outing.deadline | date('d/m/y') }}</p>
-    <p>Description et infos : </p>
-    <p>{{ outing.description }}</p>
+    <p>Description et infos : {{ outing.description }}</p>
     <p>Organisée par {{ outing.organizer.username }}</p>
     <p>Nombre de places : {{ outing.participants|length }} / {{ outing.maxRegistered }}</p>
     <p>Campus : {{ outing.campus.name }}</p>
@@ -41,7 +40,8 @@
         </tbody>
     </table>
 
-    {% if outing.organizer != app.user and  not isRegistered %}
+    {#{% if outing.organizer != app.user and  not isRegistered %}#}
+    {% if app.user != isRegistered %}
         <p><a href="{{ path('outing_inscription', {'id': outing.id}) }}" title="inscription">S'inscrire</a></p>
     {% endif %}
 
@@ -50,12 +50,14 @@
         <p><a href="{{ path('outing_withdrawal', {'id': outing.id}) }}" title="desistement">Se désister</a></p>
     {% endif %}
 
-    {% if outing.organizer == app.user %}
+    {% if (outing.organizer == app.user) and (outing.status.label == 'Open' or outing.status.label == 'Closed') %}
         <p><a href="" title="modification">Modifier</a></p>
+        <p><a href="" title="annulation">Annuler la sortie</a></p>
     {% endif %}
 
     {% if outing.organizer == app.user and outing.status.label == 'Created' %}
-        <p><a href="" title="publication">Publier</a></p>
+        <p><a href="{{ path('outing_publication', {'id':outing.id}) }}" title="publication">Publier</a></p>
+        <p><a href="" title="suppresion">Supprimer le projet</a></p>
     {% endif %}
 
     <p>
