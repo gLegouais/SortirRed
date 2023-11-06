@@ -66,14 +66,14 @@ class OutingRepository extends ServiceEntityRepository
         if ($formModel->getOutingEnlisted()) {
             $qb->join('outing.participants', 'p')
                 ->addSelect('p')
-                ->andWhere('p.id = :userID')
-                ->setParameter('userID', $user->getId());
+                ->andWhere(':user MEMBER OF outing.participants')
+                ->setParameter('user', $user);
         }
         if ($formModel->getOutingNotEnlisted()) {
             $qb->join('outing.participants', 'p')
                 ->addSelect('p')
-                ->andWhere('p.id != :userID')
-                ->setParameter('userID', $user->getId());
+                ->andWhere(':user NOT MEMBER OF outing.participants')
+                ->setParameter('user', $user);
         }
         if ($formModel->getOutingFinished()) {
             $qb->join('outing.status', 's')
