@@ -95,7 +95,6 @@ class OutingController extends AbstractController
         $locations = $locationRepository->findAll();
 
 
-        $outingCreateModel = new OutingTypeModel();
         $outing = new Outing();
 
         $outingForm = $this->createForm(OutingType::class, $outing);
@@ -104,35 +103,8 @@ class OutingController extends AbstractController
         if ($outingForm->isSubmitted() && $outingForm->isValid()) {
             try {
 
-                $location = $locationRepository->findOneBy([
-                    'name' => $outingCreateModel->getLocation()->getName(),
-                    'street' => $outingCreateModel->getLocation()->getStreet()
-                ]);
-
-                if (!$location) {
-                    $location = new Location();
-                    $location->setName($outingCreateModel->getLocation()->getName());
-                    $location->setStreet($outingCreateModel->getLocation()->getStreet());
-                    $location->setCity($outingCreateModel->getCity());
-                    $location->setLatitude(1.500);
-                    $location->setLongitude(-1.500);
-
-                    $manager->persist($location);
-
-                    $manager->flush();
-                }
-
-                $outing = new Outing();
-                $outing->setName($outingCreateModel->getName());
-                $outing->setStartDate($outingCreateModel->getStartDate());
-                $outing->setDuration($outingCreateModel->getDuration());
-                $outing->setDeadline($outingCreateModel->getDeadline());
-                $outing->setMaxRegistered($outingCreateModel->getMaxRegistered());
-                $outing->setDescription($outingCreateModel->getDescription());
                 $outing->setStatus($statusRepository->findOneBy(['label' => 'Created']));
-                $outing->setLocation($location);
                 $outing->setOrganizer($this->getUser());
-                $outing->setCampus($outingCreateModel->getCampus());
 
                 $manager->persist($outing);
 

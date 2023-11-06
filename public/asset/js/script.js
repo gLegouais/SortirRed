@@ -6,9 +6,10 @@ citySelect.addEventListener('change', getRelatedLocations);
 async function getRelatedLocations(element) {
     const cityId = element.target.value;
     locationSelect.disabled = false;
+    locationDetailsDiv.innerHTML = "";
 
     const response = await fetch('/sortirRED/public/api/city/' + cityId + '/getRelatedLocations');
-    await response.json().then(function(response) {
+    await response.json().then((response) => {
         response.forEach((location) => {
 
             let defaultOption = document.createElement('option');
@@ -32,11 +33,60 @@ async function getRelatedLocations(element) {
 locationSelect.addEventListener('change', getLocationDetails);
 async function getLocationDetails(element) {
     const locationId = element.target.value;
+    console.log(locationId);
     const response = await fetch('/sortirRED/public/api/location/' + locationId);
-    const location = await response.json();
-    showLocationDetails(location);
+    await response.json().then((response) => {
+        response.forEach((attribute) => {
+            let streetP = document.createElement('p');
+            streetP.innerText = 'Rue : ' + attribute.street;
+
+            let postcodeP = document.createElement('p');
+            postcodeP.innerText = 'Code postal : ' + attribute.city.postcode;
+
+            locationDetailsDiv.appendChild(streetP);
+            locationDetailsDiv.appendChild(postcodeP);
+
+            if (!attribute.latitude) {
+                getLocationLatAndLongitude(attribute.street, attribute.city.postcode);
+            } else {
+                let latitudeP = document.createElement('p');
+                latitudeP.innerText = 'Latitude : ' + attribute.latitude;
+
+                let longitudeP = document.createElement('p');
+                longitudeP.innerText = 'Latitude : ' + attribute.longitude;
+
+                locationDetailsDiv.appendChild(latitudeP);
+                locationDetailsDiv.appendChild(longitudeP);
+            }
+
+        })
+    });
 }
 
-function showLocationDetails(location) {
-
+async function getLocationLatAndLongitude(street, postcode) {
+    const api_url = 'https://api-adresse.data.gouv.fr/search/?q=';
+    console.log(api_url + formatStreet(street) + '&postcode=' + postcode);
+    let coordinates = [];
+    const response = await fetch(api_url + formatStreet(street) + '&postcode=' + formatPostcode(postcode));
+    await response.json().then((data) => {
+        let latitudeP = document.createElement('p');
+        let longitudeP = document.createElement('p');
+        latitudeP.innerText = 'Latitude : ' + data['features'][0].geometry.coordinates[0];
+        longitudeP.innerText = 'Longitude : ' + data['features'][0].geometry.coordinates[1];
+        locationDetailsDiv.appendChild(latitudeP);
+        locationDetailsDiv.appendChild(longitudeP);
+    })
+    console.log(coordinates)
+    return coordinates;
+}
+function formatStreet(street) {
+    let streetArray = street.split(' ');
+    let newStreetArray = []
+    streetArray.map((item) => {
+        newStreetArray.push(item.replace(',', ''));
+    });
+    return newStreetArray.join('+');
+}
+function formatPostcode(postcode) {
+    return postcode.replace(' ', '');
 }
