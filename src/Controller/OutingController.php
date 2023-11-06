@@ -211,36 +211,36 @@ class OutingController extends AbstractController
 
     }
 
-#[Route('/cancellation/{id}', name: 'outing_cancellation', requirements:['id'=>'\d+'], methods: ['GET'])]
-public function cancellation(
-    int $id,
-    OutingRepository $outingRepository,
-    StatusRepository $statusRepository,
-    EntityManagerInterface $em,
-    Request $request): Response
-{
-    $outing = $outingRepository->find($id);
-    if(($outing->getStatus()->getLabel()=='Open') || ($outing->getStatus()->getLabel()=='Closed')){
-        $outing->setStatus($statusRepository->findOneBy(['label' => 'Cancelled']));
-        $participants = $outing->getParticipants();
-        $participants->clear();
-        $this->addFlash('success', 'Vous avez supprimé votre proposition de sortie !');
-    }
-    $em->persist($outing);
-    $em->flush();
-
-    $referer = $request->headers->get('referer');
-    return $this->redirect($referer);
-}
-    #[Route('/campus/{id}', name: 'search_campus', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function findByCampus(int $id, OutingRepository $outingRepository): Response
+    #[Route('/cancellation/{id}', name: 'outing_cancellation', requirements:['id'=>'\d+'], methods: ['GET'])]
+    public function cancellation(
+        int $id,
+        OutingRepository $outingRepository,
+        StatusRepository $statusRepository,
+        EntityManagerInterface $em,
+        Request $request): Response
     {
-        $outingCampus = $outingRepository -> findByCampus($id);
-        if(!$outingCampus){
-            throw $this -> createNotFoundException('Pas de sortie prévue sur ce campus');
+        $outing = $outingRepository->find($id);
+        if(($outing->getStatus()->getLabel()=='Open') || ($outing->getStatus()->getLabel()=='Closed')){
+            $outing->setStatus($statusRepository->findOneBy(['label' => 'Cancelled']));
+            $participants = $outing->getParticipants();
+            $participants->clear();
+            $this->addFlash('success', 'Vous avez supprimé votre proposition de sortie !');
         }
-        return $this -> render('outing/list.html.twig');
+        $em->persist($outing);
+        $em->flush();
+
+        $referer = $request->headers->get('referer');
+        return $this->redirect($referer);
     }
+        #[Route('/campus/{id}', name: 'search_campus', requirements: ['id' => '\d+'], methods: ['GET'])]
+        public function findByCampus(int $id, OutingRepository $outingRepository): Response
+        {
+            $outingCampus = $outingRepository -> findByCampus($id);
+            if(!$outingCampus){
+                throw $this -> createNotFoundException('Pas de sortie prévue sur ce campus');
+            }
+            return $this -> render('outing/list.html.twig');
+        }
 
     #[Route('/delete/{id}', name: 'delete_outing', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function deleteOuting(
