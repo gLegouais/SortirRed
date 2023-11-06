@@ -41,6 +41,14 @@ class OutingController extends AbstractController
 
         if($searchForm -> isSubmitted() && $searchForm -> isValid()) {
 
+            $enlisted = $searchForm -> get('outingEnlisted') -> getData();
+            $notEnlisted = $searchForm -> get('outingNotEnlisted') -> getData();
+
+            if($enlisted == 'true' && $notEnlisted == 'true'){
+                $this -> addFlash('danger', 'Vous ne pouvez pas être inscrit et non-inscrit à une sortie');
+                return $this -> redirectToRoute('home_list');
+            }
+
             $outings = $outingRepository->filterOutings($searchOutingFormModel, $this->getUser());
             if(!$outings){
                 $this -> addFlash('danger', 'Pas de sortie prévue sur ce campus');
