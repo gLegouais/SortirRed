@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Location;
 use App\Entity\Outing;
 use App\Form\CancellationType;
+use App\Form\Model\CancellationTypeModel;
 use App\Form\Model\OutingTypeModel;
 use App\Form\Model\SearchOutingFormModel;
 use App\Form\OutingType;
@@ -29,34 +30,34 @@ class OutingController extends AbstractController
 {
     #[Route('/', name: 'home_list', methods: ['GET', 'POST'])]
     public function listOuting(
-        OutingRepository $outingRepository,
-        StatusRepository $status,
+        OutingRepository       $outingRepository,
+        StatusRepository       $status,
         EntityManagerInterface $em,
-        ChangeStatus $changeStatus,
-        Request $request
+        ChangeStatus           $changeStatus,
+        Request                $request
     ): Response
     {
         $searchOutingFormModel = new SearchOutingFormModel();
-        $searchForm = $this -> createForm(SearchOutingType::class, $searchOutingFormModel);
-        $searchForm -> handleRequest($request);
+        $searchForm = $this->createForm(SearchOutingType::class, $searchOutingFormModel);
+        $searchForm->handleRequest($request);
 
         $outings = $outingRepository->findOutings();
 
-        $changeStatus -> changeStatus($outingRepository, $status, $em);
+        $changeStatus->changeStatus($outingRepository, $status, $em);
 
-        if($searchForm -> isSubmitted() && $searchForm -> isValid()) {
+        if ($searchForm->isSubmitted() && $searchForm->isValid()) {
 
-            $enlisted = $searchForm -> get('outingEnlisted') -> getData();
-            $notEnlisted = $searchForm -> get('outingNotEnlisted') -> getData();
+            $enlisted = $searchForm->get('outingEnlisted')->getData();
+            $notEnlisted = $searchForm->get('outingNotEnlisted')->getData();
 
-            if($enlisted == 'true' && $notEnlisted == 'true'){
-                $this -> addFlash('danger', 'Vous ne pouvez pas être inscrit et non-inscrit à une sortie');
-                return $this -> redirectToRoute('home_list');
+            if ($enlisted == 'true' && $notEnlisted == 'true') {
+                $this->addFlash('danger', 'Vous ne pouvez pas être inscrit et non-inscrit à une sortie');
+                return $this->redirectToRoute('home_list');
             }
 
             $outings = $outingRepository->filterOutings($searchOutingFormModel, $this->getUser());
-            if(!$outings){
-                $this -> addFlash('danger', 'Pas de sortie prévue sur ce campus');
+            if (!$outings) {
+                $this->addFlash('danger', 'Pas de sortie prévue sur ce campus');
             }
         }
 
@@ -156,6 +157,8 @@ class OutingController extends AbstractController
     #[Route('/inscription/{id}', name: 'outing_inscription', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
     public function inscription(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response
     {
+        //todo : ici, il faudrait vérifier que mon utilisateur ne soit pas déjà inscrit ?
+        //est-ce que quelqu'un peut "inscrire" quelqu'un d'autres à sa place ?
         $outing = $outingRepository->find($id);
         if (
             ($outing->getStatus()->getLabel() == 'Open') &&
@@ -180,7 +183,8 @@ class OutingController extends AbstractController
         Request                $request
     ): Response
     {
-        //todo : ici, il faudrait vérifier que mon utilisateur ne soit pas déjà inscrit ?
+        //todo : ici, il faudrait vérifier que mon utilisateur soit déjà bien inscrit ?
+        //est-ce que quelqu'un peut "désister" quelqu'un d'autres à sa place ?
         $outing = $outingRepository->find($id);
         if ($outing->getStatus()->getLabel() == 'Open' || $outing->getStatus()->getLabel() == 'Close') {
             $outing->removeParticipant($this->getUser());
@@ -233,20 +237,20 @@ class OutingController extends AbstractController
         EntityManagerInterface $em,
         Request                $request): Response
     {
-        var_dump("Je suis dans LA PREMIERE PARTIE DE ma méthode d'annulation de sortie");
-        if (($this->getUser()) === ($outing->getOrganizer())) { //vérifier si la personne connectée est bien l'organisateur
+        if (($this->getUser()) === ($outing->getOrganizer())) {
 
             $outing = $outingRepository->find($id);
-            $cancellationForm = $this->createForm(CancellationType::class, $outing);
+            $cancellationTypeModel = new CancellationTypeModel();
+            $cancellationForm = $this->createForm(CancellationType::class, $cancellationTypeModel);
             $cancellationForm->handleRequest($request);
 
             if (($cancellationForm->isSubmitted() && $cancellationForm->isValid()) && (($outing->getStatus()->getLabel() == 'Open') || ($outing->getStatus()->getLabel() == 'Closed'))) {
 
-                var_dump("Je suis dans LA DEUXIEME PARTIE DE ma méthode d'annulation de sortie  : soumission et validation du formulaire");
-                $outing->setStatus($statusRepository->findOneBy(['label' => 'Cancelled'])); //changement du statut en "Cancelled"
-                $participants = $outing->getParticipants(); //suppression des participants
+                $outing->setStatus($statusRepository->findOneBy(['label' => 'Cancelled']));
+                $participants = $outing->getParticipants();
                 $participants->clear();
-
+                $outing->setDescription("[ANNULÉ] : " . $cancellationTypeModel->getMotif() . "\n" . $outing->getDescription());
+                var_dump($outing->getDescription());
                 $em->persist($outing);
                 $em->flush();
                 $this->addFlash('success', 'Vous avez supprimé votre proposition de sortie !');
@@ -283,7 +287,7 @@ class OutingController extends AbstractController
         EntityManagerInterface $em): Response
     {
         $outing = $outingRepository->find($id);
-        if (($this->getUser()) === ($outing->getOrganizer())) { //vérifier si la personne connectée est bien l'organisateur
+        if (($this->getUser()) === ($outing->getOrganizer())) {
             if ($outing->getStatus()->getLabel() == 'Created') {
                 $this->addFlash('success', 'Votre projet de sortie a été supprimé. ');
                 $em->remove($outing);
