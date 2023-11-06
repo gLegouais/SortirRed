@@ -15,9 +15,13 @@ use App\Repository\StatusRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Context\Normalizer\ObjectNormalizerContextBuilder;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class OutingController extends AbstractController
 {
@@ -111,8 +115,9 @@ class OutingController extends AbstractController
 
 
         $outingCreateModel = new OutingTypeModel();
+        $outing = new Outing();
 
-        $outingForm = $this->createForm(OutingType::class, $outingCreateModel);
+        $outingForm = $this->createForm(OutingType::class, $outing);
         $outingForm->handleRequest($request);
 
         if ($outingForm->isSubmitted() && $outingForm->isValid()) {
@@ -179,12 +184,10 @@ class OutingController extends AbstractController
             $outing->addParticipant($this->getUser());
             $this->addFlash('success', 'Vous avez été inscrit à la sortie');
         }
-
         $em->persist($outing);
         $em->flush();
 
         return $this->redirectToRoute('home_list');
-
     }
 
     #[Route('/withdrawal/{id}', name: 'outing_withdrawal', requirements: ['id' => '\d+'], methods: ['GET'])]
@@ -240,16 +243,20 @@ public function cancellation(
     EntityManagerInterface $em,
     Request $request): Response
 {
-    $outing = $outingRepository->find($id);
-    if(($outing->getStatus()->getLabel()=='Open') || ($outing->getStatus()->getLabel()=='Closed')){
-        $outing->setStatus($statusRepository->findOneBy(['label' => 'Cancelled']));
-        $participants = $outing->getParticipants();
-        $participants->clear();
-        $this->addFlash('success', 'Vous avez supprimé votre proposition de sortie !');
-    }
-    $em->persist($outing);
-    $em->flush();
 
+    $outing = $outingRepository->find($id);
+    if ($outing->getOrganizer() === $this->getUser()) {
+        if(($outing->getStatus()->getLabel()=='Open') || ($outing->getStatus()->getLabel()=='Closed')){
+            $outing->setStatus($statusRepository->findOneBy(['label' => 'Cancelled']));
+            $participants = $outing->getParticipants();
+            $participants->clear();
+            $em->persist($outing);
+            $em->flush();
+            $this->addFlash('success', 'Vous avez supprimé votre proposition de sortie !');
+        }
+    } else {
+        $this->addFlash('danger', 'Vous ne pouvez pas annuler une sortie dont vous n\'êtes pas l\'organisateur.');
+    }
     $referer = $request->headers->get('referer');
     return $this->redirect($referer);
 }
@@ -270,12 +277,16 @@ public function cancellation(
         EntityManagerInterface $em): Response
     {
         $outing = $outingRepository->find($id);
-        if ($outing->getStatus()->getLabel() == 'Created' ) {
-            $this->addFlash('success', 'Votre projet de sortie a été supprimé. ');
-            $em->remove($outing);
+        if ($outing->getOrganizer() === $this->getUser() || $this->isGranted('ROLE_ADMIN')) {
+            if ($outing->getStatus()->getLabel() == 'Created') {
+                $outing->getParticipants()->clear();
+                $em->remove($outing);
+                $em->flush();
+                $this->addFlash('success', 'Votre projet de sortie a été supprimé. ');
+            }
+        } else {
+            $this->addFlash('danger', 'Vous ne pouvez pas supprimer une sortie dont vous n\'êtes pas l\'organisateur.');
         }
-
-        $em->flush();
         return $this->redirectToRoute('home_list');
     }
 
