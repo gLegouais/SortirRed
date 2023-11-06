@@ -26,7 +26,7 @@ class ApiController extends AbstractController
         LocationRepository $locationRepository
     ): JsonResponse
     {
-        $location = $locationRepository->find($locationId);
+        $location = $locationRepository->findBy(['id'=>$locationId]);
         return $this->json($location, Response::HTTP_OK, [], ['groups'=>'get:full:location']);
     }
 }
