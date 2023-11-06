@@ -12,6 +12,7 @@ use App\Repository\CityRepository;
 use App\Repository\LocationRepository;
 use App\Repository\OutingRepository;
 use App\Repository\StatusRepository;
+use App\Services\ChangeStatus;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Config\Definition\Exception\Exception;
@@ -30,6 +31,7 @@ class OutingController extends AbstractController
         OutingRepository $outingRepository,
         StatusRepository $status,
         EntityManagerInterface $em,
+        ChangeStatus $changeStatus,
         Request $request
     ): Response
     {
@@ -37,43 +39,20 @@ class OutingController extends AbstractController
         $searchForm = $this -> createForm(SearchOutingType::class, $searchOutingFormModel);
         $searchForm -> handleRequest($request);
 
-        $currentDate = new \DateTimeImmutable();
-
         $outings = $outingRepository->findOutings();
 
-        foreach ($outings as $outing) {
-            $deadline = $outing->getDeadline();
-            $starDate = $outing->getStartDate();
-            $duration = $outing->getDuration();
+        $changeStatus -> changeStatus($outingRepository, $status, $em);
 
-            $endDate = $currentDate->modify('+' . $duration . 'days');
-            $archiveDate = $endDate->modify('+' . 30 . 'days');
-
-            if ($outing->getStatus()->getLabel() != 'Created' && $outing->getStatus()->getLabel() != 'Cancelled') {
-                if ($currentDate < $deadline && (count($outing->getParticipants())) < $outing->getMaxRegistered()) {
-                    $outing->setStatus($status->findOneBy(['label' => 'Open']));
-                } elseif (
-                    $currentDate < $starDate ||
-                    (count($outing->getParticipants())) == $outing->getMaxRegistered()
-                ) {
-                    $outing->setStatus($status->findOneBy(['label' => 'Closed']));
-                } elseif ($currentDate < $endDate) {
-                    $outing->setStatus($status->findOneBy(['label' => 'Ongoing']));
-                } elseif ($currentDate >= $archiveDate) {
-                    $outing->setStatus($status->findOneBy(['label' => 'Archived']));
-                } else {
-                    $outing->setStatus($status->findOneBy(['label' => 'Finished']));
-                }
-                $em->persist($outing);
-                $em->flush();
-            }
-        }
-
-        // if form submitted
-        // $outings = requete sql
         if($searchForm -> isSubmitted() && $searchForm -> isValid()) {
-            //dd($searchOutingFormModel);
-            // $outings = $outingRepository -> findByCampus($searchOutingFormModel -> getCampus() -> getId());
+
+            $enlisted = $searchForm -> get('outingEnlisted') -> getData();
+            $notEnlisted = $searchForm -> get('outingNotEnlisted') -> getData();
+
+            if($enlisted == 'true' && $notEnlisted == 'true'){
+                $this -> addFlash('danger', 'Vous ne pouvez pas être inscrit et non-inscrit à une sortie');
+                return $this -> redirectToRoute('home_list');
+            }
+
             $outings = $outingRepository->filterOutings($searchOutingFormModel, $this->getUser());
             if(!$outings){
                 $this -> addFlash('danger', 'Pas de sortie prévue sur ce campus');
