@@ -40,14 +40,11 @@
             {{ form_row(outingForm.description) }}
         </div>
         <div class="container col-6 mx-auto">
-            {{ form_row(outingForm.campus, {value : app.user.campus.id}) }}
+            {{ form_row(outingForm.campus) }}
             {{ form_row(outingForm.city) }}
-            <div id="location">
+            {{ form_row(outingForm.location) }}
+            <div id="locationDetails">
             </div>
-            <div id="locationForm">
-                {{ form_row(outingForm.location) }}
-            </div>
-
         </div>
     </div>
 

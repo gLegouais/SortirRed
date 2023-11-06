@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Location;
 use App\Entity\Outing;
+use App\Form\CancellationType;
+use App\Form\Model\CancellationTypeModel;
 use App\Form\Model\OutingTypeModel;
 use App\Form\Model\SearchOutingFormModel;
 use App\Form\OutingType;
@@ -16,16 +18,20 @@ use App\Services\ChangeStatus;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Context\Normalizer\ObjectNormalizerContextBuilder;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class OutingController extends AbstractController
 {
     #[Route('/', name: 'home_list', methods: ['GET', 'POST'])]
     public function listOuting(
-        OutingRepository $outingRepository,
-        StatusRepository $status,
+        OutingRepository       $outingRepository,
+        StatusRepository       $status,
         EntityManagerInterface $em,
         ChangeStatus $changeStatus,
         Request $request
@@ -89,43 +95,16 @@ class OutingController extends AbstractController
         $locations = $locationRepository->findAll();
 
 
-        $outingCreateModel = new OutingTypeModel();
+        $outing = new Outing();
 
-        $outingForm = $this->createForm(OutingType::class, $outingCreateModel);
+        $outingForm = $this->createForm(OutingType::class, $outing);
         $outingForm->handleRequest($request);
 
         if ($outingForm->isSubmitted() && $outingForm->isValid()) {
             try {
 
-                $location = $locationRepository->findOneBy([
-                    'name' => $outingCreateModel->getLocation()->getName(),
-                    'street' => $outingCreateModel->getLocation()->getStreet()
-                ]);
-
-                if (!$location) {
-                    $location = new Location();
-                    $location->setName($outingCreateModel->getLocation()->getName());
-                    $location->setStreet($outingCreateModel->getLocation()->getStreet());
-                    $location->setCity($outingCreateModel->getCity());
-                    $location->setLatitude(1.500);
-                    $location->setLongitude(-1.500);
-
-                    $manager->persist($location);
-
-                    $manager->flush();
-                }
-
-                $outing = new Outing();
-                $outing->setName($outingCreateModel->getName());
-                $outing->setStartDate($outingCreateModel->getStartDate());
-                $outing->setDuration($outingCreateModel->getDuration());
-                $outing->setDeadline($outingCreateModel->getDeadline());
-                $outing->setMaxRegistered($outingCreateModel->getMaxRegistered());
-                $outing->setDescription($outingCreateModel->getDescription());
                 $outing->setStatus($statusRepository->findOneBy(['label' => 'Created']));
-                $outing->setLocation($location);
                 $outing->setOrganizer($this->getUser());
-                $outing->setCampus($outingCreateModel->getCampus());
 
                 $manager->persist($outing);
 
@@ -150,6 +129,8 @@ class OutingController extends AbstractController
     #[Route('/inscription/{id}', name: 'outing_inscription', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
     public function inscription(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response
     {
+        //todo : ici, il faudrait vérifier que mon utilisateur ne soit pas déjà inscrit ?
+        //est-ce que quelqu'un peut "inscrire" quelqu'un d'autres à sa place ?
         $outing = $outingRepository->find($id);
         if (
             ($outing->getStatus()->getLabel() == 'Open') &&
@@ -174,6 +155,8 @@ class OutingController extends AbstractController
         Request $request
     ): Response
     {
+        //todo : ici, il faudrait vérifier que mon utilisateur soit déjà bien inscrit ?
+        //est-ce que quelqu'un peut "désister" quelqu'un d'autres à sa place ?
         $outing = $outingRepository->find($id);
         if ($outing->getStatus()->getLabel() == 'Open' || $outing->getStatus()->getLabel() == 'Close') {
             $outing->removeParticipant($this->getUser());
@@ -198,64 +181,85 @@ class OutingController extends AbstractController
     ): Response
     {
         $outing = $outingRepository->find($id);
-        if($outing->getStatus()->getLabel() == 'Created'){
-            $outing->addParticipant($outing->getOrganizer());
-            $outing->setStatus($statusRepository->findOneBy(['label' => 'Open']));
-            $this->addFlash('success', 'Votre proposition de sortie a été publiée !');
-        }
-        $em->persist($outing);
-        $em->flush();
-
-        $referer = $request->headers->get('referer');
-        return $this->redirect($referer);
-
-    }
-
-    #[Route('/cancellation/{id}', name: 'outing_cancellation', requirements:['id'=>'\d+'], methods: ['GET'])]
-    public function cancellation(
-        int $id,
-        OutingRepository $outingRepository,
-        StatusRepository $statusRepository,
-        EntityManagerInterface $em,
-        Request $request): Response
-    {
-        $outing = $outingRepository->find($id);
-        if(($outing->getStatus()->getLabel()=='Open') || ($outing->getStatus()->getLabel()=='Closed')){
-            $outing->setStatus($statusRepository->findOneBy(['label' => 'Cancelled']));
-            $participants = $outing->getParticipants();
-            $participants->clear();
-            $this->addFlash('success', 'Vous avez supprimé votre proposition de sortie !');
-        }
-        $em->persist($outing);
-        $em->flush();
-
-        $referer = $request->headers->get('referer');
-        return $this->redirect($referer);
-    }
-        #[Route('/campus/{id}', name: 'search_campus', requirements: ['id' => '\d+'], methods: ['GET'])]
-        public function findByCampus(int $id, OutingRepository $outingRepository): Response
-        {
-            $outingCampus = $outingRepository -> findByCampus($id);
-            if(!$outingCampus){
-                throw $this -> createNotFoundException('Pas de sortie prévue sur ce campus');
+        if (($this->getUser()) === ($outing->getOrganizer())) {
+            if ($outing->getStatus()->getLabel() == 'Created') {
+                $outing->addParticipant($outing->getOrganizer());
+                $outing->setStatus($statusRepository->findOneBy(['label' => 'Open']));
+                $this->addFlash('success', 'Votre proposition de sortie a été publiée !');
             }
-            return $this -> render('outing/list.html.twig');
+            $em->persist($outing);
+            $em->flush();
+
+            $referer = $request->headers->get('referer');
+            return $this->redirect($referer);
+
+        } else {
+            $this->addFlash('danger', "Hé p'tit malin, on ne publie pas les sorties des autres ! è_é");
+            return $this->redirectToRoute('home_list');
         }
+    }
+
+
+    #[Route('/cancellation/{id}', name: 'outing_cancellation', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    public function cancellation(
+        int                    $id,
+        Outing                 $outing,
+        OutingRepository       $outingRepository,
+        StatusRepository       $statusRepository,
+        EntityManagerInterface $em,
+        Request                $request): Response
+    {
+        if (($this->getUser()) === ($outing->getOrganizer())) {
+
+            $outing = $outingRepository->find($id);
+            $cancellationTypeModel = new CancellationTypeModel();
+            $cancellationForm = $this->createForm(CancellationType::class, $cancellationTypeModel);
+            $cancellationForm->handleRequest($request);
+
+            if (($cancellationForm->isSubmitted() && $cancellationForm->isValid()) && (($outing->getStatus()->getLabel() == 'Open') || ($outing->getStatus()->getLabel() == 'Closed'))) {
+
+                $outing->setStatus($statusRepository->findOneBy(['label' => 'Cancelled']));
+                $participants = $outing->getParticipants();
+                $participants->clear();
+                $outing->setDescription("[ANNULÉ] : " . $cancellationTypeModel->getMotif() . "\n" . $outing->getDescription());
+                var_dump($outing->getDescription());
+                $em->persist($outing);
+                $em->flush();
+                $this->addFlash('success', 'Vous avez supprimé votre proposition de sortie !');
+
+                return $this->redirectToRoute('outing_show', ['id' => $outing->getId()]);
+            }
+
+            return $this->render('outing/cancel.html.twig', [
+                'outing' => $outing,
+                'cancellationForm' => $cancellationForm
+            ]);
+        } else {
+            $this->addFlash('danger', "Hé p'tit malin, on n'annule pas les sorties des autres ! è_é");
+            return $this->redirectToRoute('home_list');
+        }
+
+    }
 
     #[Route('/delete/{id}', name: 'delete_outing', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function deleteOuting(
-        int $id,
-        OutingRepository $outingRepository,
+        int                    $id,
+        OutingRepository       $outingRepository,
         EntityManagerInterface $em): Response
     {
         $outing = $outingRepository->find($id);
-        if ($outing->getStatus()->getLabel() == 'Created' ) {
-            $this->addFlash('success', 'Votre projet de sortie a été supprimé. ');
-            $em->remove($outing);
-        }
+        if (($this->getUser()) === ($outing->getOrganizer())) {
+            if ($outing->getStatus()->getLabel() == 'Created') {
+                $this->addFlash('success', 'Votre projet de sortie a été supprimé. ');
+                $em->remove($outing);
+            }
 
-        $em->flush();
-        return $this->redirectToRoute('home_list');
+            $em->flush();
+            return $this->redirectToRoute('home_list');
+        } else {
+            $this->addFlash('danger', "Hé p'tit malin, on ne supprime pas les sorties des autres ! è_é");
+            return $this->redirectToRoute('home_list');
+        }
     }
 
 

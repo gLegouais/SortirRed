@@ -6,6 +6,8 @@ use App\Repository\LocationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Ignore;
 
 #[ORM\Entity(repositoryClass: LocationRepository::class)]
 class Location
@@ -13,22 +15,28 @@ class Location
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['get:collection:locations', 'get:full:location'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['get:collection:locations', 'get:full:location'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['get:collection:locations', 'get:full:location'])]
     private ?string $street = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['get:collection:locations', 'get:full:location'])]
     private ?float $latitude = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['get:collection:locations', 'get:full:location'])]
     private ?float $longitude = null;
 
     #[ORM\ManyToOne(inversedBy: 'locations')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['get:collection:locations', 'get:full:location'])]
     private ?City $city = null;
 
     #[ORM\OneToMany(mappedBy: 'location', targetEntity: Outing::class)]

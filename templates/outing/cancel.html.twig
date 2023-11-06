@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ outing.name }} | {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    <h1>Annuler une sortie</h1>
+    <p>Nom de la sortie : {{ outing.name }}</p>
+    <p>Date de la sortie : {{ outing.startDate | date('d/m/y') }} à {{ outing.startDate | date('H:i') }}</p>
+    <p>Campus : {{ outing.campus.name }}</p>
+    <p>Lieu : {{ outing.location.name }}</p>
+    <p>{{ outing.location.street }}, {{ outing.location.city.postcode }} {{ outing.location.city.name }}</p>
+    <p>Motif : </p>
+    {{ form_start(cancellationForm) }}
+    {{ form_widget(cancellationForm) }}
+    <button>Enregistrer</button>
+    {{ form_end(cancellationForm) }}
+{% endblock %}
