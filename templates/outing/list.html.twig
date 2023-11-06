@@ -84,7 +84,7 @@
 
                     {% if outing.organizer == app.user and outing.status.label == 'Created' %}
                         <a href="{{ path('outing_publication', {'id':outing.id}) }}" title="publication">Publier</a>
-                        <a href="" title="suppression">Supprimer le projet</a>
+                        <a href="{{ path('delete_outing', {'id':outing.id}) }}" title="suppression">Supprimer le projet</a>
                     {% endif %}
                 </td>
 

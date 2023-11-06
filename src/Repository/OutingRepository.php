@@ -34,7 +34,7 @@ class OutingRepository extends ServiceEntityRepository
             -> addSelect('org');
         $qb -> leftJoin('o.participants', 'p')
             -> addSelect('p');
-        $qb -> andWhere('o.status != 13');
+        $qb -> andWhere('s.label != \'Created\'');
 
         $query = $qb -> getQuery();
         return $query -> getResult();
@@ -75,39 +75,14 @@ class OutingRepository extends ServiceEntityRepository
                 ->andWhere('p.id != :userID')
                 ->setParameter('userID', $user->getId());
         }
-//        if ($formModel->getOutingFinished()) {
-//            $qb->join('outing.status', 's')
-//                ->addSelect('s')
-//                ->andWhere('outing.status = :status')
-//                ->setParameter('status', )
-//        }
+        if ($formModel->getOutingFinished()) {
+            $qb->join('outing.status', 's')
+                ->addSelect('s')
+                ->andWhere('s.label = \'Cancelled\'');
+        }
 
         $query = $qb->getQuery();
         return $query->getResult();
     }
 
-//    /**
-//     * @return Outing[] Returns an array of Outing objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('o')
-//            ->andWhere('o.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('o.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Outing
-//    {
-//        return $this->createQueryBuilder('o')
-//            ->andWhere('o.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }
