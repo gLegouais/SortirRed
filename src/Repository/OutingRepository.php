@@ -54,7 +54,7 @@ class OutingRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('outing');
         if ($formModel->getCampus()) {
-            $qb->andWhere('outing.campus_id = :campusId')
+            $qb->andWhere('outing.campus = :campusId')
                 ->setParameter('campusId', $formModel->getCampus()->getId());
         }
         if ($formModel->getName()) {

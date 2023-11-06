@@ -26,11 +26,12 @@ class ProfilePicManager
 
     public function delete(?string $filename, string $directory): void
     {
-        $path = $directory . '/' . $filename;
-        if ($filename != null && file_exists($path)) {
-            unlink($path);
+        if ($filename != 'defautAdminPicture.png' && $filename != 'defaultProfilePicture.png') {
+            $path = $directory . '/' . $filename;
+            if ($filename != null && file_exists($path)) {
+                unlink($path);
+            }
         }
-
     }
 
 
