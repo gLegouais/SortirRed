@@ -237,7 +237,8 @@ public function cancellation(
     int $id,
     OutingRepository $outingRepository,
     StatusRepository $statusRepository,
-    EntityManagerInterface $em): Response
+    EntityManagerInterface $em,
+    Request $request): Response
 {
     $outing = $outingRepository->find($id);
     if(($outing->getStatus()->getLabel()=='Open') || ($outing->getStatus()->getLabel()=='Closed')){
@@ -249,7 +250,8 @@ public function cancellation(
     $em->persist($outing);
     $em->flush();
 
-    return $this->redirectToRoute('home_list');
+    $referer = $request->headers->get('referer');
+    return $this->redirect($referer);
 }
     #[Route('/campus/{id}', name: 'search_campus', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function findByCampus(int $id, OutingRepository $outingRepository): Response
@@ -260,5 +262,22 @@ public function cancellation(
         }
         return $this -> render('outing/list.html.twig');
     }
+
+    #[Route('/delete/{id}', name: 'delete_outing', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function deleteOuting(
+        int $id,
+        OutingRepository $outingRepository,
+        EntityManagerInterface $em): Response
+    {
+        $outing = $outingRepository->find($id);
+        if ($outing->getStatus()->getLabel() == 'Created' ) {
+            $this->addFlash('success', 'Votre projet de sortie a été supprimé. ');
+            $em->remove($outing);
+        }
+
+        $em->flush();
+        return $this->redirectToRoute('home_list');
+    }
+
 
 }//fin public class

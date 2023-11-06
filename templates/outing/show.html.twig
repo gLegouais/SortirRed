@@ -41,7 +41,7 @@
     </table>
 
     {#{% if outing.organizer != app.user and  not isRegistered %}#}
-    {% if app.user != isRegistered %}
+    {% if app.user != isRegistered and outing.status.label == 'Open'%}
         <p><a href="{{ path('outing_inscription', {'id': outing.id}) }}" title="inscription">S'inscrire</a></p>
     {% endif %}
 
@@ -57,7 +57,7 @@
 
     {% if outing.organizer == app.user and outing.status.label == 'Created' %}
         <p><a href="{{ path('outing_publication', {'id':outing.id}) }}" title="publication">Publier</a></p>
-        <p><a href="" title="suppresion">Supprimer le projet</a></p>
+        <p><a href="{{ path('delete_outing', {'id':outing.id}) }}" title="suppresion">Supprimer le projet</a></p>
     {% endif %}
 
     <p>
