@@ -7,20 +7,17 @@ async function getRelatedLocations(element) {
     const cityId = element.target.value;
     locationSelect.disabled = false;
     locationDetailsDiv.innerHTML = "";
+    let defaultOption = document.createElement('option');
+    defaultOption.id = '#';
+    defaultOption.innerText = '-- Choisir un lieu --';
+    defaultOption.selected = true;
+    defaultOption.disabled = true;
+    locationSelect.innerHTML = ''
+    locationSelect.appendChild(defaultOption);
 
     const response = await fetch('/sortirRED/public/api/city/' + cityId + '/getRelatedLocations');
     await response.json().then((response) => {
         response.forEach((location) => {
-
-            let defaultOption = document.createElement('option');
-            defaultOption.id = '#';
-            defaultOption.innerText = '-- Choisir un lieu --';
-            defaultOption.selected = true;
-            defaultOption.disabled = true;
-
-            locationSelect.innerHTML = ''
-            locationSelect.appendChild(defaultOption);
-
             let option = document.createElement('option');
             option.value = location.id;
             option.innerText = location.name;
@@ -33,7 +30,7 @@ async function getRelatedLocations(element) {
 locationSelect.addEventListener('change', getLocationDetails);
 async function getLocationDetails(element) {
     const locationId = element.target.value;
-    console.log(locationId);
+    locationDetailsDiv.innerHTML = "";
     const response = await fetch('/sortirRED/public/api/location/' + locationId);
     await response.json().then((response) => {
         response.forEach((attribute) => {

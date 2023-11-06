@@ -85,14 +85,9 @@ class OutingController extends AbstractController
     public function create(
         Request                $request,
         EntityManagerInterface $manager,
-        CityRepository         $cityRepository,
-        LocationRepository     $locationRepository,
         StatusRepository       $statusRepository
     ): Response
     {
-        $cities = $cityRepository->findAll();
-        $locations = $locationRepository->findAll();
-
 
         $outing = new Outing();
 
@@ -104,9 +99,7 @@ class OutingController extends AbstractController
 
                 $outing->setStatus($statusRepository->findOneBy(['label' => 'Created']));
                 $outing->setOrganizer($this->getUser());
-
                 $manager->persist($outing);
-
                 $manager->flush();
 
                 $this->addFlash('success', 'La sortie a été créée avec succès.');
@@ -119,9 +112,7 @@ class OutingController extends AbstractController
         }
 
         return $this->render('outing/create.html.twig', [
-            'outingForm' => $outingForm,
-            'cities' => $cities,
-            'locations' => $locations
+            'outingForm' => $outingForm
         ]);
     }
 
