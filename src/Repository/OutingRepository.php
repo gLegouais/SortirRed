@@ -32,19 +32,9 @@ class OutingRepository extends ServiceEntityRepository
             -> addSelect('l');
         $qb -> join('o.organizer', 'org')
             -> addSelect('org');
-        $qb -> andWhere('o.status != 13');
-
-        $query = $qb -> getQuery();
-        return $query -> getResult();
-    }
-
-    public function findByCampus(int $id): ?array
-    {
-        $qb = $this -> createQueryBuilder('o');
-        $qb -> join('o.campus', 'c')
-            -> addSelect('c');
-        $qb -> andWhere('c.id = :id')
-            -> setParameter('id', $id);
+        $qb -> leftJoin('o.participants', 'p')
+            -> addSelect('p');
+        $qb -> andWhere('s.label != \'Created\'');
 
         $query = $qb -> getQuery();
         return $query -> getResult();
@@ -54,7 +44,7 @@ class OutingRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('outing');
         if ($formModel->getCampus()) {
-            $qb->andWhere('outing.campus = :campusId')
+            $qb->andWhere('outing.campus_id = :campusId')
                 ->setParameter('campusId', $formModel->getCampus()->getId());
         }
         if ($formModel->getName()) {
@@ -76,48 +66,23 @@ class OutingRepository extends ServiceEntityRepository
         if ($formModel->getOutingEnlisted()) {
             $qb->join('outing.participants', 'p')
                 ->addSelect('p')
-                ->andWhere('p.id = :userID')
-                ->setParameter('userID', $user->getId());
+                ->andWhere(':user MEMBER OF outing.participants')
+                ->setParameter('user', $user);
         }
         if ($formModel->getOutingNotEnlisted()) {
             $qb->join('outing.participants', 'p')
                 ->addSelect('p')
-                ->andWhere('p.id != :userID')
-                ->setParameter('userID', $user->getId());
+                ->andWhere(':user NOT MEMBER OF outing.participants')
+                ->setParameter('user', $user);
         }
-//        if ($formModel->getOutingFinished()) {
-//            $qb->join('outing.status', 's')
-//                ->addSelect('s')
-//                ->andWhere('outing.status = :status')
-//                ->setParameter('status', )
-//        }
+        if ($formModel->getOutingFinished()) {
+            $qb->join('outing.status', 's')
+                ->addSelect('s')
+                ->andWhere('s.label = \'Cancelled\'');
+        }
 
         $query = $qb->getQuery();
         return $query->getResult();
     }
 
-//    /**
-//     * @return Outing[] Returns an array of Outing objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('o')
-//            ->andWhere('o.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('o.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Outing
-//    {
-//        return $this->createQueryBuilder('o')
-//            ->andWhere('o.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

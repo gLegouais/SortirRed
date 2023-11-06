@@ -8,73 +8,55 @@ use App\Form\CancellationType;
 use App\Form\Model\OutingTypeModel;
 use App\Form\Model\SearchOutingFormModel;
 use App\Form\OutingType;
-use App\Form\ProfileType;
 use App\Form\SearchOutingType;
 use App\Repository\CityRepository;
 use App\Repository\LocationRepository;
 use App\Repository\OutingRepository;
 use App\Repository\StatusRepository;
+use App\Services\ChangeStatus;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Context\Normalizer\ObjectNormalizerContextBuilder;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class OutingController extends AbstractController
 {
     #[Route('/', name: 'home_list', methods: ['GET', 'POST'])]
     public function listOuting(
-        OutingRepository       $outingRepository,
-        StatusRepository       $status,
+        OutingRepository $outingRepository,
+        StatusRepository $status,
         EntityManagerInterface $em,
-        Request                $request
+        ChangeStatus $changeStatus,
+        Request $request
     ): Response
     {
         $searchOutingFormModel = new SearchOutingFormModel();
-        $searchForm = $this->createForm(SearchOutingType::class, $searchOutingFormModel);
-        $searchForm->handleRequest($request);
-
-        $currentDate = new \DateTimeImmutable();
+        $searchForm = $this -> createForm(SearchOutingType::class, $searchOutingFormModel);
+        $searchForm -> handleRequest($request);
 
         $outings = $outingRepository->findOutings();
 
-        foreach ($outings as $outing) {
-            $deadline = $outing->getDeadline();
-            $starDate = $outing->getStartDate();
-            $duration = $outing->getDuration();
+        $changeStatus -> changeStatus($outingRepository, $status, $em);
 
-            $endDate = $currentDate->modify('+' . $duration . 'days');
-            $archiveDate = $endDate->modify('+' . 30 . 'days');
+        if($searchForm -> isSubmitted() && $searchForm -> isValid()) {
 
-            if ($outing->getStatus()->getLabel() != 'Created' && $outing->getStatus()->getLabel() != 'Cancelled') {
-                if ($currentDate < $deadline && (count($outing->getParticipants())) < $outing->getMaxRegistered()) {
-                    $outing->setStatus($status->findOneBy(['label' => 'Open']));
-                } elseif (
-                    $currentDate < $starDate ||
-                    (count($outing->getParticipants())) == $outing->getMaxRegistered()
-                ) {
-                    $outing->setStatus($status->findOneBy(['label' => 'Closed']));
-                } elseif ($currentDate < $endDate) {
-                    $outing->setStatus($status->findOneBy(['label' => 'Ongoing']));
-                } elseif ($currentDate >= $archiveDate) {
-                    $outing->setStatus($status->findOneBy(['label' => 'Archived']));
-                } else {
-                    $outing->setStatus($status->findOneBy(['label' => 'Finished']));
-                }
-                $em->persist($outing);
-                $em->flush();
+            $enlisted = $searchForm -> get('outingEnlisted') -> getData();
+            $notEnlisted = $searchForm -> get('outingNotEnlisted') -> getData();
+
+            if($enlisted == 'true' && $notEnlisted == 'true'){
+                $this -> addFlash('danger', 'Vous ne pouvez pas être inscrit et non-inscrit à une sortie');
+                return $this -> redirectToRoute('home_list');
             }
-        }
 
-        // if form submitted
-        // $outings = requete sql
-        if ($searchForm->isSubmitted() && $searchForm->isValid()) {
-            //dd($searchOutingFormModel);
-            // $outings = $outingRepository -> findByCampus($searchOutingFormModel -> getCampus() -> getId());
             $outings = $outingRepository->filterOutings($searchOutingFormModel, $this->getUser());
-            if (!$outings) {
-                $this->addFlash('danger', 'Pas de sortie prévue sur ce campus');
+            if(!$outings){
+                $this -> addFlash('danger', 'Pas de sortie prévue sur ce campus');
             }
         }
 
@@ -113,8 +95,9 @@ class OutingController extends AbstractController
 
 
         $outingCreateModel = new OutingTypeModel();
+        $outing = new Outing();
 
-        $outingForm = $this->createForm(OutingType::class, $outingCreateModel);
+        $outingForm = $this->createForm(OutingType::class, $outing);
         $outingForm->handleRequest($request);
 
         if ($outingForm->isSubmitted() && $outingForm->isValid()) {
@@ -221,7 +204,6 @@ class OutingController extends AbstractController
         Request                $request
     ): Response
     {
-
         $outing = $outingRepository->find($id);
         if (($this->getUser()) === ($outing->getOrganizer())) {
             if ($outing->getStatus()->getLabel() == 'Created') {
