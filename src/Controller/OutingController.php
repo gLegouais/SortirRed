@@ -2,11 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Location;
 use App\Entity\Outing;
 use App\Form\CancellationType;
 use App\Form\Model\CancellationTypeModel;
-use App\Form\Model\OutingTypeModel;
 use App\Form\Model\SearchOutingFormModel;
 use App\Form\OutingType;
 use App\Form\SearchOutingType;
@@ -18,20 +16,16 @@ use App\Services\ChangeStatus;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Context\Normalizer\ObjectNormalizerContextBuilder;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class OutingController extends AbstractController
 {
     #[Route('/', name: 'home_list', methods: ['GET', 'POST'])]
     public function listOuting(
-        OutingRepository       $outingRepository,
-        StatusRepository       $status,
+        OutingRepository $outingRepository,
+        StatusRepository $status,
         EntityManagerInterface $em,
         ChangeStatus $changeStatus,
         Request $request

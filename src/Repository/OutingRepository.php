@@ -34,6 +34,8 @@ class OutingRepository extends ServiceEntityRepository
             -> addSelect('org');
         $qb -> leftJoin('o.participants', 'p')
             -> addSelect('p');
+        $qb -> join('l.city', 'c')
+            ->addSelect('c');
         $qb -> andWhere('s.label != \'Created\'');
 
         $query = $qb -> getQuery();
@@ -44,7 +46,7 @@ class OutingRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('outing');
         if ($formModel->getCampus()) {
-            $qb->andWhere('outing.campus_id = :campusId')
+            $qb->andWhere('outing.campus = :campusId')
                 ->setParameter('campusId', $formModel->getCampus()->getId());
         }
         if ($formModel->getName()) {

@@ -1,8 +1,9 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+    <img src="asset/images/logo.png" alt="logo du site" class="enabled-smart" id="logo"/>
 
-    <div class="container" style="border: green solid 4px">
+    <div class="container formContainer" style="border: green solid 4px">
         {{ form_start(searchForm) }}
         <div class="row align-items-center">
             <div class="col-5 mx-auto">
@@ -43,12 +44,13 @@
         <tr class="table-top">
             <th>Nom de la sortie</th>
             <th>Date de la sortie</th>
-            <th>Clôture</th>
-            <th>Inscrits / Places</th>
-            <th>Etat</th>
-            <th>Inscrit</th>
-            <th>Organisateur</th>
-            <th>Actions</th>
+            <th class="hidden-smart">Clôture</th>
+            <th class="hidden-smart">Inscrits / Places</th>
+            <th class="hidden-smart">Etat</th>
+            <th class="hidden-smart">Inscrit</th>
+            <th class="hidden-smart">Organisateur</th>
+            <th class="hidden-smart">Actions</th>
+            <th class="enabled-smart">Lieu</th>
         </tr>
         </thead>
         <tbody>
@@ -59,14 +61,14 @@
                 {% set isRegistered = isRegistered or (participant == app.user) %}
             {% endfor %}
             <tr class="table-rows">
-                <td>{{ outing.name }}</td>
+                <td><a href="{{ path('outing_show', {'id':outing.id}) }}" title="Détail d'une sortie smartphone" class="link-smart">{{ outing.name }}</a></td>
                 <td>{{ outing.startDate | date('d/m/y') }}</td>
-                <td>{{ outing.deadline | date('d/m/y') }}</td>
-                <td> {{ outing.participants|length }}/ {{ outing.maxRegistered }}</td>
-                <td>{{ outing.status.label }}</td>
-                <td>{% if isRegistered %}X{% endif %}</td>
-                <td>{{ outing.organizer.username }}</td>
-                <td>
+                <td class="hidden-smart">{{ outing.deadline | date('d/m/y') }}</td>
+                <td class="hidden-smart"> {{ outing.participants|length }}/ {{ outing.maxRegistered }}</td>
+                <td class="hidden-smart">{{ outing.status.label }}</td>
+                <td class="hidden-smart">{% if isRegistered %}X{% endif %}</td>
+                <td class="hidden-smart">{{ outing.organizer.username }}</td>
+                <td class="hidden-smart">
                     <a href="{{ path('outing_show', {'id':outing.id}) }}" title="Détail d'une sortie">Afficher</a>
 
                     {% if (app.user != isRegistered) and (outing.status.label =='Open') %}
@@ -87,7 +89,7 @@
                         <a href="{{ path('delete_outing', {'id':outing.id}) }}" title="suppression">Supprimer le projet</a>
                     {% endif %}
                 </td>
-
+                <td class="enabled-smart">{{ outing.location.city.name }}</td>
 
             </tr>
         {% endfor %}
