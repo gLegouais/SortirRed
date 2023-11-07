@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Upload d'utilisateurs via csv</h1>
+    {{ form_start(uploadingForm) }}
+    {{ form_widget(uploadingForm) }}
+    <input type="submit" value="Charger le fichier">
+    {{ form_end(uploadingForm) }}
+
+{% endblock %}
+
+{% block title %}
+    Ajouter des utilisateurs | {{ parent() }}
+{% endblock %}
+
