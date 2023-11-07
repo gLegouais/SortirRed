@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Form\Model\SearchOutingFormModel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @extends ServiceEntityRepository<Outing>
@@ -23,7 +24,7 @@ class OutingRepository extends ServiceEntityRepository
         parent::__construct($registry, Outing::class);
     }
 
-    public function findOutings(): ?array
+    public function findOutings(UserInterface $user): ?array
     {
         $qb = $this -> createQueryBuilder('o');
         $qb -> join('o.status', 's')
@@ -36,7 +37,9 @@ class OutingRepository extends ServiceEntityRepository
             -> addSelect('p');
         $qb -> join('l.city', 'c')
             ->addSelect('c');
-        $qb -> andWhere('s.label != \'Created\'');
+        $qb -> andWhere('s.label != \'Created\'')
+            -> orWhere('org = :user')
+            -> setParameter(':user', $user->getId());
 
         $query = $qb -> getQuery();
         return $query -> getResult();
@@ -80,7 +83,7 @@ class OutingRepository extends ServiceEntityRepository
         if ($formModel->getOutingFinished()) {
             $qb->join('outing.status', 's')
                 ->addSelect('s')
-                ->andWhere('s.label = \'Cancelled\'');
+                ->andWhere('s.label = \'Finished\'');
         }
 
         $query = $qb->getQuery();
