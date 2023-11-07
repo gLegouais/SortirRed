@@ -6,15 +6,10 @@
 {% endblock %}
 
 {% block title %}
-    Créer une sortie | {{ parent() }}
+    Modifier une sortie | {{ parent() }}
 {% endblock %}
 
-
-
 {% block body %}
-
-    <h1>Créer une sortie</h1>
-
     <div
             id="js-url-data"
             data-api-city-x-locations="{{ path('api_relatedLocation', {'cityId': 0}) }}"
@@ -45,8 +40,8 @@
     </div>
 
 
-    <input type="submit" value="Créer" name="save">
-    <input type="submit" value="Publier" name="publish">
+    <input type="submit" value="Modifier la sortie">
+    <a href="{{ path('home_list') }}" class="btn btn-secondary">Publier la sortie (ne fonctionne pas)</a>
     <a href="{{ path('home_list') }}" class="btn btn-secondary">Annuler</a>
     {{ form_end(outingForm) }}
 
@@ -86,6 +81,4 @@
         </div>
     </div>
 
-
 {% endblock %}
-

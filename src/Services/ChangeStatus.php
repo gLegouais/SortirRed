@@ -5,29 +5,34 @@ namespace App\Services;
 use App\Repository\OutingRepository;
 use App\Repository\StatusRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class ChangeStatus
 {
 
-    public function changeStatus(OutingRepository $outingRepository, StatusRepository $status, EntityManagerInterface $em):void
+    public function __construct(private readonly OutingRepository $outingRepository, private readonly StatusRepository $status, private readonly  EntityManagerInterface $em, private Security $security){
+
+    }
+
+    public function changeStatus():void
     {
         $currentDate = new \DateTimeImmutable();
 
-        $outings = $outingRepository->findOutings();
+        $outings = $this -> outingRepository->findOutings($this -> security -> getUser());
 
-        $open = $status->findOneBy(['label' => 'Open']);
-        $closed = $status->findOneBy(['label' => 'Closed']);
-        $ongoing = $status->findOneBy(['label' => 'Ongoing']);
-        $archived = $status->findOneBy(['label' => 'Archived']);
-        $finished = $status->findOneBy(['label' => 'Finished']);
+        $open = $this -> status->findOneBy(['label' => 'Open']);
+        $closed = $this -> status->findOneBy(['label' => 'Closed']);
+        $ongoing = $this -> status->findOneBy(['label' => 'Ongoing']);
+        $archived = $this -> status->findOneBy(['label' => 'Archived']);
+        $finished = $this -> status->findOneBy(['label' => 'Finished']);
 
         foreach ($outings as $outing) {
             $deadline = $outing->getDeadline();
             $starDate = $outing->getStartDate();
             $duration = $outing->getDuration();
 
-            $endDate = $currentDate->modify('+' . $duration . 'days');
-            $archiveDate = $endDate->modify('+' . 30 . 'days');
+            $endDate = $starDate->modify('+' . $duration . 'minute');
+            $archiveDate = $endDate->modify('+' . 30 . 'day');
 
 
             if ($outing->getStatus()->getLabel() != 'Created' && $outing->getStatus()->getLabel() != 'Cancelled') {
@@ -45,8 +50,8 @@ class ChangeStatus
                 } else {
                     $outing->setStatus($finished);
                 }
-                $em->persist($outing);
-                $em->flush();
+                $this -> em->persist($outing);
+                $this -> em->flush();
             }
         }
 

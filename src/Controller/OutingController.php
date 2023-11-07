@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Outing;
+use App\Entity\Status;
 use App\Form\CancellationType;
 use App\Form\Model\CancellationTypeModel;
 use App\Form\Model\SearchOutingFormModel;
@@ -19,14 +20,13 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class OutingController extends AbstractController
 {
     #[Route('/', name: 'home_list', methods: ['GET', 'POST'])]
     public function listOuting(
         OutingRepository $outingRepository,
-        StatusRepository $status,
-        EntityManagerInterface $em,
         ChangeStatus $changeStatus,
         Request $request
     ): Response
@@ -35,23 +35,31 @@ class OutingController extends AbstractController
         $searchForm = $this -> createForm(SearchOutingType::class, $searchOutingFormModel);
         $searchForm -> handleRequest($request);
 
-        $outings = $outingRepository->findOutings();
+        $userAgent = $request->headers->get('User-Agent');
+        dump($userAgent);
 
-        $changeStatus -> changeStatus($outingRepository, $status, $em);
+        $assertAndroid = strpos($userAgent, 'Android');
+        if($assertAndroid){
+            $outings = $outingRepository -> findOutingsAndroid();
+        }else{
+            $outings = $outingRepository->findOutings($this -> getUser());
+        }
 
-        if($searchForm -> isSubmitted() && $searchForm -> isValid()) {
+        $changeStatus -> changeStatus();
 
-            $enlisted = $searchForm -> get('outingEnlisted') -> getData();
-            $notEnlisted = $searchForm -> get('outingNotEnlisted') -> getData();
+        if ($searchForm->isSubmitted() && $searchForm->isValid()) {
 
-            if($enlisted == 'true' && $notEnlisted == 'true'){
-                $this -> addFlash('danger', 'Vous ne pouvez pas être inscrit et non-inscrit à une sortie');
-                return $this -> redirectToRoute('home_list');
+            $enlisted = $searchForm->get('outingEnlisted')->getData();
+            $notEnlisted = $searchForm->get('outingNotEnlisted')->getData();
+
+            if ($enlisted == 'true' && $notEnlisted == 'true') {
+                $this->addFlash('danger', 'Vous ne pouvez pas être inscrit et non-inscrit à une sortie');
+                return $this->redirectToRoute('home_list');
             }
 
             $outings = $outingRepository->filterOutings($searchOutingFormModel, $this->getUser());
-            if(!$outings){
-                $this -> addFlash('danger', 'Pas de sortie prévue sur ce campus');
+            if (!$outings) {
+                $this->addFlash('danger', 'Pas de sortie prévue sur ce campus');
             }
         }
 
@@ -91,9 +99,14 @@ class OutingController extends AbstractController
 
         if ($outingForm->isSubmitted() && $outingForm->isValid()) {
             try {
-
-                $outing->setStatus($statusRepository->findOneBy(['label' => 'Created']));
                 $outing->setOrganizer($this->getUser());
+                if ($request->get('publish')) {
+                    $outing->setStatus($statusRepository->findOneBy(['label' => 'Open']));
+                    $outing->addParticipant($this->getUser());
+                } else {
+                    $outing->setStatus($statusRepository->findOneBy(['label' => 'Created']));
+                }
+
                 $manager->persist($outing);
                 $manager->flush();
 
@@ -134,10 +147,10 @@ class OutingController extends AbstractController
 
     #[Route('/withdrawal/{id}', name: 'outing_withdrawal', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function withdrawal(
-        int $id,
-        OutingRepository $outingRepository,
+        int                    $id,
+        OutingRepository       $outingRepository,
         EntityManagerInterface $em,
-        Request $request
+        Request                $request
     ): Response
     {
         //todo : ici, il faudrait vérifier que mon utilisateur soit déjà bien inscrit ?
@@ -158,11 +171,11 @@ class OutingController extends AbstractController
 
     #[Route('/publication/{id}', name: 'outing_publication', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function publication(
-        int $id,
-        OutingRepository $outingRepository,
-        StatusRepository $statusRepository,
+        int                    $id,
+        OutingRepository       $outingRepository,
+        StatusRepository       $statusRepository,
         EntityManagerInterface $em,
-        Request $request
+        Request                $request
     ): Response
     {
         $outing = $outingRepository->find($id);
@@ -247,5 +260,41 @@ class OutingController extends AbstractController
         }
     }
 
+    #[Route('/outing/{id}/update', name: 'outing_update', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    public function update(
+        int                    $id,
+        EntityManagerInterface $manager,
+        OutingRepository       $outingRepository,
+        StatusRepository       $statusRepository,
+        Request                $request): Response
+    {
+        $outing = $outingRepository->find($id);
+
+        if ($outing->getStatus()->getLabel() === 'Created' && $this->getUser() === $outing->getOrganizer()) {
+            $outingForm = $this->createForm(OutingType::class, $outing);
+            $outingForm->handleRequest($request);
+
+            if ($outingForm->isSubmitted() && $outingForm->isValid()) {
+
+                if ($outingForm->get('publish')->isClicked()) {
+                    $outing->setStatus($statusRepository->findOneBy(['label' => 'Open']));
+                    $outing->addParticipant($this->getUser());
+                }
+
+                $manager->persist($outing);
+                $manager->flush();
+
+                $this->addFlash('success', 'La sortie a été modifée avec succès !');
+                return $this->redirectToRoute('outing_show', ['id' => $outing->getId()]);
+            }
+            return $this->render('outin/edit.html.twig', ['outingForm' => $outingForm, 'outing' => $outing]);
+        } else {
+            $this->addFlash(
+                'danger',
+                'Impossible de modifier une sortie dont vous n\'êtes pas l\'organisateur ou qui est déjà publiée.');
+            return $this->redirectToRoute('home_list');
+        }
+
+    }
 
 }//fin public class
