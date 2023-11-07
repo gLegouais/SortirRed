@@ -70,7 +70,6 @@ class OutingController extends AbstractController
     #[Route('/sortie/{id}', name: 'outing_show', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function showOuting(int $id, OutingRepository $outingRepository): Response
     {
-        var_dump("test de l'affichage d'un vardump");//todo : à effacer
         $outing = $outingRepository->find($id);
         if (!$outing) {
             throw $this->createNotFoundException("cette sortie n'existe pas");
