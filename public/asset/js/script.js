@@ -1,7 +1,17 @@
 const citySelect = document.getElementById('outing_city');
 const locationSelect = document.getElementById('outing_location');
 const locationDetailsDiv = document.getElementById('locationDetails');
+const eventChange = new Event('change');
 citySelect.addEventListener('change', getRelatedLocations);
+let updatedLocation = false;
+
+const cityXLocationsURL = document.getElementById('js-url-data').dataset.cityXLocations;
+const locationDetailsURL = document.getElementById('js-url-data').dataset.locationDetails;
+const locationAddURL = document.getElementById('js-url-data').dataset.locationAdd;
+
+console.log(cityXLocationsURL);
+console.log(locationDetailsURL);
+console.log(locationAddURL);
 
 async function getRelatedLocations(element) {
     const cityId = element.target.value;
@@ -24,10 +34,16 @@ async function getRelatedLocations(element) {
             locationSelect.appendChild(option);
         })
     });
+    if(updatedLocation) {
+        console.log('updated !!!')
+        locationSelect.lastElementChild.selected = true;
+        updatedLocation = false;
+        locationSelect.dispatchEvent(eventChange)
+    }
 }
 
-
 locationSelect.addEventListener('change', getLocationDetails);
+
 async function getLocationDetails(element) {
     const locationId = element.target.value;
     locationDetailsDiv.innerHTML = "";
@@ -73,17 +89,51 @@ async function getLocationLatAndLongitude(street, postcode) {
         locationDetailsDiv.appendChild(latitudeP);
         locationDetailsDiv.appendChild(longitudeP);
     })
-    console.log(coordinates)
     return coordinates;
 }
+
 function formatStreet(street) {
     let streetArray = street.split(' ');
     let newStreetArray = []
     streetArray.map((item) => {
-        newStreetArray.push(item.replace(',', ''));
+        newStreetArray.push(item.replace(',', '').replace('\'', ''));
     });
     return newStreetArray.join('+');
 }
+
 function formatPostcode(postcode) {
     return postcode.replace(' ', '');
 }
+
+const createLocBtn = document.getElementById('createLocation');
+const inputNameLoc = document.getElementById('locName');
+const inputStreetLoc = document.getElementById('locStreet');
+const inputCityLoc = document.getElementById('locCity');
+const inputLatitudeLoc = document.getElementById('locLat');
+const inputLongitudeLoc = document.getElementById('locLong');
+createLocBtn.addEventListener('click', function () {
+    inputCityLoc.value = document.getElementById('outing_city').value;
+    inputLatitudeLoc.value = 1.5;
+    inputLongitudeLoc.value = -1.5;
+
+    let location = JSON.stringify({
+        name: inputNameLoc.value,
+        street: inputStreetLoc.value,
+        city: document.getElementById('outing_city').value,
+        latitude: 1.5,
+        longitude: -1.5
+    });
+
+    fetch('/sortirRED/public/api/location/create', {
+        method: 'POST',
+        body: location,
+        headers: {
+            'Content-type': 'application/json; charset=UTF-8'
+        }
+    }).then(() => {
+        updatedLocation = true;
+
+        citySelect.dispatchEvent(eventChange);
+    });
+
+})
