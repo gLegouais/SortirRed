@@ -35,7 +35,15 @@ class OutingController extends AbstractController
         $searchForm = $this -> createForm(SearchOutingType::class, $searchOutingFormModel);
         $searchForm -> handleRequest($request);
 
-        $outings = $outingRepository->findOutings($this -> getUser());
+        $userAgent = $request->headers->get('User-Agent');
+        dump($userAgent);
+
+        $assertAndroid = strpos($userAgent, 'Android');
+        if($assertAndroid){
+            $outings = $outingRepository -> findOutingsAndroid();
+        }else{
+            $outings = $outingRepository->findOutings($this -> getUser());
+        }
 
         $changeStatus -> changeStatus();
 
