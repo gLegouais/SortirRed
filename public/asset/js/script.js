@@ -5,13 +5,9 @@ const eventChange = new Event('change');
 citySelect.addEventListener('change', getRelatedLocations);
 let updatedLocation = false;
 
-const cityXLocationsURL = document.getElementById('js-url-data').dataset.cityXLocations;
-const locationDetailsURL = document.getElementById('js-url-data').dataset.locationDetails;
-const locationAddURL = document.getElementById('js-url-data').dataset.locationAdd;
-
-console.log(cityXLocationsURL);
-console.log(locationDetailsURL);
-console.log(locationAddURL);
+const cityXLocationsURL = document.getElementById('js-url-data').dataset.apiCityXLocations;
+const locationDetailsURL = document.getElementById('js-url-data').dataset.apiLocationDetails;
+const locationAddURL = document.getElementById('js-url-data').dataset.apiLocationAdd;
 
 async function getRelatedLocations(element) {
     const cityId = element.target.value;
@@ -24,8 +20,8 @@ async function getRelatedLocations(element) {
     defaultOption.disabled = true;
     locationSelect.innerHTML = ''
     locationSelect.appendChild(defaultOption);
-
-    const response = await fetch('/sortirRED/public/api/city/' + cityId + '/getRelatedLocations');
+    const fetchLocationsURL = cityXLocationsURL.replace('0', cityId);
+    const response = await fetch(fetchLocationsURL);
     await response.json().then((response) => {
         response.forEach((location) => {
             let option = document.createElement('option');
@@ -47,7 +43,8 @@ locationSelect.addEventListener('change', getLocationDetails);
 async function getLocationDetails(element) {
     const locationId = element.target.value;
     locationDetailsDiv.innerHTML = "";
-    const response = await fetch('/sortirRED/public/api/location/' + locationId);
+    const fetchLocationDetailsURL = locationDetailsURL.replace('0', locationId);
+    const response = await fetch(fetchLocationDetailsURL);
     await response.json().then((response) => {
         response.forEach((attribute) => {
             let streetP = document.createElement('p');
@@ -124,7 +121,7 @@ createLocBtn.addEventListener('click', function () {
         longitude: -1.5
     });
 
-    fetch('/sortirRED/public/api/location/create', {
+    fetch(locationAddURL, {
         method: 'POST',
         body: location,
         headers: {
