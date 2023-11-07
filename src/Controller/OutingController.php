@@ -2,11 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Location;
 use App\Entity\Outing;
 use App\Form\CancellationType;
 use App\Form\Model\CancellationTypeModel;
-use App\Form\Model\OutingTypeModel;
 use App\Form\Model\SearchOutingFormModel;
 use App\Form\OutingType;
 use App\Form\SearchOutingType;
@@ -18,46 +16,42 @@ use App\Services\ChangeStatus;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Context\Normalizer\ObjectNormalizerContextBuilder;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class OutingController extends AbstractController
 {
     #[Route('/', name: 'home_list', methods: ['GET', 'POST'])]
     public function listOuting(
-        OutingRepository       $outingRepository,
-        StatusRepository       $status,
+        OutingRepository $outingRepository,
+        StatusRepository $status,
         EntityManagerInterface $em,
-        ChangeStatus           $changeStatus,
-        Request                $request
+        ChangeStatus $changeStatus,
+        Request $request
     ): Response
     {
         $searchOutingFormModel = new SearchOutingFormModel();
-        $searchForm = $this->createForm(SearchOutingType::class, $searchOutingFormModel);
-        $searchForm->handleRequest($request);
+        $searchForm = $this -> createForm(SearchOutingType::class, $searchOutingFormModel);
+        $searchForm -> handleRequest($request);
 
         $outings = $outingRepository->findOutings();
 
-        $changeStatus->changeStatus($outingRepository, $status, $em);
+        $changeStatus -> changeStatus($outingRepository, $status, $em);
 
-        if ($searchForm->isSubmitted() && $searchForm->isValid()) {
+        if($searchForm -> isSubmitted() && $searchForm -> isValid()) {
 
-            $enlisted = $searchForm->get('outingEnlisted')->getData();
-            $notEnlisted = $searchForm->get('outingNotEnlisted')->getData();
+            $enlisted = $searchForm -> get('outingEnlisted') -> getData();
+            $notEnlisted = $searchForm -> get('outingNotEnlisted') -> getData();
 
-            if ($enlisted == 'true' && $notEnlisted == 'true') {
-                $this->addFlash('danger', 'Vous ne pouvez pas être inscrit et non-inscrit à une sortie');
-                return $this->redirectToRoute('home_list');
+            if($enlisted == 'true' && $notEnlisted == 'true'){
+                $this -> addFlash('danger', 'Vous ne pouvez pas être inscrit et non-inscrit à une sortie');
+                return $this -> redirectToRoute('home_list');
             }
 
             $outings = $outingRepository->filterOutings($searchOutingFormModel, $this->getUser());
-            if (!$outings) {
-                $this->addFlash('danger', 'Pas de sortie prévue sur ce campus');
+            if(!$outings){
+                $this -> addFlash('danger', 'Pas de sortie prévue sur ce campus');
             }
         }
 
@@ -77,6 +71,7 @@ class OutingController extends AbstractController
 
         return $this->render('outing/show.html.twig', [
             'outing' => $outing
+
         ]);
 
     }
@@ -139,10 +134,10 @@ class OutingController extends AbstractController
 
     #[Route('/withdrawal/{id}', name: 'outing_withdrawal', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function withdrawal(
-        int                    $id,
-        OutingRepository       $outingRepository,
+        int $id,
+        OutingRepository $outingRepository,
         EntityManagerInterface $em,
-        Request                $request
+        Request $request
     ): Response
     {
         //todo : ici, il faudrait vérifier que mon utilisateur soit déjà bien inscrit ?
@@ -163,11 +158,11 @@ class OutingController extends AbstractController
 
     #[Route('/publication/{id}', name: 'outing_publication', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function publication(
-        int                    $id,
-        OutingRepository       $outingRepository,
-        StatusRepository       $statusRepository,
+        int $id,
+        OutingRepository $outingRepository,
+        StatusRepository $statusRepository,
         EntityManagerInterface $em,
-        Request                $request
+        Request $request
     ): Response
     {
         $outing = $outingRepository->find($id);
@@ -229,17 +224,6 @@ class OutingController extends AbstractController
             return $this->redirectToRoute('home_list');
         }
 
-    }
-
-
-    #[Route('/campus/{id}', name: 'search_campus', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function findByCampus(int $id, OutingRepository $outingRepository): Response
-    {
-        $outingCampus = $outingRepository->findByCampus($id);
-        if (!$outingCampus) {
-            throw $this->createNotFoundException('Pas de sortie prévue sur ce campus');
-        }
-        return $this->render('outing/list.html.twig');
     }
 
     #[Route('/delete/{id}', name: 'delete_outing', requirements: ['id' => '\d+'], methods: ['GET'])]

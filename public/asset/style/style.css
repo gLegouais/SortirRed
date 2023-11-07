@@ -82,3 +82,36 @@ table {
     border-right: solid 4px darkgray;
     border-bottom: solid 4px darkgray;
 }
+
+.link-smart{
+    pointer-events: none;
+    text-decoration: none;
+    color: black;
+}
+
+.enabled-smart{
+    display: none;
+}
+
+@media screen and (max-width: 576px) {
+    .navbar {
+        display: none;
+    }
+    .formContainer{
+        display: none;
+    }
+    .link-smart{
+        pointer-events: auto;
+        text-decoration: revert;
+        color: revert;
+    }
+    .hidden-smart{
+        display: none;
+    }
+    .enabled-smart{
+        display: revert;
+    }
+    #logo{
+        width: 20%;
+    }
+}
