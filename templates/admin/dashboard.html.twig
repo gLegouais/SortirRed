@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+     | {{ parent() }} {# c'est quoi le parent ici ? #}
+{% endblock %}
+
+{% block body %}
+    <h1>ADMINISTRATION</h1>
+
+    <p><a href="{{ path('admin_addUser')}}" title="Admin_addUser">Ajouter un utilisateur</a></p>
+    <p><a href="" title="adminCity">Gérer les villes</a></p>
+    <p><a href="" title="adminCampus">Gérer les campus</a></p>
+
+{% endblock %}
