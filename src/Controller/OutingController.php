@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Outing;
+use App\Entity\Status;
 use App\Form\CancellationType;
 use App\Form\Model\CancellationTypeModel;
 use App\Form\Model\SearchOutingFormModel;
@@ -90,8 +91,14 @@ class OutingController extends AbstractController
 
         if ($outingForm->isSubmitted() && $outingForm->isValid()) {
             try {
-                $outing->setStatus($statusRepository->findOneBy(['label' => 'Created']));
                 $outing->setOrganizer($this->getUser());
+                if ($request->get('publish')) {
+                    $outing->setStatus($statusRepository->findOneBy(['label' => 'Open']));
+                    $outing->addParticipant($this->getUser());
+                } else {
+                    $outing->setStatus($statusRepository->findOneBy(['label' => 'Created']));
+                }
+
                 $manager->persist($outing);
                 $manager->flush();
 
@@ -250,6 +257,7 @@ class OutingController extends AbstractController
         int                    $id,
         EntityManagerInterface $manager,
         OutingRepository       $outingRepository,
+        StatusRepository       $statusRepository,
         Request                $request): Response
     {
         $outing = $outingRepository->find($id);
@@ -259,6 +267,12 @@ class OutingController extends AbstractController
             $outingForm->handleRequest($request);
 
             if ($outingForm->isSubmitted() && $outingForm->isValid()) {
+
+                if ($outingForm->get('publish')->isClicked()) {
+                    $outing->setStatus($statusRepository->findOneBy(['label' => 'Open']));
+                    $outing->addParticipant($this->getUser());
+                }
+
                 $manager->persist($outing);
                 $manager->flush();
 

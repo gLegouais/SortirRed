@@ -45,8 +45,8 @@
     </div>
 
 
-    <input type="submit" value="Créer la sortie">
-    <a href="{{ path('home_list') }}" class="btn btn-secondary">Publier la sortie (ne fonctionne pas)</a>
+    <input type="submit" value="Créer" name="save">
+    <input type="submit" value="Publier" name="publish">
     <a href="{{ path('home_list') }}" class="btn btn-secondary">Annuler</a>
     {{ form_end(outingForm) }}
 

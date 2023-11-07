@@ -93,9 +93,6 @@ class OutingType extends AbstractType
         }
 
         if ($location) {
-            $city = $location->getCity();
-            $city = $this->cityRepository->find($city);
-            dump($city);
             $form->add('location', EntityType::class, [
                 'required' => true,
                 'class' => Location::class,
@@ -111,7 +108,7 @@ class OutingType extends AbstractType
                 'choice_label' => 'name',
                 'mapped' => false,
                 'placeholder' => '-- Choisir une ville --',
-                'empty_data' => $city
+                'data' => $city
             ]);
         } else {
             $form->add('location', EntityType::class, [
@@ -122,9 +119,6 @@ class OutingType extends AbstractType
                 'choice_label' => 'name'
             ]);
         }
-
-
-
     }
 
     public function onPreSubmit(FormEvent $event)
@@ -143,9 +137,12 @@ class OutingType extends AbstractType
         $form = $event->getForm();
         $outing = $event->getData();
         $location = $outing->getLocation();
-        $city = $location->getCity();
+        if ($location) {
+            $city = $location->getCity();
 
-        $this->addLocations($form, $city, $location);
+            $this->addLocations($form, $city, $location);
+        }
+
     }
 
 
