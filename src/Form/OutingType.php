@@ -78,11 +78,12 @@ class OutingType extends AbstractType
                 'disabled' => true,
                 'placeholder' => '-- Choix d\'une ville requis --'
             ]);
-        //$builder->addEventListener(FormEvents::PRE_SET_DATA, array($this, 'onPreSetData'));
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, array($this, 'onPreSetData'));
         $builder->addEventListener(FormEvents::PRE_SUBMIT, array($this, 'onPreSubmit'));
     }
 
-    protected function addLocations(FormInterface $form, City $city = null) {
+    protected function addLocations(FormInterface $form, City $city = null, Location $location = null) {
+
 
         if ($city) {
             $locations = $this->locationRepository->createQueryBuilder('l')
@@ -90,12 +91,40 @@ class OutingType extends AbstractType
                 ->setParameter('cityId', $city->getId())
                 ->getQuery()->getResult();
         }
-        $form->add('location', EntityType::class, [
-            'required' => true,
-            'class' => Location::class,
-            'placeholder' => '-- Choix d\'une ville requis --',
-            'choices' => $locations
-        ]);
+
+        if ($location) {
+            $city = $location->getCity();
+            $city = $this->cityRepository->find($city);
+            dump($city);
+            $form->add('location', EntityType::class, [
+                'required' => true,
+                'class' => Location::class,
+                'placeholder' => '-- Choix d\'une ville requis --',
+                'choices' => $locations,
+                'choice_label' => 'name',
+                'empty_data' => $location
+            ]);
+            $form->add('city', EntityType::class, [
+                'label' => 'Ville',
+                'required' => true,
+                'class' => City::class,
+                'choice_label' => 'name',
+                'mapped' => false,
+                'placeholder' => '-- Choisir une ville --',
+                'empty_data' => $city
+            ]);
+        } else {
+            $form->add('location', EntityType::class, [
+                'required' => true,
+                'class' => Location::class,
+                'placeholder' => '-- Choix d\'une ville requis --',
+                'choices' => $locations,
+                'choice_label' => 'name'
+            ]);
+        }
+
+
+
     }
 
     public function onPreSubmit(FormEvent $event)
@@ -108,17 +137,17 @@ class OutingType extends AbstractType
         $this->addLocations($form, $city);
 
     }
-/*
+
     public function onPreSetData(FormEvent $event)
     {
         $form = $event->getForm();
-        $data = $event->getData();
+        $outing = $event->getData();
+        $location = $outing->getLocation();
+        $city = $location->getCity();
 
-        $city = $this->cityRepository->find($data['city']);
-
-        $this->addLocations($form, $city);
+        $this->addLocations($form, $city, $location);
     }
-*/
+
 
     public function configureOptions(OptionsResolver $resolver): void
     {
