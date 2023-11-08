@@ -7,16 +7,17 @@
                 <img src="asset/images/logo.png" alt="logo du site" class="enabled-smart" id="logo"/>
             </div>
             <div class="col block-dateUsername">
-                <p>Date du jour: {{ currentDate | date('d/m/y') }}</p>
-                <p>Participant: {{ app.user.username }}</p>
+                <div>Date du jour: {{ currentDate | date('d/m/y') }}</div>
+
+                <div>Participant: {{ app.user.username }}</div>
             </div>
         </div>
     </div>
 
-    <div class="container formContainer" style="border: green solid 4px">
+    <div class="container formContainer">
         {{ form_start(searchForm) }}
         <div class="row align-items-center">
-            <div class="col-5 mx-auto">
+            <div class="col-6 mx-auto">
                 <div class="container">
                     <div class="col">
                         {{ form_row(searchForm.campus) }}
@@ -32,13 +33,13 @@
                     </div>
                 </div>
             </div>
-            <div class="col-3 mx-auto">
+            <div class="col-4 mx-auto">
                 {{ form_row(searchForm.outingOrganizer) }}
                 {{ form_row(searchForm.outingEnlisted) }}
                 {{ form_row(searchForm.outingNotEnlisted) }}
                 {{ form_row(searchForm.outingFinished) }}
             </div>
-            <div class="col-3 mx-auto">
+            <div class="col-2 mx-auto">
                 <button>Rechercher</button>
             </div>
         </div>

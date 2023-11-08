@@ -110,7 +110,9 @@ label[for="city_postcode"] {
     padding-right: 0;
     font-weight: bold;
     font-family: "Comic Sans MS";
-    border: solid 3px #000080;
+    display: flex;
+    text-align: right;
+    flex-direction: column;
 }
 
 @media screen and (max-width: 576px) {
