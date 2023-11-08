@@ -39,6 +39,20 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
         $manager->persist($admin);
         $this -> addReference('gandalf', $admin);
 
+        $deletedUser = new User();
+        $deletedUser->setRoles(['ROLE_USER']);
+        $deletedUser->setUsername('Utilisateur supprimé');
+        $password = $this->passwordHasher->hashPassword($deletedUser, 'IAmDeletedDoNotUse');
+        $deletedUser->setPassword($password);
+        $deletedUser->setEmail('deleted@user.old');
+        $deletedUser->setPhone('0000000000');
+        $deletedUser->setFirstname('UTILISATEUR');
+        $deletedUser->setLastname('SUPPRIMÉ');
+        $deletedUser->setCampus($campusList[0]);
+        $deletedUser->setProfilePicture('defaultDeletedUser.png');
+        $manager->persist($deletedUser);
+        $this->addReference('deletedUser', $deletedUser);
+
         for ($i = 1; $i <= 50; $i++) {
             $guest = new User();
             $firstname = $faker->firstName();
@@ -58,8 +72,6 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
             $this -> addReference('user' . $i, $guest);
 
         }
-
-
         $manager->flush();
     }
 
