@@ -28,7 +28,12 @@
         <thead>
         <tr class="table-top">
             <th>Pseudo</th>
+            <th>Prénom</th>
             <th>Nom</th>
+            <th>Email</th>
+            <th>Téléphone</th>
+            <th>Campus</th>
+            <th>Statut</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -36,12 +41,21 @@
 
         {% for user in users %}
             <tr class="table-rows">
-                <td>{{ user.pseudo }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.firstname }}</td>
                 <td>{{ user.lastname }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.phone }}</td>
+                <td>{{ user.campus.name }}</td>
+                <td>{% if user.isActive %}X{% endif %}</td>
                 <td>
-                    <a href="" title="Modification d'une ville" id= {{"modify" ~ city.id }}>Modifier</a>
+                    {% if (user.isActive) %}
+                        <a href="" title="Rendre inactif">Rendre inactif</a>
+                    {% else %}
+                        <a href="" title="Rendre actif">Rendre actif</a>
+                    {% endif %}
                     -
-                    <a href="{{ path('delete_city', {'id':city.id}) }}" title="Supression d'une ville">Supprimer</a>
+                    <a href="" title="Supression d'une ville">Supprimer</a>
                 </td>
             </tr>
         {% endfor %}

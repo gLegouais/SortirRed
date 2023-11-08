@@ -28,7 +28,7 @@ class AdminController extends AbstractController
     #[Route('/', name: 'admin_dashboard')]
     public function dashboard(UserRepository $userRepository): Response
     {
-        $users = $userRepository -> findAll();
+        $users = $userRepository -> selectAllUsers();
 
         return $this->render('admin/dashboard.html.twig', [
             'users' => $users
@@ -109,7 +109,7 @@ class AdminController extends AbstractController
         ]);
     }
 
-    #[Route('/delete/{id}', name: 'delete_campus', requirements: ['id' => '\d+'], methods: ['GET'])]
+    #[Route('/campus/delete/{id}', name: 'delete_campus', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function deleteCampus(int $id, CampusRepository $campusRepository, EntityManagerInterface $em): Response
     {
         $campus = $campusRepository->find($id);
@@ -120,7 +120,7 @@ class AdminController extends AbstractController
         return $this->redirectToRoute('manage_campus');
     }
 
-    #[Route('/{id}/update', name: 'update_campus', requirements: ['id' => '\d+'], methods: ['POST'])]
+    #[Route('/campus/{id}/update', name: 'update_campus', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function updateCampus(
         int                    $id,
         CampusRepository       $campusRepository,
@@ -181,7 +181,7 @@ class AdminController extends AbstractController
         ]);
     }
 
-    #[Route('/delete/{id}', name: 'delete_city', requirements: ['id' => '\d+'], methods: ['GET'])]
+    #[Route('/city/delete/{id}', name: 'delete_city', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function deleteCity(int $id, CityRepository $cityRepository, EntityManagerInterface $em): Response
     {
         $city = $cityRepository->find($id);
@@ -192,7 +192,7 @@ class AdminController extends AbstractController
         return $this->redirectToRoute('manage_city');
     }
 
-    #[Route('/{id}/update', name: 'update_city', requirements: ['id' => '\d+'], methods: ['POST'])]
+    #[Route('/city/{id}/update', name: 'update_city', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function updateCity(
         int                    $id,
         CityRepository $cityRepository,

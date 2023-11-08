@@ -9,7 +9,7 @@ document.querySelectorAll("[id^='modify']").forEach((link)=>{
         let cityId = link.id.slice(6, link.id.length);
         const targetURL = updateUrl.replace('0', cityId);
         document.getElementsByName('city')[0].action = targetURL;
-        document.getElementById('campus_name').name = 'newName'
+        document.getElementById('city_name').name = 'newName'
         document.getElementById('city_postcode').name = 'newPostCode'
         document.getElementsByName('city')[0].submit();
     })
