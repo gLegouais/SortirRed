@@ -11,6 +11,7 @@ use App\Form\Model\UploadUsersTypeModel;
 use App\Form\SearchCityType;
 use App\Form\UploadUsersType;
 use App\Repository\CityRepository;
+use App\Repository\OutingRepository;
 use App\Repository\UserRepository;
 use App\Repository\CampusRepository;
 use App\Services\UserUploader;
@@ -243,10 +244,22 @@ class AdminController extends AbstractController
     public function deactivateUser(
         int                    $id,
         UserRepository         $userRepository,
+        OutingRepository       $outingRepository,
         EntityManagerInterface $manager
     ): Response
     {
         $user = $userRepository->findOneBy(['id' => $id]);
+
+
+        if ($user->isIsActive()) {
+            // TODO : export this functionality in a service
+            $outings = $outingRepository->findOpenOutingsByParticipant($user);
+            foreach ($outings as $outing) {
+                $outing->removeParticipant($user);
+                $manager->persist($outing);
+            }
+        }
+
         $user->setIsActive(!$user->isIsActive());
 
         $user->isIsActive() ?
@@ -258,6 +271,36 @@ class AdminController extends AbstractController
 
         return $this->redirectToRoute('manage_users');
 
+    }
+
+    #[Route('/delete/{id}', name: 'delete_user', requirements: ['id'=> '\d+'], methods: ['GET', 'POST'])]
+    public function deleteUser(
+        int $id,
+        UserRepository $userRepository,
+        OutingRepository $outingRepository,
+        EntityManagerInterface $manager): Response
+    {
+        $user = $userRepository->findOneBy(['id' => $id]);
+        $deletedUser = $userRepository->findOneBy(['username'=> 'Utilisateur supprimé']);
+
+        $outings = $outingRepository->findOpenOutingsByParticipant($user);
+        foreach ($outings as $outing) {
+            $outing->removeParticipant($user);
+            $manager->persist($outing);
+        }
+
+        $outingsOrganized = $outingRepository->findBy(['organizer' => $user]);
+        foreach($outingsOrganized as $outing) {
+            $outing->setOrganizer($deletedUser);
+            $manager->persist($outing);
+        }
+
+        $manager->remove($user);
+        $manager->flush();
+
+        $this->addFlash('success', 'L\'utilisateur a bien été supprimé.');
+
+        return $this->redirectToRoute('manage_users');
     }
 
 }

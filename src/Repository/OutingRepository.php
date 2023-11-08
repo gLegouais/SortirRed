@@ -91,6 +91,21 @@ class OutingRepository extends ServiceEntityRepository
         return $query->getResult();
     }
 
+    public function findOpenOutingsByParticipant(User $user): ?array
+    {
+        $qb = $this->createQueryBuilder('outing');
+        $qb->leftjoin('outing.participants', 'p')
+            ->addSelect('p')
+            ->andWhere(':user MEMBER OF outing.participants')
+            ->setParameter('user', $user);
+        $qb->join('outing.status', 's')
+            ->addSelect('s')
+            ->andWhere('s.label = \'Open\' or s.label = \'Closed\'');
+
+        $query = $qb->getQuery();
+        return $query->getResult();
+    }
+
     public function findOutingsAndroid(): ?array
     {
         $qb = $this -> createQueryBuilder('o');

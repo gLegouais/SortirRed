@@ -38,7 +38,7 @@
                         <a href="{{ path('de-activate_user', {'id': user.id}) }}" title="Rendre actif">Rendre actif</a>
                     {% endif %}
                     -
-                    <a href="" title="Supression d'une ville">Supprimer</a>
+                    <a href="{{ path('delete_user', {'id': user.id}) }}" title="Supression d'une ville">Supprimer</a>
                 </td>
             </tr>
         {% endfor %}
