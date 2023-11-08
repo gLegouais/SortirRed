@@ -8,6 +8,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\Ignore;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Range;
 
 #[ORM\Entity(repositoryClass: LocationRepository::class)]
 class Location
@@ -19,23 +22,42 @@ class Location
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
+    #[NotBlank(message: 'Le nom ne peut être vide.')]
+    #[Length(
+        min: 4,
+        max: 100,
+        minMessage: 'Le nom du lieu doit avoir au minimum 4 caractères.',
+        maxMessage: 'Le nom du lieu ne peut dépasser 100 caractères.'
+    )]
     #[Groups(['get:collection:locations', 'get:full:location'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Length(max: 255, maxMessage: 'L\'adresse ne peut dépasser 255 caractères.')]
     #[Groups(['get:collection:locations', 'get:full:location'])]
     private ?string $street = null;
 
     #[ORM\Column(nullable: true)]
+    #[Range(
+        min: -90,
+        max: 90,
+        notInRangeMessage: 'Une latitude doit être comprise entre -90.0 et 90.0.'
+    )]
     #[Groups(['get:collection:locations', 'get:full:location'])]
     private ?float $latitude = null;
 
     #[ORM\Column(nullable: true)]
+    #[Range(
+        min: -90,
+        max: 90,
+        notInRangeMessage: 'Une longitude doit être comprise entre -90.0 et 90.0.'
+    )]
     #[Groups(['get:collection:locations', 'get:full:location'])]
     private ?float $longitude = null;
 
     #[ORM\ManyToOne(inversedBy: 'locations')]
     #[ORM\JoinColumn(nullable: false)]
+    #[NotBlank(message: 'Ce champ ne peut être vide.')]
     #[Groups(['get:collection:locations', 'get:full:location'])]
     private ?City $city = null;
 

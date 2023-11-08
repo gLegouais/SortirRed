@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\Unique;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[UniqueEntity(fields: ['username'], message: 'Un utilisateur utilise déjà ce pseudo')]
@@ -21,6 +23,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Unique(message: 'Votre pseudo doit être unique. Celui-ci est déjà utilisé.')]
+    #[Length(
+        min: 1,
+        max: 180,
+        minMessage: 'Votre pseudo doit comporter un minimum de 1 caractère.',
+        maxMessage: 'Votre pseudo ne peut dépasser 180 caractères.')]
     private ?string $username = null;
 
     #[ORM\Column]
@@ -33,12 +41,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 50)]
+    #[Length(
+        min: 1,
+        max: 50,
+        minMessage: 'Le nom de famille doit comporter un minimum de 1 caractère.',
+        maxMessage: 'Le nom de famille ne peut dépasser 50 caractères.')]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 50)]
+    #[Length(
+        min: 1,
+        max: 50,
+        minMessage: 'Le prénom doit comporter un minimum de 1 caractère.',
+        maxMessage: 'Le prénom ne peut dépasser 50 caractères.')]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 50)]
+    #[Length(
+        min: 6,
+        max: 50,
+        minMessage: 'Votre adresse mail doit comporter un minimum de 6 caractère.',
+        maxMessage: 'Votre adresse mail ne peut dépasser 50 caractères.')]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -52,6 +75,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $outings;
 
     #[ORM\Column(length: 15)]
+    #[Length(
+        min: 2,
+        max: 15,
+        minMessage: 'Un numéro de téléphone doit comporter un minimum de 2 chiffres.',
+        maxMessage: 'Un numéro de téléphone ne peut dépasser 15 chiffres.')]
     private ?string $phone = null;
 
     #[ORM\Column(length: 100)]

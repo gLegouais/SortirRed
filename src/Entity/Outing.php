@@ -3,9 +3,14 @@
 namespace App\Entity;
 
 use App\Repository\OutingRepository;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ORM\Entity(repositoryClass: OutingRepository::class)]
 class Outing
@@ -16,21 +21,34 @@ class Outing
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
+    #[NotBlank(message: 'Le nom ne peut être vide.')]
+    #[Length(
+        min: 4,
+        max: 100,
+        minMessage: 'Le nom du lieu doit avoir au minimum 4 caractères.',
+        maxMessage: 'Le nom du lieu ne peut dépasser 100 caractères.'
+    )]
     private ?string $name = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $startDate = null;
+    #[GreaterThanOrEqual('+1 day', message: 'La date de début doit être supérieure à la date du jour.')]
+    private ?DateTimeImmutable $startDate = null;
 
     #[ORM\Column]
+    #[GreaterThan(value: 0, message: 'La durée doit être supérieure à 0 minute.')]
     private ?int $duration = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $deadline = null;
+    #[GreaterThanOrEqual('+1 day', message:'La date limite d\'inscription doit être supérieure à la date du jour.')]
+    // Asserting this value is less than startDate  is done in OutingType.php.
+    private ?DateTimeImmutable $deadline = null;
 
     #[ORM\Column]
+    #[GreaterThan(value: 0, message: 'La nombre de participants doit être supérieur à 0.')]
     private ?int $maxRegistered = null;
 
     #[ORM\Column(length: 255)]
+    #[Length(max: 255, maxMessage: 'La description de la sortie ne peut dépasser 255 caractères.')]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'outings')]
@@ -74,12 +92,12 @@ class Outing
         return $this;
     }
 
-    public function getStartDate(): ?\DateTimeImmutable
+    public function getStartDate(): ?DateTimeImmutable
     {
         return $this->startDate;
     }
 
-    public function setStartDate(\DateTimeImmutable $startDate): static
+    public function setStartDate(DateTimeImmutable $startDate): static
     {
         $this->startDate = $startDate;
 
@@ -98,12 +116,12 @@ class Outing
         return $this;
     }
 
-    public function getDeadline(): ?\DateTimeImmutable
+    public function getDeadline(): ?DateTimeImmutable
     {
         return $this->deadline;
     }
 
-    public function setDeadline(\DateTimeImmutable $deadline): static
+    public function setDeadline(DateTimeImmutable $deadline): static
     {
         $this->deadline = $deadline;
 
