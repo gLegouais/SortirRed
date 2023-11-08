@@ -31,6 +31,8 @@ class OutingController extends AbstractController
         Request          $request
     ): Response
     {
+        $currentDate = new \DateTimeImmutable();
+
         $searchOutingFormModel = new SearchOutingFormModel();
         $searchForm = $this->createForm(SearchOutingType::class, $searchOutingFormModel);
         $searchForm->handleRequest($request);
@@ -63,7 +65,8 @@ class OutingController extends AbstractController
 
         return $this->render('outing/list.html.twig', [
             'outings' => $outings,
-            'searchForm' => $searchForm
+            'searchForm' => $searchForm,
+            'currentDate' => $currentDate
         ]);
     }
 
