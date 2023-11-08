@@ -27,24 +27,24 @@ class OutingController extends AbstractController
     #[Route('/', name: 'home_list', methods: ['GET', 'POST'])]
     public function listOuting(
         OutingRepository $outingRepository,
-        ChangeStatus $changeStatus,
-        Request $request
+        ChangeStatus     $changeStatus,
+        Request          $request
     ): Response
     {
         $searchOutingFormModel = new SearchOutingFormModel();
-        $searchForm = $this -> createForm(SearchOutingType::class, $searchOutingFormModel);
-        $searchForm -> handleRequest($request);
+        $searchForm = $this->createForm(SearchOutingType::class, $searchOutingFormModel);
+        $searchForm->handleRequest($request);
 
         $userAgent = $request->headers->get('User-Agent');
 
         $assertAndroid = strpos($userAgent, 'Android');
-        if($assertAndroid){
-            $outings = $outingRepository -> findOutingsAndroid();
-        }else{
-            $outings = $outingRepository->findOutings($this -> getUser());
+        if ($assertAndroid) {
+            $outings = $outingRepository->findOutingsAndroid();
+        } else {
+            $outings = $outingRepository->findOutings($this->getUser());
         }
 
-        $changeStatus -> changeStatus();
+        $changeStatus->changeStatus();
 
         if ($searchForm->isSubmitted() && $searchForm->isValid()) {
 
@@ -206,7 +206,7 @@ class OutingController extends AbstractController
         EntityManagerInterface $em,
         Request                $request): Response
     {
-        if (($this->getUser()) === ($outing->getOrganizer())) {
+        if (($this->getUser()) === ($outing->getOrganizer()) || $this->isGranted('ROLE_ADMIN')) {
 
             $outing = $outingRepository->find($id);
             $cancellationTypeModel = new CancellationTypeModel();
@@ -217,8 +217,12 @@ class OutingController extends AbstractController
                 $outing->setStatus($statusRepository->findOneBy(['label' => 'Cancelled']));
                 $participants = $outing->getParticipants();
                 $participants->clear();
-                $outing->setDescription("[ANNULÉ] : " . $cancellationTypeModel->getMotif() . "\n" . $outing->getDescription());
-                var_dump($outing->getDescription());
+                if (($this->getUser()) === ($outing->getOrganizer())) {
+                    $outing->setDescription("[ANNULÉ] : " . $cancellationTypeModel->getMotif() . "\n" . $outing->getDescription());
+                }
+                else if ($this->isGranted('ROLE_ADMIN')) {
+                    $outing->setDescription("[SORTIE ANNULÉE PAR LA MODERATION] : " . $cancellationTypeModel->getMotif() . "\n" . $outing->getDescription());
+                }
                 $em->persist($outing);
                 $em->flush();
                 $this->addFlash('success', 'Vous avez supprimé votre proposition de sortie !');
