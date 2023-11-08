@@ -1,25 +1,42 @@
 const citySelect = document.getElementById('outing_city');
 const locationSelect = document.getElementById('outing_location');
 const locationDetailsDiv = document.getElementById('locationDetails');
+const btnLocationForm = document.getElementById('btnTriggerLocationForm');
+btnLocationForm.disabled = true;
 const eventChange = new Event('change');
 citySelect.addEventListener('change', getRelatedLocations);
 let updatedLocation = false;
 
+/*
+* These constants are responsible for getting a dynamic URL based on the project name in
+* order to fetch the relevant data from the application endpoint.
+ */
 const cityXLocationsURL = document.getElementById('js-url-data').dataset.apiCityXLocations;
 const locationDetailsURL = document.getElementById('js-url-data').dataset.apiLocationDetails;
 const locationAddURL = document.getElementById('js-url-data').dataset.apiLocationAdd;
 
+/*
+* This method calls asynchronously a fetch to the database in order to get the locations related to a
+* specific city (the target of the select).
+* It is triggered by an onChange event on the select input dedicated to the city.
+ */
 async function getRelatedLocations(element) {
+
     const cityId = element.target.value;
     locationSelect.disabled = false;
+    btnLocationForm.disabled = cityId === '';
+
     locationDetailsDiv.innerHTML = "";
+
     let defaultOption = document.createElement('option');
     defaultOption.id = '#';
     defaultOption.innerText = '-- Choisir un lieu --';
     defaultOption.selected = true;
     defaultOption.disabled = true;
+
     locationSelect.innerHTML = ''
     locationSelect.appendChild(defaultOption);
+
     const fetchLocationsURL = cityXLocationsURL.replace('0', cityId);
     const response = await fetch(fetchLocationsURL);
     await response.json().then((response) => {
@@ -30,19 +47,26 @@ async function getRelatedLocations(element) {
             locationSelect.appendChild(option);
         })
     });
+
     if(updatedLocation) {
-        console.log('updated !!!')
         locationSelect.lastElementChild.selected = true;
         updatedLocation = false;
         locationSelect.dispatchEvent(eventChange)
     }
+
 }
 
 locationSelect.addEventListener('change', getLocationDetails);
 
+/*
+* This method calls asynchronously a fetch to the database in order to get the details of a location in the database.
+* It is triggered by an onChange event on the select input dedicated to the location.
+ */
 async function getLocationDetails(element) {
+
     const locationId = element.target.value;
     locationDetailsDiv.innerHTML = "";
+
     const fetchLocationDetailsURL = locationDetailsURL.replace('0', locationId);
     const response = await fetch(fetchLocationDetailsURL);
     await response.json().then((response) => {
@@ -71,11 +95,12 @@ async function getLocationDetails(element) {
 
         })
     });
+
 }
 
 async function getLocationLatAndLongitude(street, postcode) {
+
     const api_url = 'https://api-adresse.data.gouv.fr/search/?q=';
-    console.log(api_url + formatStreet(street) + '&postcode=' + postcode);
     let coordinates = [];
     const response = await fetch(api_url + formatStreet(street) + '&postcode=' + formatPostcode(postcode));
     await response.json().then((data) => {
@@ -86,9 +111,11 @@ async function getLocationLatAndLongitude(street, postcode) {
         locationDetailsDiv.appendChild(latitudeP);
         locationDetailsDiv.appendChild(longitudeP);
     })
-    return coordinates;
-}
 
+    return coordinates;
+
+}
+// Formatting a location street to match the API for latitude and longitude requirements
 function formatStreet(street) {
     let streetArray = street.split(' ');
     let newStreetArray = []
@@ -98,6 +125,7 @@ function formatStreet(street) {
     return newStreetArray.join('+');
 }
 
+// Formatting a city postcode to match the API for latitude and longitude requirements
 function formatPostcode(postcode) {
     return postcode.replace(' ', '');
 }
@@ -108,6 +136,7 @@ const inputStreetLoc = document.getElementById('locStreet');
 const inputCityLoc = document.getElementById('locCity');
 const inputLatitudeLoc = document.getElementById('locLat');
 const inputLongitudeLoc = document.getElementById('locLong');
+
 createLocBtn.addEventListener('click', function () {
     inputCityLoc.value = document.getElementById('outing_city').value;
     inputLatitudeLoc.value = 1.5;

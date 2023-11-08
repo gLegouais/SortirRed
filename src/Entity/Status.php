@@ -6,6 +6,7 @@ use App\Repository\StatusRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\Length;
 
 #[ORM\Entity(repositoryClass: StatusRepository::class)]
 class Status
@@ -16,6 +17,11 @@ class Status
     private ?int $id = null;
 
     #[ORM\Column(length: 20)]
+    #[Length(
+        min: 2,
+        max: 20,
+        minMessage: 'Le libellé du statut doit comporter un minimum de 2 caractères.',
+        maxMessage: 'Le libellé du statut ne peut dépasser 20 caractères.')]
     private ?string $label = null;
 
     #[ORM\OneToMany(mappedBy: 'status', targetEntity: Outing::class)]

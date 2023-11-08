@@ -12,14 +12,15 @@ use App\Form\SearchCityType;
 use App\Form\UploadUsersType;
 use App\Repository\CityRepository;
 use App\Repository\UserRepository;
+use App\Repository\CampusRepository;
 use App\Services\UserUploader;
 use App\Form\CampusType;
 use App\Form\SearchCampusType;
-use App\Repository\CampusRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/admin')]
@@ -36,18 +37,35 @@ class AdminController extends AbstractController
     }
 
 
-    #[Route('/addUser', name: 'admin_addUser')]
-    public function addUserAdmin(Request $request): Response
+    #[Route('/addUser', name: 'admin_addUser', methods: ['GET', 'POST'])]
+    public function addUserAdmin(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): Response
     {
         $user = new User();
-        $adminAddUserForm = $this->createForm(AdminAddUserType::class, $user);
 
+        $adminAddUserForm = $this->createForm(AdminAddUserType::class, $user);
         $adminAddUserForm->handleRequest($request);
+
+        if ($adminAddUserForm->isSubmitted() && $adminAddUserForm->isValid()) {
+            $user->setPassword($passwordHasher->hashPassword($user, 'magique'));
+
+            if ($adminAddUserForm->get('role')->getData()) {
+                var_dump('mon role est administrateur');
+                $user->setRoles(['ROLE_ADMIN']);
+                $user->setProfilePicture('defaultAdminPicture.png');
+            } else {
+                $user->setRoles(['ROLE_USER']);
+            }
+            $this->addFlash('success', 'Vous avez créé un nouvel utilisateur' );
+            $em->persist($user);
+            $em->flush();
+        }
+
 
         return $this->render('admin/addUser.html.twig', [
             'adminAddUserForm' => $adminAddUserForm
-        ]);
+        ]); //peut-être faire le retour vers le profil de l'utilisateur nouvellement créé ?
     }
+
     #[Route('/uploadUsers', name: 'admin_upload', methods: ['GET', 'POST'])]
     public function index(
         UserUploader $uploader,
@@ -67,6 +85,7 @@ class AdminController extends AbstractController
                 }
             }
         }
+
         return $this->render('admin/upload.html.twig', ['uploadingForm' => $uploadingForm]);
     }
 

@@ -156,11 +156,12 @@ class OutingController extends AbstractController
         $outing = $outingRepository->find($id);
         if ($outing->getStatus()->getLabel() == 'Open' || $outing->getStatus()->getLabel() == 'Close') {
             $outing->removeParticipant($this->getUser());
-            $this->addFlash('success', "Vous êtes désinscrit de la sortie");
+
         }
 
         $em->persist($outing);
         $em->flush();
+        $this->addFlash('success', "Vous êtes désinscrit de la sortie");
 
         $referer = $request->headers->get('referer');
         return $this->redirect($referer);
