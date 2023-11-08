@@ -10,8 +10,12 @@ use Symfony\Bundle\SecurityBundle\Security;
 class ChangeStatus
 {
 
-    public function __construct(private readonly OutingRepository $outingRepository, private readonly StatusRepository $status, private readonly  EntityManagerInterface $em, private Security $security){
-
+    public function __construct(
+        private readonly OutingRepository $outingRepository,
+        private readonly StatusRepository $status,
+        private readonly  EntityManagerInterface $em,
+        private Security $security
+    ){
     }
 
     public function changeStatus():void

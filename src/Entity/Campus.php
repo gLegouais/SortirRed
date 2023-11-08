@@ -6,6 +6,7 @@ use App\Repository\CampusRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CampusRepository::class)]
 class Campus
@@ -16,6 +17,13 @@ class Campus
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
+    #[Assert\NotBlank(message: 'Le nom du campus ne peut être vide.')]
+    #[Assert\Length(
+        min: 1,
+        max: 100,
+        minMessage: 'Le nom du campus doit avoir au minimum 1 caractère.',
+        maxMessage: 'Le nom du campus ne peut dépasser 100 caractères.'
+    )]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'campus', targetEntity: User::class)]

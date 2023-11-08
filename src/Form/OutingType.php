@@ -20,6 +20,11 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\DateTime;
+use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\LessThan;
+use Symfony\Component\Validator\Constraints\LessThanOrEqual;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class OutingType extends AbstractType
 {
@@ -46,7 +51,13 @@ class OutingType extends AbstractType
             ->add('deadline', DateTimeType::class, [
                 'label' => 'Date limite d\'inscription',
                 'widget' => 'single_text',
-                'input' => 'datetime_immutable'
+                'input' => 'datetime_immutable',
+                'constraints' => [
+                    new LessThanOrEqual([
+                        'propertyPath' => 'parent.all[startDate].data',
+                        'message' => 'La date limite d\'inscription doit être inférieure/égale à la date de la sortie'
+                    ]),
+                ]
             ])
             ->add('maxRegistered', IntegerType::class, [
                 'label' => 'Nombre de places'
