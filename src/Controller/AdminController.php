@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/admin')]
@@ -26,25 +27,27 @@ class AdminController extends AbstractController
 
 
     #[Route('/addUser', name: 'admin_addUser', methods: ['GET', 'POST'])]
-    public function addUserAdmin(Request $request, EntityManagerInterface $em): Response
+    public function addUserAdmin(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): Response
     {
-        var_dump("je rentre dans ma fonction addUserAdmin");
         $user = new User();
 
         $adminAddUserForm = $this->createForm(AdminAddUserType::class, $user);
         $adminAddUserForm->handleRequest($request);
 
         if ($adminAddUserForm->isSubmitted() && $adminAddUserForm->isValid()) {
-            //$password = $this->passwordHasher->hashPassword($user, 'magic'); //rajouter une propriété pour hasher le password ?
-            $user->setPassword('magic'); //le mot de passe n'est pas haché, mais c'est pour le test
-            $user->setProfilePicture('defaultProfilePicture.png');
-            var_dump("Mon formulaire d'ajout d'utilisateur a été soumis");
-            //$this->addFlash('success', 'Vous avez créé un nouvel utilisateur' );
+            $user->setPassword($passwordHasher->hashPassword($user, 'magique'));
 
+            if ($adminAddUserForm->get('role')->getData()) {
+                var_dump('mon role est administrateur');
+                $user->setRoles(['ROLE_ADMIN']);
+                $user->setProfilePicture('defaultAdminPicture.png');
+            } else {
+                $user->setRoles(['ROLE_USER']);
+            }
+            $this->addFlash('success', 'Vous avez créé un nouvel utilisateur' );
             $em->persist($user);
             $em->flush();
         }
-
 
 
         return $this->render('admin/addUser.html.twig', [

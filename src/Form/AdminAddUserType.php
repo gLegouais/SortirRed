@@ -20,16 +20,11 @@ class AdminAddUserType extends AbstractType
                 'label' => "Nom d'utilisateur",
                 'required' => true
             ])
-            ->add('roles', CheckboxType::class, [
+            ->add('role', CheckboxType::class, [
                 'label' => 'role admin ?', //checkbox, menu déroulant, bouton ?
                 'required' => false,
                 'mapped' => false
             ])
-            /*
-            ->add('password', TextType::class, [
-                'label' => 'Mot de passe : ',
-            ]) //password par défaut ? Truc aléatoire en fonction du nom ?
-                */
 
             ->add('lastname', TextType::class, [
                 'label' => 'Nom : ',
@@ -42,8 +37,6 @@ class AdminAddUserType extends AbstractType
                 'label' => 'mail :',
                 'required' => true
             ])
-
-            //->add('isActive') //commenté car non nécessaire et mis en actif par défaut ?
 
             ->add('phone', TextType::class, [
                 'label' => 'Téléphone : ',
