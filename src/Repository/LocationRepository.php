@@ -21,16 +21,6 @@ class LocationRepository extends ServiceEntityRepository
         parent::__construct($registry, Location::class);
     }
 
-    public function searchLikeLocation(City $city): ?array
-    {
-        $qb = $this -> createQueryBuilder('l');
-        $qb -> andWhere('l.name LIKE :cityName')
-            -> setParameter(':cityName', '%' . $city -> getName() . '%');
-
-        $query = $qb -> getQuery();
-        return $query -> getResult();
-    }
-
 //    /** THIS IS AN EXAMPLE */
 //     * @return Location[] Returns an array of Location objects
 //     */

@@ -3,10 +3,15 @@
 namespace App\Controller;
 
 use App\Entity\Campus;
+use App\Entity\City;
 use App\Entity\User;
 use App\Form\AdminAddUserType;
+use App\Form\CityType;
 use App\Form\Model\UploadUsersTypeModel;
+use App\Form\SearchCityType;
 use App\Form\UploadUsersType;
+use App\Repository\CityRepository;
+use App\Repository\UserRepository;
 use App\Services\UserUploader;
 use App\Form\CampusType;
 use App\Form\SearchCampusType;
@@ -21,8 +26,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class AdminController extends AbstractController
 {
     #[Route('/', name: 'admin_dashboard')]
-    public function dashboard(): Response
+    public function dashboard(UserRepository $userRepository): Response
     {
+        $user = $userRepository -> findAll();
+
         return $this->render('admin/dashboard.html.twig');
     }
 
@@ -77,12 +84,13 @@ class AdminController extends AbstractController
             }
         }
 
-        $createCampusForm = $this->createForm(CampusType::class, $campus);
+        $newCampus = new Campus();
+        $createCampusForm = $this->createForm(CampusType::class, $newCampus);
         $createCampusForm->handleRequest($request);
 
         if ($createCampusForm->isSubmitted() && $createCampusForm->isValid()) {
             try {
-                $em->persist($campus);
+                $em->persist($newCampus);
                 $em->flush();
                 $this->addFlash('success', 'Campus créé avec succès');
                 return $this->redirectToRoute('manage_campus');
@@ -129,6 +137,80 @@ class AdminController extends AbstractController
         $this->addFlash('success', 'Le campus a été modifié avec succès');
 
         return $this->redirectToRoute('manage_campus');
+
+    }
+
+    #[Route('/managecity', name: 'manage_city', methods: ['GET', 'POST'])]
+    public function manageCity(Request $request, CityRepository $cityRepository, EntityManagerInterface $em): Response
+    {
+        $cityList = $cityRepository->findAll();
+
+        $city = new City();
+        $searchCityForm = $this->createForm(SearchCityType::class, $city);
+        $searchCityForm->handleRequest($request);
+
+        if ($searchCityForm->isSubmitted() && $searchCityForm->isValid()) {
+            $cityList = $cityRepository->filterLikeCity($city);
+            if (!$cityList) {
+                $this->addFlash('danger', 'Pas de ville à ce nom');
+            }
+        }
+
+        $newCity = new City();
+        $createCityForm = $this->createForm(CityType::class, $newCity);
+        $createCityForm->handleRequest($request);
+
+        if ($createCityForm->isSubmitted() && $createCityForm->isValid()) {
+            try {
+                $em->persist($newCity);
+                $em->flush();
+                $this->addFlash('success', 'Ville créée avec succès');
+                return $this->redirectToRoute('manage_city');
+            } catch (\Exception $e) {
+                $this->addFlash('danger', 'Erreur lors de la création de la ville');
+            }
+
+        }
+
+        return $this->render('admin/manageCity.html.twig', [
+            'searchCityForm' => $searchCityForm,
+            'createCityForm' => $createCityForm,
+            'cityList' => $cityList
+        ]);
+    }
+
+    #[Route('/delete/{id}', name: 'delete_city', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function deleteCity(int $id, CityRepository $cityRepository, EntityManagerInterface $em): Response
+    {
+        $city = $cityRepository->find($id);
+        $em->remove($city);
+        $em->flush();
+        $this->addFlash('success', 'Ville supprimée');
+
+        return $this->redirectToRoute('manage_city');
+    }
+
+    #[Route('/{id}/update', name: 'update_city', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function updateCity(
+        int                    $id,
+        CityRepository $cityRepository,
+        EntityManagerInterface $em,
+        Request                $request
+    ): Response
+    {
+        $city = $cityRepository->find($id);
+
+        $name = $request->get('newName');
+        $city->setName($name);
+        $postCode = $request -> get('newPostCode');
+        $city -> setPostcode($postCode);
+
+        $em->persist($city);
+        $em->flush();
+
+        $this->addFlash('success', 'La ville a été modifiée avec succès');
+
+        return $this->redirectToRoute('manage_city');
 
     }
 

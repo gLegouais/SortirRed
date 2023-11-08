@@ -7,8 +7,21 @@
 {% block body %}
     <h1>ADMINISTRATION</h1>
 
-    <p><a href="{{ path('admin_addUser')}}" title="Admin_addUser">Ajouter un utilisateur</a></p>
-    <p><a href="" title="adminCity">Gérer les villes</a></p>
-    <p><a href="{{ path('manage_campus') }}" title="adminCampus">Gérer les campus</a></p>
+    <table class="table-sm table-bordered mb-3">
+        <thead>
+            <tr class="table-top">
+                <th>Actions d'administration</th>
+            </tr>
+        </thead>
+        <tr class="table-rows">
+            <td><a href="{{ path('admin_addUser')}}" title="Admin_addUser">Ajouter un utilisateur</a></td>
+        </tr>
+        <tr class="table-rows">
+            <td><a href="{{ path('manage_city') }}" title="adminCity">Gérer les villes</a></td>
+        </tr>
+        <tr class="table-rows">
+            <td><a href="{{ path('manage_campus') }}" title="adminCampus">Gérer les campus</a></td>
+        </tr>
+    </table>
 
 {% endblock %}
