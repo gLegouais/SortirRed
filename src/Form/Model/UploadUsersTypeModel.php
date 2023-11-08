@@ -7,7 +7,7 @@ use Symfony\Component\Mime\Part\File;
 
 class UploadUsersTypeModel
 {
-    private string $csvFileName;
+    private UploadedFile $csvFileName;
 
     public function getCsv(): UploadedFile
     {

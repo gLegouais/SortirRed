@@ -11,7 +11,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface; //utile ? Juste copié-collé, par importé
 
 #[Route('/admin')]
 class AdminController extends AbstractController
@@ -19,9 +18,7 @@ class AdminController extends AbstractController
     #[Route('/', name: 'admin_dashboard')]
     public function dashboard(): Response
     {
-        return $this->render('admin/dashboard.html.twig', [
-            'controller_name' => 'AdminController',
-        ]);
+        return $this->render('admin/dashboard.html.twig');
     }
 
 
@@ -52,13 +49,18 @@ class AdminController extends AbstractController
         Request      $request
     ): Response
     {
-        $upload = new UploadUsersTypeModel();
-        $uploadingForm = $this->createForm(UploadUsersType::class, $upload);
+        $uploadedCSV = new UploadUsersTypeModel();
+        $uploadingForm = $this->createForm(UploadUsersType::class, $uploadedCSV);
         $uploadingForm->handleRequest($request);
-        dump('hello');
         if ($uploadingForm->isSubmitted() && $uploadingForm->isValid()) {
-            dump('hello 2');
-            $uploader->uploadUsers($upload);
+            if ($uploadedCSV->getCsv()->getClientOriginalExtension() === 'csv') {
+                $nbUsersAdded = $uploader->uploadUsers($uploadedCSV->getCsv());
+                if ($nbUsersAdded > 0) {
+                    $this->addFlash('success', 'Le fichier a bien été traité (' . $nbUsersAdded . ' utilisateurs ajoutés).');
+                } else {
+                    $this->addFlash('danger', 'Échec lors de l\'importation du fichier. Vérifiez le format (.csv) et les données.');
+                }
+            }
         }
 
         return $this->render('admin/upload.html.twig', ['uploadingForm' => $uploadingForm]);
