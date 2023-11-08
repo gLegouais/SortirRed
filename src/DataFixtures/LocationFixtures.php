@@ -22,8 +22,8 @@ class LocationFixtures extends Fixture implements DependentFixtureInterface
             $fakeLocation->setName($faker->company());
             $fakeLocation->setCity($this->getReference('city' . mt_rand(1, 21)));
             $fakeLocation->setStreet($faker->streetAddress());
-            $fakeLocation->setLongitude($faker->randomFloat());
-            $fakeLocation->setLatitude($faker->randomFloat());
+            $fakeLocation->setLongitude($faker->randomFloat(5,-90,90));
+            $fakeLocation->setLatitude($faker->randomFloat(5,-90,90));
             $manager->persist($fakeLocation);
             $this -> addReference('location' . $i, $fakeLocation);
 
