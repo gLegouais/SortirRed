@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    | {{ parent() }} {# c'est quoi le parent ici ? #}
+{% endblock %}
+
+{% block body %}
+    <h1>Ajouter un nouvel utilisateur</h1>
+
+    <div>
+        {{ form_start(adminAddUserForm) }}
+        {{ form_widget(adminAddUserForm) }}
+        <button>Créer utilisateur</button>
+        {{ form_end(adminAddUserForm) }}
+    </div>
+{% endblock %}
