@@ -93,6 +93,18 @@ table {
     display: none;
 }
 
+label[for="campus_name"] {
+    display: none;
+}
+
+label[for="city_name"] {
+    display: none;
+}
+
+label[for="city_postcode"] {
+    display: none;
+}
+
 @media screen and (max-width: 576px) {
     .navbar {
         display: none;
