@@ -2,7 +2,9 @@
 
 namespace App\Form;
 
+use App\Entity\Campus;
 use App\Entity\User;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -11,18 +13,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AdminAddUserType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options, ): void
+    public function buildForm(FormBuilderInterface $builder, array $options,): void
     {
         $builder
             ->add('username', TextType::class, [
                 'label' => "Nom d'utilisateur",
+                'required' => true
             ])
             ->add('roles', CheckboxType::class, [
                 'label' => 'role admin ?', //checkbox, menu déroulant, bouton ?
                 'required' => false,
                 'mapped' => false
             ])
-
             /*
             ->add('password', TextType::class, [
                 'label' => 'Mot de passe : ',
@@ -30,28 +32,31 @@ class AdminAddUserType extends AbstractType
                 */
 
             ->add('lastname', TextType::class, [
-                'label' => 'Nom : '
+                'label' => 'Nom : ',
+                'required' => true
             ])
             ->add('firstname', TextType::class, [
                 'label' => 'Prénom : '
             ])
-            ->add('email', TextType::class,[
-                'label' => 'mail :'
+            ->add('email', TextType::class, [
+                'label' => 'mail :',
+                'required' => true
             ])
 
             //->add('isActive') //commenté car non nécessaire et mis en actif par défaut ?
 
             ->add('phone', TextType::class, [
-                'label' => 'Téléphone : '
+                'label' => 'Téléphone : ',
+                'required' => true
+            ])
+            ->add('campus', EntityType::class, [
+                'label' => 'Campus',
+                'class' => Campus::class,
+                'choice_label' => 'name',
             ]);
 
-            //->add('profilePicture') //photo de profil par défaut ? Supprimé car inutile dans le formulaire
+        //->add('profilePicture') //photo de profil par défaut ? Supprimé car inutile dans le formulaire
 
-               /*
-            ->add('campus', TextType::class, [ //menu déroulant ?
-                'label' => 'Campus : ',
-                'mapped' => false //mapped car ma donnée dans mon entité n'est pas du même type que ce que je demande dans mon formulaire. Bonne ou mauvaise idée ?
-            ]);*/
     }
 
     public function configureOptions(OptionsResolver $resolver): void

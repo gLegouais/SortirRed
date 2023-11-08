@@ -78,12 +78,12 @@
                     {% endif %}
 
                     {% if (outing.organizer == app.user) and (outing.status.label =='Open' or outing.status.label == 'Closed')%}
-                        <a href="{{ path('outing_update', {'id': outing.id}) }}" title="modification">Modifier</a>
                         <a href="{{ path('outing_cancellation', {'id':outing.id}) }}" title="annulation">Annuler la sortie</a>
                     {% endif %}
 
                     {% if outing.organizer == app.user and outing.status.label == 'Created' %}
                         <a href="{{ path('outing_publication', {'id':outing.id}) }}" title="publication">Publier</a>
+                        <a href="{{ path('outing_update', {'id': outing.id}) }}" title="modification">Modifier</a>
                         <a href="{{ path('delete_outing', {'id':outing.id}) }}" title="suppression">Supprimer le projet</a>
                     {% endif %}
                 </td>

@@ -2,11 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Campus;
 use App\Entity\User;
 use App\Form\AdminAddUserType;
 use App\Form\Model\UploadUsersTypeModel;
 use App\Form\UploadUsersType;
+use App\Repository\CampusRepository;
 use App\Services\UserUploader;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,20 +26,26 @@ class AdminController extends AbstractController
 
 
     #[Route('/addUser', name: 'admin_addUser', methods: ['GET', 'POST'])]
-    public function addUserAdmin(Request $request): Response
+    public function addUserAdmin(Request $request, EntityManagerInterface $em): Response
     {
         var_dump("je rentre dans ma fonction addUserAdmin");
         $user = new User();
-        //$password = $this->passwordHasher->hashPassword($user, 'magic'); //rajouter une propriété
-        $user->setPassword('magic'); //le mot de passe n'est pas haché, mais c'est pour le test
-        $user->setProfilePicture('defaultProfilePicture.png');
-        $adminAddUserForm = $this->createForm(AdminAddUserType::class, $user);
 
+        $adminAddUserForm = $this->createForm(AdminAddUserType::class, $user);
         $adminAddUserForm->handleRequest($request);
+
         if ($adminAddUserForm->isSubmitted() && $adminAddUserForm->isValid()) {
-            dump("Mon formulaire d'ajout d'utilisateur a été soumis");
-            $this->addFlash('success', 'Vous avez créé un nouvel utilisateur' );
+            //$password = $this->passwordHasher->hashPassword($user, 'magic'); //rajouter une propriété pour hasher le password ?
+            $user->setPassword('magic'); //le mot de passe n'est pas haché, mais c'est pour le test
+            $user->setProfilePicture('defaultProfilePicture.png');
+            var_dump("Mon formulaire d'ajout d'utilisateur a été soumis");
+            //$this->addFlash('success', 'Vous avez créé un nouvel utilisateur' );
+
+            $em->persist($user);
+            $em->flush();
         }
+
+
 
         return $this->render('admin/addUser.html.twig', [
             'adminAddUserForm' => $adminAddUserForm
