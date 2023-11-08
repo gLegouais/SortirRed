@@ -7,6 +7,8 @@ use App\Entity\User;
 use App\Form\Model\SearchOutingFormModel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @extends ServiceEntityRepository<Outing>
@@ -18,12 +20,12 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class OutingRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, private Security $security)
     {
         parent::__construct($registry, Outing::class);
     }
 
-    public function findOutings(): ?array
+    public function findOutings(UserInterface $user): ?array
     {
         $qb = $this -> createQueryBuilder('o');
         $qb -> join('o.status', 's')
@@ -36,7 +38,9 @@ class OutingRepository extends ServiceEntityRepository
             -> addSelect('p');
         $qb -> join('l.city', 'c')
             ->addSelect('c');
-        $qb -> andWhere('s.label != \'Created\'');
+        $qb -> andWhere('s.label != \'Created\'')
+            -> orWhere('org = :user')
+            -> setParameter(':user', $user->getId());
 
         $query = $qb -> getQuery();
         return $query -> getResult();
@@ -80,11 +84,30 @@ class OutingRepository extends ServiceEntityRepository
         if ($formModel->getOutingFinished()) {
             $qb->join('outing.status', 's')
                 ->addSelect('s')
-                ->andWhere('s.label = \'Cancelled\'');
+                ->andWhere('s.label = \'Finished\'');
         }
 
         $query = $qb->getQuery();
         return $query->getResult();
+    }
+
+    public function findOutingsAndroid(): ?array
+    {
+        $qb = $this -> createQueryBuilder('o');
+        $qb -> join('o.status', 's')
+            -> addSelect('s');
+        $qb -> join('o.location', 'l')
+            -> addSelect('l');
+        $qb -> join('l.city', 'c')
+            -> addSelect('c');
+        $qb -> join('o.campus', 'ca')
+            -> addSelect('ca');
+        $qb -> andWhere('o.campus = :userCampus')
+            -> setParameter(':userCampus', $this -> security -> getUser() -> getCampus())
+            -> andWhere('s.label != \'Created\'');
+
+        $query = $qb -> getQuery();
+        return $query -> getResult();
     }
 
 }

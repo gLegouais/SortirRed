@@ -20,25 +20,32 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class OutingController extends AbstractController
 {
     #[Route('/', name: 'home_list', methods: ['GET', 'POST'])]
     public function listOuting(
-        OutingRepository       $outingRepository,
-        StatusRepository       $status,
-        EntityManagerInterface $em,
-        ChangeStatus           $changeStatus,
-        Request                $request
+        OutingRepository $outingRepository,
+        ChangeStatus $changeStatus,
+        Request $request
     ): Response
     {
         $searchOutingFormModel = new SearchOutingFormModel();
-        $searchForm = $this->createForm(SearchOutingType::class, $searchOutingFormModel);
-        $searchForm->handleRequest($request);
+        $searchForm = $this -> createForm(SearchOutingType::class, $searchOutingFormModel);
+        $searchForm -> handleRequest($request);
 
-        $outings = $outingRepository->findOutings();
+        $userAgent = $request->headers->get('User-Agent');
+        dump($userAgent);
 
-        $changeStatus->changeStatus($outingRepository, $status, $em);
+        $assertAndroid = strpos($userAgent, 'Android');
+        if($assertAndroid){
+            $outings = $outingRepository -> findOutingsAndroid();
+        }else{
+            $outings = $outingRepository->findOutings($this -> getUser());
+        }
+
+        $changeStatus -> changeStatus();
 
         if ($searchForm->isSubmitted() && $searchForm->isValid()) {
 
