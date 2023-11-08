@@ -21,7 +21,7 @@ class AdminAddUserType extends AbstractType
                 'required' => true
             ])
             ->add('role', CheckboxType::class, [
-                'label' => 'role admin ?', //checkbox, menu déroulant, bouton ?
+                'label' => 'role admin ?',
                 'required' => false,
                 'mapped' => false
             ])

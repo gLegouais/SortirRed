@@ -208,7 +208,7 @@ class OutingController extends AbstractController
         EntityManagerInterface $em,
         Request                $request): Response
     {
-        if (($this->getUser()) === ($outing->getOrganizer())) {
+        if (($this->getUser()) === ($outing->getOrganizer()) ||($this->getUser() == isGranted("ROLE_ADMIN"))) {
 
             $outing = $outingRepository->find($id);
             $cancellationTypeModel = new CancellationTypeModel();
@@ -220,7 +220,10 @@ class OutingController extends AbstractController
                 $outing->setStatus($statusRepository->findOneBy(['label' => 'Cancelled']));
                 $participants = $outing->getParticipants();
                 $participants->clear();
+                //si l'utilisateur est la personne qui a créé la sortie
                 $outing->setDescription("[ANNULÉ] : " . $cancellationTypeModel->getMotif() . "\n" . $outing->getDescription());
+                //si la sortie est annulée par un administrateur
+                //$outing->setDescription("[ANNULATION ADMINISTRATIVE] : " . $cancellationTypeModel->getMotif() . "\n" . $outing->getDescription());
                 var_dump($outing->getDescription());
                 $em->persist($outing);
                 $em->flush();
