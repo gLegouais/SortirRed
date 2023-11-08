@@ -40,13 +40,18 @@ class AdminController extends AbstractController
         Request      $request
     ): Response
     {
-        $upload = new UploadUsersTypeModel();
-        $uploadingForm = $this->createForm(UploadUsersType::class, $upload);
+        $uploadedCSV = new UploadUsersTypeModel();
+        $uploadingForm = $this->createForm(UploadUsersType::class, $uploadedCSV);
         $uploadingForm->handleRequest($request);
-        dump('hello');
         if ($uploadingForm->isSubmitted() && $uploadingForm->isValid()) {
-            dump('hello 2');
-            $uploader->uploadUsers($upload);
+            if ($uploadedCSV->getCsv()->getClientOriginalExtension() === 'csv') {
+                $nbUsersAdded = $uploader->uploadUsers($uploadedCSV->getCsv());
+                if ($nbUsersAdded > 0) {
+                    $this->addFlash('success', 'Le fichier a bien été traité (' . $nbUsersAdded . ' utilisateurs ajoutés).');
+                } else {
+                    $this->addFlash('danger', 'Échec lors de l\'importation du fichier. Vérifiez le format (.csv) et les données.');
+                }
+            }
         }
 
         return $this->render('admin/upload.html.twig', ['uploadingForm' => $uploadingForm]);

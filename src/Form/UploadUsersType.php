@@ -19,7 +19,9 @@ class UploadUsersType extends AbstractType
                     new File([
                         'maxSize' => '1024k',
                         'mimeTypes' => [
-                            'application/csv',
+                            'text/plain',
+                            'text/csv',
+                            'application/octet-stream',
                         ],
                         'mimeTypesMessage' => 'Choisir un fichier au format csv.',
                     ])
