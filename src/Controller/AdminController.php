@@ -27,13 +27,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class AdminController extends AbstractController
 {
     #[Route('/', name: 'admin_dashboard')]
-    public function dashboard(UserRepository $userRepository): Response
+    public function dashboard(): Response
     {
-        $users = $userRepository -> selectAllUsers();
 
-        return $this->render('admin/dashboard.html.twig', [
-            'users' => $users
-        ]);
+        return $this->render('admin/dashboard.html.twig');
     }
 
 
@@ -55,7 +52,7 @@ class AdminController extends AbstractController
             } else {
                 $user->setRoles(['ROLE_USER']);
             }
-            $this->addFlash('success', 'Vous avez créé un nouvel utilisateur' );
+            $this->addFlash('success', 'Vous avez créé un nouvel utilisateur');
             $em->persist($user);
             $em->flush();
         }
@@ -214,7 +211,7 @@ class AdminController extends AbstractController
     #[Route('/city/{id}/update', name: 'update_city', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function updateCity(
         int                    $id,
-        CityRepository $cityRepository,
+        CityRepository         $cityRepository,
         EntityManagerInterface $em,
         Request                $request
     ): Response
@@ -223,8 +220,8 @@ class AdminController extends AbstractController
 
         $name = $request->get('newName');
         $city->setName($name);
-        $postCode = $request -> get('newPostCode');
-        $city -> setPostcode($postCode);
+        $postCode = $request->get('newPostCode');
+        $city->setPostcode($postCode);
 
         $em->persist($city);
         $em->flush();
@@ -232,6 +229,34 @@ class AdminController extends AbstractController
         $this->addFlash('success', 'La ville a été modifiée avec succès');
 
         return $this->redirectToRoute('manage_city');
+
+    }
+
+    #[Route('/manageUsers', name: 'manage_users', methods: ['GET'])]
+    public function manageUsers(UserRepository $userRepository): Response
+    {
+        $users = $userRepository->selectAllUsers();
+        return $this->render('admin/manageUsers.html.twig', ['users' => $users]);
+    }
+
+    #[Route('/de-activate/{id}', name: 'de-activate_user', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    public function deactivateUser(
+        int                    $id,
+        UserRepository         $userRepository,
+        EntityManagerInterface $manager
+    ): Response
+    {
+        $user = $userRepository->findOneBy(['id' => $id]);
+        $user->setIsActive(!$user->isIsActive());
+
+        $user->isIsActive() ?
+            $this->addFlash('success', 'L\'utilisateur a bien été réactivé') :
+            $this->addFlash('success', 'L\'utilisateur a bien été désactivé');
+
+        $manager->persist($user);
+        $manager->flush();
+
+        return $this->redirectToRoute('manage_users');
 
     }
 
