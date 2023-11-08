@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('asset/js/scriptCampus.js') }}" defer></script>
+{% endblock %}
+
+{% block title %}
+    | {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    <h1>Gérer les campus</h1>
+
+    <h3>Filtrer les sites</h3>
+
+    <div class="container">
+        {{ form_start(searchCampusForm) }}
+        <div class="row">
+            <div class="col">
+                {{ form_widget(searchCampusForm) }}
+            </div>
+            <div class="col align-self-center">
+                <button>Rechercher</button>
+            </div>
+        </div>
+        {{ form_end(searchCampusForm) }}
+    </div>
+
+    <table class="table-sm table-bordered mb-3">
+        <thead>
+        <tr class="table-top">
+            <th>Campus</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for campus in campusList %}
+            <tr class="table-rows">
+                <td>{{ campus.name }}</td>
+                <td>
+                    <a href="" title="Modification d'un campus" id= {{"modify" ~ campus.id }}>Modifier</a>
+                     -
+                    <a href="{{ path('delete_campus', {'id':campus.id}) }}" title="Supression d'un campus">Supprimer</a>
+                </td>
+            </tr>
+        {% endfor %}
+        <tr class="table-rows">
+            {{ form_start(createCampusForm, {'action': path('manage_campus'), 'method': 'POST', 'id': 'updateCampus'}) }}
+                <td>{{ form_widget(createCampusForm) }}</td>
+                <td><button>Ajouter</button></td>
+            {{ form_end(createCampusForm) }}
+        </tr>
+
+        </tbody>
+    </table>
+
+    <div id="js-url-data" data-url-modify="{{ path('update_campus', {'id':0}) }}"></div>
+{% endblock %}

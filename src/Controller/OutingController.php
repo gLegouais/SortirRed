@@ -36,7 +36,6 @@ class OutingController extends AbstractController
         $searchForm -> handleRequest($request);
 
         $userAgent = $request->headers->get('User-Agent');
-        dump($userAgent);
 
         $assertAndroid = strpos($userAgent, 'Android');
         if($assertAndroid){
@@ -51,7 +50,6 @@ class OutingController extends AbstractController
 
             $enlisted = $searchForm->get('outingEnlisted')->getData();
             $notEnlisted = $searchForm->get('outingNotEnlisted')->getData();
-
             if ($enlisted == 'true' && $notEnlisted == 'true') {
                 $this->addFlash('danger', 'Vous ne pouvez pas être inscrit et non-inscrit à une sortie');
                 return $this->redirectToRoute('home_list');
@@ -287,7 +285,7 @@ class OutingController extends AbstractController
                 $this->addFlash('success', 'La sortie a été modifée avec succès !');
                 return $this->redirectToRoute('outing_show', ['id' => $outing->getId()]);
             }
-            return $this->render('outin/edit.html.twig', ['outingForm' => $outingForm, 'outing' => $outing]);
+            return $this->render('outing/edit.html.twig', ['outingForm' => $outingForm, 'outing' => $outing]);
         } else {
             $this->addFlash(
                 'danger',
