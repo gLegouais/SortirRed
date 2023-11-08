@@ -87,7 +87,7 @@
                         <a href="{{ path('outing_withdrawal', {'id': outing.id}) }}" title="desistement">Se désister</a>
                     {% endif %}
 
-                    {% if (outing.organizer == app.user) and (outing.status.label =='Open' or outing.status.label == 'Closed')%}
+                    {% if (outing.organizer == app.user or (is_granted("ROLE_ADMIN"))) and (outing.status.label =='Open' or outing.status.label == 'Closed')%}
                         <a href="{{ path('outing_cancellation', {'id':outing.id}) }}" title="annulation">Annuler la sortie</a>
                     {% endif %}
 
