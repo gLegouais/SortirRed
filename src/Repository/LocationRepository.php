@@ -21,6 +21,8 @@ class LocationRepository extends ServiceEntityRepository
         parent::__construct($registry, Location::class);
     }
 
+    public function searchLikeLocation(Location $location)
+
 //    /** THIS IS AN EXAMPLE */
 //     * @return Location[] Returns an array of Location objects
 //     */
