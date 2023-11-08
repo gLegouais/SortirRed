@@ -23,9 +23,11 @@ class AdminAddUserType extends AbstractType
                 'mapped' => false
             ])
 
+            /*
             ->add('password', TextType::class, [
                 'label' => 'Mot de passe : ',
             ]) //password par défaut ? Truc aléatoire en fonction du nom ?
+                */
 
             ->add('lastname', TextType::class, [
                 'label' => 'Nom : '
@@ -36,14 +38,20 @@ class AdminAddUserType extends AbstractType
             ->add('email', TextType::class,[
                 'label' => 'mail :'
             ])
-            ->add('isActive')
+
+            //->add('isActive') //commenté car non nécessaire et mis en actif par défaut ?
+
             ->add('phone', TextType::class, [
                 'label' => 'Téléphone : '
-            ])
-            ->add('profilePicture') //photo de profil par défaut ?
-            ->add('campus', TextType::class, [ //menu déroulant ?
-                'label' => 'Campus : '
             ]);
+
+            //->add('profilePicture') //photo de profil par défaut ? Supprimé car inutile dans le formulaire
+
+               /*
+            ->add('campus', TextType::class, [ //menu déroulant ?
+                'label' => 'Campus : ',
+                'mapped' => false //mapped car ma donnée dans mon entité n'est pas du même type que ce que je demande dans mon formulaire. Bonne ou mauvaise idée ?
+            ]);*/
     }
 
     public function configureOptions(OptionsResolver $resolver): void

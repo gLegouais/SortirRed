@@ -11,6 +11,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface; //utile ? Juste copié-collé, par importé
+
 #[Route('/admin')]
 class AdminController extends AbstractController
 {
@@ -23,18 +25,27 @@ class AdminController extends AbstractController
     }
 
 
-    #[Route('/addUser', name: 'admin_addUser')]
+    #[Route('/addUser', name: 'admin_addUser', methods: ['GET', 'POST'])]
     public function addUserAdmin(Request $request): Response
     {
+        var_dump("je rentre dans ma fonction addUserAdmin");
         $user = new User();
+        //$password = $this->passwordHasher->hashPassword($user, 'magic'); //rajouter une propriété
+        $user->setPassword('magic'); //le mot de passe n'est pas haché, mais c'est pour le test
+        $user->setProfilePicture('defaultProfilePicture.png');
         $adminAddUserForm = $this->createForm(AdminAddUserType::class, $user);
 
         $adminAddUserForm->handleRequest($request);
+        if ($adminAddUserForm->isSubmitted() && $adminAddUserForm->isValid()) {
+            dump("Mon formulaire d'ajout d'utilisateur a été soumis");
+            $this->addFlash('success', 'Vous avez créé un nouvel utilisateur' );
+        }
 
         return $this->render('admin/addUser.html.twig', [
             'adminAddUserForm' => $adminAddUserForm
-        ]);
+        ]); //peut-être faire le retour vers le profil de l'utilisateur nouvellement créé ?
     }
+
     #[Route('/uploadUsers', name: 'admin_upload', methods: ['GET', 'POST'])]
     public function index(
         UserUploader $uploader,
