@@ -105,6 +105,14 @@ label[for="city_postcode"] {
     display: none;
 }
 
+.block-dateUsername{
+    margin-right: 0;
+    padding-right: 0;
+    font-weight: bold;
+    font-family: "Comic Sans MS";
+    border: solid 3px #000080;
+}
+
 @media screen and (max-width: 576px) {
     .navbar {
         display: none;
