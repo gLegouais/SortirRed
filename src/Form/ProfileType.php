@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Campus;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -20,6 +21,10 @@ use Symfony\Component\Validator\Constraints\Image;
 
 class ProfileType extends AbstractType
 {
+    public function __construct(private Security $security)
+    {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -38,7 +43,7 @@ class ProfileType extends AbstractType
             ->add('email', EmailType::class, [
                 'label' => 'Email:'
             ])
-            ->add('password', RepeatedType::class, [
+            ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'invalid_message' => 'Les mots de passe doivent être les mêmes',
                 'options' => ['attr' => ['class' => 'password-field']],
@@ -46,6 +51,7 @@ class ProfileType extends AbstractType
                 'first_options' => ['label' => 'Mot de passe:'],
                 'second_options' => ['label' => 'Confirmation'],
                 'mapped' => false,
+                'attr' => ['autocomplete' => $this -> security -> getUser() -> getPassword()]
             ])
 
             ->add('campus', EntityType::class, [

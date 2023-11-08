@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('asset/js/scriptCity.js') }}" defer></script>
+{% endblock %}
+
+{% block title %}
+    | {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    <h1>Gérer les villes</h1>
+
+    <h3>Filtrer les sites</h3>
+
+    <div class="container">
+        {{ form_start(searchCityForm) }}
+        <div class="row">
+            <div class="col">
+                {{ form_widget(searchCityForm) }}
+            </div>
+            <div class="col align-self-center">
+                <button>Rechercher</button>
+            </div>
+        </div>
+        {{ form_end(searchCityForm) }}
+    </div>
+
+    <table class="table-sm table-bordered mb-3">
+        <thead>
+            <tr class="table-top">
+                <th>Ville</th>
+                <th>Code postal</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        {% for city in cityList %}
+            <tr class="table-rows">
+                <td>{{ city.name }}</td>
+                <td>{{ city.postcode }}</td>
+                <td>
+                    <a href="" title="Modification d'une ville" id= {{"modify" ~ city.id }}>Modifier</a>
+                    -
+                    <a href="{{ path('delete_city', {'id':city.id}) }}" title="Supression d'une ville">Supprimer</a>
+                </td>
+            </tr>
+        {% endfor %}
+        <tr class="table-rows">
+            {{ form_start(createCityForm, {'action': path('manage_city'), 'method': 'POST', 'id': 'updateCity'}) }}
+            <td>{{ form_row(createCityForm.name) }}</td>
+            <td>{{ form_row(createCityForm.postcode) }}</td>
+            <td><button>Ajouter</button></td>
+            {{ form_end(createCityForm) }}
+        </tr>
+
+        </tbody>
+    </table>
+
+    <div id="js-url-data" data-url-modify="{{ path('update_city', {'id':0}) }}"></div>
+{% endblock %}

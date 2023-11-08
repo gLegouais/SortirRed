@@ -3,12 +3,19 @@
 namespace App\Controller;
 
 use App\Entity\Campus;
+use App\Entity\City;
 use App\Entity\User;
 use App\Form\AdminAddUserType;
+use App\Form\CityType;
 use App\Form\Model\UploadUsersTypeModel;
+use App\Form\SearchCityType;
 use App\Form\UploadUsersType;
+use App\Repository\CityRepository;
+use App\Repository\UserRepository;
 use App\Repository\CampusRepository;
 use App\Services\UserUploader;
+use App\Form\CampusType;
+use App\Form\SearchCampusType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,9 +27,13 @@ use Symfony\Component\Routing\Annotation\Route;
 class AdminController extends AbstractController
 {
     #[Route('/', name: 'admin_dashboard')]
-    public function dashboard(): Response
+    public function dashboard(UserRepository $userRepository): Response
     {
-        return $this->render('admin/dashboard.html.twig');
+        $users = $userRepository -> selectAllUsers();
+
+        return $this->render('admin/dashboard.html.twig', [
+            'users' => $users
+        ]);
     }
 
 
@@ -77,4 +88,151 @@ class AdminController extends AbstractController
 
         return $this->render('admin/upload.html.twig', ['uploadingForm' => $uploadingForm]);
     }
+
+    #[Route('/managecampus', name: 'manage_campus', methods: ['GET', 'POST'])]
+    public function manageCampus(Request $request, CampusRepository $campusRepository, EntityManagerInterface $em): Response
+    {
+        $campusList = $campusRepository->findAll();
+
+        $campus = new Campus();
+        $searchCampusForm = $this->createForm(SearchCampusType::class, $campus);
+        $searchCampusForm->handleRequest($request);
+
+        if ($searchCampusForm->isSubmitted() && $searchCampusForm->isValid()) {
+            $campusList = $campusRepository->filterLikeCampus($campus);
+            if (!$campusList) {
+                $this->addFlash('danger', 'Pas de campus à ce nom');
+            }
+        }
+
+        $newCampus = new Campus();
+        $createCampusForm = $this->createForm(CampusType::class, $newCampus);
+        $createCampusForm->handleRequest($request);
+
+        if ($createCampusForm->isSubmitted() && $createCampusForm->isValid()) {
+            try {
+                $em->persist($newCampus);
+                $em->flush();
+                $this->addFlash('success', 'Campus créé avec succès');
+                return $this->redirectToRoute('manage_campus');
+            } catch (\Exception $e) {
+                $this->addFlash('danger', 'Erreur lors de la création du campus');
+            }
+
+        }
+
+        return $this->render('admin/manageCampus.html.twig', [
+            'searchCampusForm' => $searchCampusForm,
+            'createCampusForm' => $createCampusForm,
+            'campusList' => $campusList
+        ]);
+    }
+
+    #[Route('/campus/delete/{id}', name: 'delete_campus', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function deleteCampus(int $id, CampusRepository $campusRepository, EntityManagerInterface $em): Response
+    {
+        $campus = $campusRepository->find($id);
+        $em->remove($campus);
+        $em->flush();
+        $this->addFlash('success', 'Campus supprimé');
+
+        return $this->redirectToRoute('manage_campus');
+    }
+
+    #[Route('/campus/{id}/update', name: 'update_campus', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function updateCampus(
+        int                    $id,
+        CampusRepository       $campusRepository,
+        EntityManagerInterface $em,
+        Request                $request
+    ): Response
+    {
+        $campus = $campusRepository->find($id);
+
+        $name = $request->get('newName');
+        $campus->setName($name);
+
+        $em->persist($campus);
+        $em->flush();
+
+        $this->addFlash('success', 'Le campus a été modifié avec succès');
+
+        return $this->redirectToRoute('manage_campus');
+
+    }
+
+    #[Route('/managecity', name: 'manage_city', methods: ['GET', 'POST'])]
+    public function manageCity(Request $request, CityRepository $cityRepository, EntityManagerInterface $em): Response
+    {
+        $cityList = $cityRepository->findAll();
+
+        $city = new City();
+        $searchCityForm = $this->createForm(SearchCityType::class, $city);
+        $searchCityForm->handleRequest($request);
+
+        if ($searchCityForm->isSubmitted() && $searchCityForm->isValid()) {
+            $cityList = $cityRepository->filterLikeCity($city);
+            if (!$cityList) {
+                $this->addFlash('danger', 'Pas de ville à ce nom');
+            }
+        }
+
+        $newCity = new City();
+        $createCityForm = $this->createForm(CityType::class, $newCity);
+        $createCityForm->handleRequest($request);
+
+        if ($createCityForm->isSubmitted() && $createCityForm->isValid()) {
+            try {
+                $em->persist($newCity);
+                $em->flush();
+                $this->addFlash('success', 'Ville créée avec succès');
+                return $this->redirectToRoute('manage_city');
+            } catch (\Exception $e) {
+                $this->addFlash('danger', 'Erreur lors de la création de la ville');
+            }
+
+        }
+
+        return $this->render('admin/manageCity.html.twig', [
+            'searchCityForm' => $searchCityForm,
+            'createCityForm' => $createCityForm,
+            'cityList' => $cityList
+        ]);
+    }
+
+    #[Route('/city/delete/{id}', name: 'delete_city', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function deleteCity(int $id, CityRepository $cityRepository, EntityManagerInterface $em): Response
+    {
+        $city = $cityRepository->find($id);
+        $em->remove($city);
+        $em->flush();
+        $this->addFlash('success', 'Ville supprimée');
+
+        return $this->redirectToRoute('manage_city');
+    }
+
+    #[Route('/city/{id}/update', name: 'update_city', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function updateCity(
+        int                    $id,
+        CityRepository $cityRepository,
+        EntityManagerInterface $em,
+        Request                $request
+    ): Response
+    {
+        $city = $cityRepository->find($id);
+
+        $name = $request->get('newName');
+        $city->setName($name);
+        $postCode = $request -> get('newPostCode');
+        $city -> setPostcode($postCode);
+
+        $em->persist($city);
+        $em->flush();
+
+        $this->addFlash('success', 'La ville a été modifiée avec succès');
+
+        return $this->redirectToRoute('manage_city');
+
+    }
+
 }
