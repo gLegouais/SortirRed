@@ -7,16 +7,16 @@ use Symfony\Component\Mime\Part\File;
 
 class UploadUsersTypeModel
 {
-    private UploadedFile $csv;
+    private string $csvFileName;
 
     public function getCsv(): UploadedFile
     {
-        return $this->csv;
+        return $this->csvFileName;
     }
 
-    public function setCsv(UploadedFile $csv): void
+    public function setCsv(UploadedFile $csvFileName): void
     {
-        $this->csv = $csv;
+        $this->csvFileName = $csvFileName;
     }
 
 

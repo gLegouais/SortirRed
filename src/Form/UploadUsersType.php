@@ -15,7 +15,6 @@ class UploadUsersType extends AbstractType
     {
         $builder
             ->add('csv', FileType::class, ['label' => 'Fichier (csv)',
-                'mapped' => false,
                 'constraints' => [
                     new File([
                         'maxSize' => '1024k',

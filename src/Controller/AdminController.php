@@ -6,6 +6,7 @@ use App\Form\Model\UploadUsersTypeModel;
 use App\Form\UploadUsersType;
 use App\Services\UserUploader;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -13,11 +14,15 @@ use Symfony\Component\Routing\Annotation\Route;
 class AdminController extends AbstractController
 {
     #[Route('/uploadUsers', name: 'admin_upload', methods: ['GET', 'POST'])]
-    public function index(UserUploader $uploader): Response
+    public function index(
+        UserUploader $uploader,
+        Request      $request
+    ): Response
     {
         $upload = new UploadUsersTypeModel();
         $uploadingForm = $this->createForm(UploadUsersType::class, $upload);
-        dump('gello');
+        $uploadingForm->handleRequest($request);
+        dump('hello');
         if ($uploadingForm->isSubmitted() && $uploadingForm->isValid()) {
             dump('hello 2');
             $uploader->uploadUsers($upload);
