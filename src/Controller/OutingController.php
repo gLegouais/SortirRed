@@ -214,7 +214,6 @@ class OutingController extends AbstractController
             $cancellationForm->handleRequest($request);
 
             if (($cancellationForm->isSubmitted() && $cancellationForm->isValid()) && (($outing->getStatus()->getLabel() == 'Open') || ($outing->getStatus()->getLabel() == 'Closed'))) {
-
                 $outing->setStatus($statusRepository->findOneBy(['label' => 'Cancelled']));
                 $participants = $outing->getParticipants();
                 $participants->clear();
