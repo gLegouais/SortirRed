@@ -28,9 +28,11 @@ class AdminController extends AbstractController
     #[Route('/', name: 'admin_dashboard')]
     public function dashboard(UserRepository $userRepository): Response
     {
-        $user = $userRepository -> findAll();
+        $users = $userRepository -> findAll();
 
-        return $this->render('admin/dashboard.html.twig');
+        return $this->render('admin/dashboard.html.twig', [
+            'users' => $users
+        ]);
     }
 
 
