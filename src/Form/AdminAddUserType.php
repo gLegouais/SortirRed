@@ -15,7 +15,7 @@ class AdminAddUserType extends AbstractType
     {
         $builder
             ->add('username', TextType::class, [
-                'label' => 'username',
+                'label' => "Nom d'utilisateur",
             ])
             ->add('roles', CheckboxType::class, [
                 'label' => 'role admin ?', //checkbox, menu déroulant, bouton ?
@@ -24,7 +24,7 @@ class AdminAddUserType extends AbstractType
             ])
 
             ->add('password', TextType::class, [
-                'label' => 'mot de passe : ',
+                'label' => 'Mot de passe : ',
             ]) //password par défaut ? Truc aléatoire en fonction du nom ?
 
             ->add('lastname', TextType::class, [
