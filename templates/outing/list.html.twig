@@ -40,14 +40,16 @@
                 {{ form_row(searchForm.outingFinished) }}
             </div>
             <div class="col-2 mx-auto">
-                <button>Rechercher</button>
+                <button class="searchButton">Rechercher</button>
             </div>
         </div>
         {{ form_end(searchForm) }}
     </div>
-
+    <br>
+    <div style ="text-align: center"><a class="btn btnCenter" href="{{ path('outing_create') }}">Organiser une sortie</a></div>
+    <br>
     <h1>Liste des sorties</h1>
-
+    <br>
     <table class="table-sm table-bordered mb-3">
         <thead>
         <tr class="table-top">
@@ -84,7 +86,7 @@
                         <a href="{{ path('outing_inscription', {'id': outing.id}) }}" title="inscription">S'inscrire</a>
                     {% endif %}
 
-                    {% if isRegistered %}
+                    {% if isRegistered and (outing.status.label =='Open' or outing.status.label == 'Closed') %}
                         <a href="{{ path('outing_withdrawal', {'id': outing.id}) }}" title="desistement">Se désister</a>
                     {% endif %}
 
@@ -105,7 +107,6 @@
 
         </tbody>
     </table>
-    <a class="btn btn-primary" href="{{ path('outing_create') }}">Organiser une sortie</a>
 {% endblock %}
 
 {% block title %}

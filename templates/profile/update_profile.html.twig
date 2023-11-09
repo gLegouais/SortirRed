@@ -3,19 +3,22 @@
 {% block title %}Modification du profil{% endblock %}
 
 {% block body %}
-    <h1>Mon profil</h1>
+    <h1 class="centerTitle">Mon profil</h1>
+    <br>
     <div class="container">
         <div class="row">
-            <div class="col">
-                <img src="{{asset(app_profile_picture_directory ~ '/' ~ user.profilePicture)}}">
+            <div class="col-4">
+                <img src="{{asset(app_profile_picture_directory ~ '/' ~ user.profilePicture)}}" class="profilepicture">
             </div>
-            <div class="col">
+            <div class="col-6">
                 {{ form_start(profileForm) }}
                 {{ form_widget(profileForm) }}
-                <button>Enregistrer</button>
-                <a href="{{ path('user_profile', {'id': app.user.id}) }}">Annuler</a>
+                <button class="btn btnCenter">Enregistrer</button>
+                <a href="{{ path('user_profile', {'id': app.user.id}) }}" class="btn btnCenterCancel">Annuler</a>
                 {{ form_end(profileForm) }}
             </div>
+            <div class="col-2"></div>
         </div>
+        <br>
     </div>
 {% endblock %}
