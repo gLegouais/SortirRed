@@ -11,7 +11,7 @@
 
 {% block body %}
 
-    <div class="align-text-bottom">
+    <div class="my-5 align-text-bottom">
         <h1>
             <img src="{{ asset('asset/images/admin_agent.png') }}" alt="icône admin"/>
             GÉRER LES UTILISATEURS
@@ -42,7 +42,13 @@
                 <td>{{ user.email }}</td>
                 <td>{{ user.phone }}</td>
                 <td>{{ user.campus.name }}</td>
-                <td>{% if user.isActive %}X{% endif %}</td>
+                <td class="text-center">
+                    {% if user.isActive %}
+                        <img src="{{ asset('asset/images/valid_check.png') }}" alt="icône verte actif"/>
+                    {% else %}
+                        <img src="{{ asset('asset/images/denied_check.png') }}" alt="icône rouge inactif"/>
+                    {% endif %}
+                </td>
                 <td>
                     {% if (user.isActive) %}
                         <a href="{{ path('de-activate_user', {'id': user.id}) }}" title="Rendre inactif">Rendre inactif</a>
