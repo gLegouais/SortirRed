@@ -4,64 +4,110 @@
     {{ outing.name }} | {{ parent() }}
 {% endblock %}
 {% block body %}
-    <h1>{{ outing.name }}</h1>
-    <p>Statut : {{ outing.status.label }}</p>
-    <p>RDV le {{ outing.startDate | date('d/m/y') }} à {{ outing.startDate | date('H:i') }}</p>
-    <p>Durée : {{ outing.duration }}minutes</p>
-    <p>Date limite d'inscription : {{ outing.deadline | date('d/m/y') }}</p>
-    <p>Description et infos : {{ outing.description | nl2br}}</p>
-    <p>Organisée par {{ outing.organizer.username }}</p>
-    <p>Nombre de places : {{ outing.participants|length }} / {{ outing.maxRegistered }}</p>
-    <p>Campus : {{ outing.campus.name }}</p>
-    <p>Lieu : {{ outing.location.name }}</p>
-    <p>{{ outing.location.street }}</p>
-    <p>{{ outing.location.city.postcode }} {{ outing.location.city.name }}</p>
-    <p>Latitude : {{ outing.location.latitude }}</p>
-    <p>Longitude : {{ outing.location.longitude }}</p>
-
+    <h1 class="centerTitle">{{ outing.name }}</h1>
+    <br>
+    <div class="container">
+        <div class="row">
+            <div class="col-2"></div>
+            <div class="col">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-2 titleCol">Statut :</div>
+                        <div class="col-3 infoCol">{{ outing.status.label }}</div>
+                        <div class="col-2"></div>
+                        <div class="col-2 titleCol">Campus :</div>
+                        <div class="col-3 infoCol">{{ outing.campus.name }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2 titleCol">RDV le </div>
+                        <div class="col-3 infoCol">{{ outing.startDate | date('d/m/y') }} à {{ outing.startDate | date('H:i') }}</div>
+                        <div class="col-2"></div>
+                        <div class="col-2 titleCol">Lieu :</div>
+                        <div class="col-3 infoCol">{{ outing.location.name }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2 titleCol">Durée :</div>
+                        <div class="col-3 infoCol">{{ outing.duration }} minutes</div>
+                        <div class="col-2"></div>
+                        <div class="col-2 titleCol">Rue :</div>
+                        <div class="col-3 infoCol">{{ outing.location.street }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2 titleCol">Date limite d'inscription :</div>
+                        <div class="col-3 infoCol">{{ outing.deadline | date('d/m/y') }}</div>
+                        <div class="col-2"></div>
+                        <div class="col-2 titleCol">Code postal :</div>
+                        <div class="col-3 infoCol">{{ outing.location.city.postcode }} {{ outing.location.city.name }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2 titleCol">Nombre de places :</div>
+                        <div class="col-3 infoCol">{{ outing.participants|length }} / {{ outing.maxRegistered }}</div>
+                        <div class="col-2"></div>
+                        <div class="col-2 titleCol">Latitude :</div>
+                        <div class="col-3 infoCol">{{ outing.location.latitude }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2 titleCol">Organisée par </div>
+                        <div class="col-3 infoCol">{{ outing.organizer.username }}</div>
+                        <div class="col-2"></div>
+                        <div class="col-2 titleCol">Longitude :</div>
+                        <div class="col-3 infoCol">{{ outing.location.longitude }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2 titleCol">Description et infos :</div>
+                        <div class="col infoCol">{{ outing.description | nl2br}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-2"></div>
+        </div>
+    </div>
     {% set isRegistered = false %}
-    <table class="table-sm table-bordered mb-3">
-        <p>Liste des participants : </p>
-        <thead>
-        <tr class="table-top">
-            <th>Pseudo</th>
-            <th>Nom</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for participant in outing.participants %}
-            {% set isRegistered = isRegistered or (participant == app.user) %}
-
-            <tr class="table-rows">
-                <td>{{ participant.username }}</td>
-                <td>{{ participant.firstname }} {{ participant.lastname }}</td>
+    <br>
+    <div style="text-align: center">
+        <table class="table-sm table-bordered mb-3 center">
+            <p>Liste des participants : </p>
+            <thead>
+            <tr class="table-top">
+                <th>Pseudo</th>
+                <th>Nom</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% for participant in outing.participants %}
+                {% set isRegistered = isRegistered or (participant == app.user) %}
 
+                <tr class="table-rows">
+                    <td>{{ participant.username }}</td>
+                    <td>{{ participant.firstname }} {{ participant.lastname }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <br>
+    <div style="text-align: center">
     {#{% if outing.organizer != app.user and  not isRegistered %}#}
     {% if app.user != isRegistered and outing.status.label == 'Open'%}
-        <p><a href="{{ path('outing_inscription', {'id': outing.id}) }}" title="inscription">S'inscrire</a></p>
+        <a href="{{ path('outing_inscription', {'id': outing.id}) }}" title="inscription" class="btn btnCenter">S'inscrire</a>
     {% endif %}
 
     {% if isRegistered %}
         <p>Vous êtes inscrits à la sortie ! </p>
-        <p><a href="{{ path('outing_withdrawal', {'id': outing.id}) }}" title="desistement">Se désister</a></p>
+        <a href="{{ path('outing_withdrawal', {'id': outing.id}) }}" title="desistement" class="btn btnCenterCancel">Se désister</a>
     {% endif %}
 
     {% if (outing.organizer == app.user) and (outing.status.label == 'Open' or outing.status.label == 'Closed') %}
-        <p><a href="{{ path('outing_update', {'id': outing.id}) }}" title="modification">Modifier</a></p>
-        <p><a href="{{ path('outing_cancellation', {'id':outing.id}) }}" title="annulation">Annuler la sortie</a></p>
+        <a href="{{ path('outing_update', {'id': outing.id}) }}" title="modification" class="btn btnCenter">Modifier</a>
+        <a href="{{ path('outing_cancellation', {'id':outing.id}) }}" title="annulation" class="btnCenterCancel">Annuler la sortie</a>
     {% endif %}
 
     {% if outing.organizer == app.user and outing.status.label == 'Created' %}
-        <p><a href="{{ path('outing_publication', {'id':outing.id}) }}" title="publication">Publier</a></p>
-        <p><a href="{{ path('delete_outing', {'id':outing.id}) }}" title="suppresion">Supprimer le projet</a></p>
+        <a href="{{ path('outing_publication', {'id':outing.id}) }}" title="publication" class="btn btnCenter">Publier</a>
+        <a href="{{ path('delete_outing', {'id':outing.id}) }}" title="suppression" class="btn btnCenterCancel">Supprimer</a>
     {% endif %}
 
-    <p>
-        <a href="{{ path('home_list') }}" title="Accueil">Retour à l'accueil</a>
-    </p>
+        <a href="{{ path('home_list') }}" title="Accueil" class="btn btnCenter">Retour à l'accueil</a>
+    </div>
 
 {% endblock %}
