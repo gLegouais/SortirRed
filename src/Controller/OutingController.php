@@ -31,10 +31,6 @@ class OutingController extends AbstractController
         Request          $request
     ): Response
     {
-        if ($this->getUser()->getRoles()[1] === 'ROLE_INACTIVE') {
-            dd('lll');
-            $this->redirectToRoute('app_logout');
-        }
         $currentDate = new \DateTimeImmutable();
 
         $searchOutingFormModel = new SearchOutingFormModel();
