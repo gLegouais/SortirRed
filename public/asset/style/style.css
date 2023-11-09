@@ -253,9 +253,7 @@ label[for="city_postcode"] {
     }
 }
 
-.alert {
-    background: #a78bfa;
-}
+
 
 .alert-danger {
     background: rgba(200, 0, 0, 75%);
