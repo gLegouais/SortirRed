@@ -126,21 +126,28 @@ class OutingController extends AbstractController
     }
 
     #[Route('/inscription/{id}', name: 'outing_inscription', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-    public function inscription(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response
+    public function inscription(int $id, OutingRepository $outingRepository, EntityManagerInterface $em, Request $request): Response
     {
         //todo : ici, il faudrait vérifier que mon utilisateur ne soit pas déjà inscrit ?
         //est-ce que quelqu'un peut "inscrire" quelqu'un d'autres à sa place ?
         $outing = $outingRepository->find($id);
-        if (
-            ($outing->getStatus()->getLabel() == 'Open') &&
-            ((count($outing->getParticipants())) < $outing->getMaxRegistered())
-        ) {
-            $outing->addParticipant($this->getUser());
-            $this->addFlash('success', 'Vous avez été inscrit à la sortie');
-        }
+        if ($outing->isParticipant($this->getUser())) {
+            $this->addFlash('danger', 'Vous êtes déjà inscrit à cette sortie');
+        } else {
+            if (
+                ($outing->getStatus()->getLabel() == 'Open') &&
+                ((count($outing->getParticipants())) < $outing->getMaxRegistered())
+            ) {
+                $outing->addParticipant($this->getUser());
+                $this->addFlash('success', 'Vous avez été inscrit à la sortie');
+            }
 
-        $em->persist($outing);
-        $em->flush();
+            $em->persist($outing);
+            $em->flush();
+
+            $referer = $request->headers->get('referer');
+            return $this->redirect($referer);
+        }
 
         return $this->redirectToRoute('home_list');
 
@@ -154,24 +161,26 @@ class OutingController extends AbstractController
         Request                $request
     ): Response
     {
-        //todo : ici, il faudrait vérifier que mon utilisateur soit déjà bien inscrit ?
-        //est-ce que quelqu'un peut "désister" quelqu'un d'autres à sa place ?
         $outing = $outingRepository->find($id);
-        if ($outing->getStatus()->getLabel() == 'Open' || $outing->getStatus()->getLabel() == 'Close') {
-            $outing->removeParticipant($this->getUser());
+        if ($outing->isParticipant($this->getUser())) {
+            if ($outing->getStatus()->getLabel() == 'Open' || $outing->getStatus()->getLabel() == 'Close') {
+                $outing->removeParticipant($this->getUser());
+                $em->persist($outing);
+                $em->flush();
+                $this->addFlash('success', "Vous êtes désinscrit de la sortie");
+            }
 
+        } else {
+            $this->addFlash('danger', "Vous ne pouvez pas vous désinscrire, vous n'êtes pas sur la liste des participants.");
+            return $this->redirectToRoute('home_list'); //return différent car referer est null (accès via l'url)
         }
-
-        $em->persist($outing);
-        $em->flush();
-        $this->addFlash('success', "Vous êtes désinscrit de la sortie");
-
         $referer = $request->headers->get('referer');
         return $this->redirect($referer);
 
     }
 
-    #[Route('/publication/{id}', name: 'outing_publication', requirements: ['id' => '\d+'], methods: ['GET'])]
+    #[
+        Route('/publication/{id}', name: 'outing_publication', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function publication(
         int                    $id,
         OutingRepository       $outingRepository,
@@ -222,8 +231,7 @@ class OutingController extends AbstractController
                 $participants->clear();
                 if (($this->getUser()) === ($outing->getOrganizer())) {
                     $outing->setDescription("[ANNULÉ] : " . $cancellationTypeModel->getMotif() . "\n" . $outing->getDescription());
-                }
-                else if ($this->isGranted('ROLE_ADMIN')) {
+                } else if ($this->isGranted('ROLE_ADMIN')) {
                     $outing->setDescription("[SORTIE ANNULÉE PAR LA MODERATION] : " . $cancellationTypeModel->getMotif() . "\n" . $outing->getDescription());
                 }
                 $em->persist($outing);

@@ -86,7 +86,7 @@
                         <a href="{{ path('outing_inscription', {'id': outing.id}) }}" title="inscription">S'inscrire</a>
                     {% endif %}
 
-                    {% if isRegistered %}
+                    {% if isRegistered and (outing.status.label =='Open' or outing.status.label == 'Closed') %}
                         <a href="{{ path('outing_withdrawal', {'id': outing.id}) }}" title="desistement">Se désister</a>
                     {% endif %}
 
