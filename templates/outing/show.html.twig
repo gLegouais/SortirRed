@@ -79,7 +79,12 @@
 
                 <tr class="table-rows">
                     <td><a href="{{ path('user_profile', {'id': participant.id}) }}">{{ participant.username }}</a></td>
-                    <td>{{ participant.firstname }} {{ participant.lastname }}</td>
+                    <td>
+                        {{ participant.firstname }} {{ participant.lastname }}
+                        {% if participant.roles[0] == 'ROLE_ADMIN' %}
+                            <img src="{{ asset('asset/images/admin_icon.png') }}" alt="administrateur" class="icon-admin">
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -98,7 +103,7 @@
     {% endif %}
 
     {% if (outing.organizer == app.user) and (outing.status.label == 'Open' or outing.status.label == 'Closed') %}
-        <a href="{{ path('outing_cancellation', {'id':outing.id}) }}" title="annulation" class="btnCenterCancel">Annuler la sortie</a>
+        <a href="{{ path('outing_cancellation', {'id':outing.id}) }}" title="annulation" class="btn btnCenterCancel">Annuler la sortie</a>
     {% endif %}
 
     {% if outing.organizer == app.user and outing.status.label == 'Created' %}
