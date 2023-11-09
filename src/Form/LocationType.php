@@ -16,10 +16,9 @@ class LocationType extends AbstractType
             ->add('name', TextType::class, [
                 'label' => 'Nom du lieu'
             ])
-            ->add('street', TextType::class ,[
+            ->add('street', TextType::class, [
                 'label' => 'Adresse'
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

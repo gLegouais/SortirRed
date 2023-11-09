@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-     | {{ parent() }} {# c'est quoi le parent ici ? #}
+    | {{ parent() }} {# c'est quoi le parent ici ? #}
 {% endblock %}
 
 {% block stylesheets %}
@@ -51,7 +51,8 @@
                 </td>
                 <td>
                     {% if (user.isActive) %}
-                        <a href="{{ path('de-activate_user', {'id': user.id}) }}" title="Rendre inactif">Rendre inactif</a>
+                        <a href="{{ path('de-activate_user', {'id': user.id}) }}" title="Rendre inactif">Rendre
+                            inactif</a>
                     {% else %}
                         <a href="{{ path('de-activate_user', {'id': user.id}) }}" title="Rendre actif">Rendre actif</a>
                     {% endif %}

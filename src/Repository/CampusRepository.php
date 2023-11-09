@@ -23,12 +23,12 @@ class CampusRepository extends ServiceEntityRepository
 
     public function filterLikeCampus(Campus $campus): ?array
     {
-        $qb = $this -> createQueryBuilder('c');
-        $qb -> andWhere('c.name LIKE :campusName')
-            -> setParameter(':campusName', '%' . $campus -> getName() . '%');
+        $qb = $this->createQueryBuilder('c');
+        $qb->andWhere('c.name LIKE :campusName')
+            ->setParameter(':campusName', '%' . $campus->getName() . '%');
 
-        $query = $qb -> getQuery();
-        return $query -> getResult();
+        $query = $qb->getQuery();
+        return $query->getResult();
     }
 
 //    /** ALSO AN EXAMPLE */

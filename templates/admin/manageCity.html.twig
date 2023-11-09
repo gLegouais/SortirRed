@@ -41,11 +41,11 @@
 
     <table class="table-sm table-bordered mb-3">
         <thead>
-            <tr class="table-top">
-                <th>Ville</th>
-                <th>Code postal</th>
-                <th>Actions</th>
-            </tr>
+        <tr class="table-top">
+            <th>Ville</th>
+            <th>Code postal</th>
+            <th>Actions</th>
+        </tr>
         </thead>
         <tbody>
 
@@ -54,7 +54,7 @@
                 <td>{{ city.name }}</td>
                 <td>{{ city.postcode }}</td>
                 <td>
-                    <a href="" title="Modification d'une ville" id= {{"modify" ~ city.id }}>Modifier</a>
+                    <a href="" title="Modification d'une ville" id= {{ "modify" ~ city.id }}>Modifier</a>
                     -
                     <a href="{{ path('delete_city', {'id':city.id}) }}" title="Supression d'une ville">Supprimer</a>
                 </td>
@@ -64,7 +64,9 @@
             {{ form_start(createCityForm, {'action': path('manage_city'), 'method': 'POST', 'id': 'updateCity'}) }}
             <td>{{ form_row(createCityForm.name) }}</td>
             <td>{{ form_row(createCityForm.postcode) }}</td>
-            <td><button>Ajouter</button></td>
+            <td>
+                <button>Ajouter</button>
+            </td>
             {{ form_end(createCityForm) }}
         </tr>
 

@@ -40,7 +40,7 @@ class Outing
     private ?int $duration = null;
 
     #[ORM\Column]
-    #[GreaterThanOrEqual('+1 day', message:'La date limite d\'inscription doit être supérieure à la date du jour.')]
+    #[GreaterThanOrEqual('+1 day', message: 'La date limite d\'inscription doit être supérieure à la date du jour.')]
     // Asserting this value is less than startDate  is done in OutingType.php.
     private ?DateTimeImmutable $deadline = null;
 

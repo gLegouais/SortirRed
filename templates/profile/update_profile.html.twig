@@ -8,7 +8,8 @@
     <div class="container">
         <div class="row">
             <div class="col-4">
-                <img src="{{asset(app_profile_picture_directory ~ '/' ~ user.profilePicture)}}" class="profilepicture">
+                <img src="{{ asset(app_profile_picture_directory ~ '/' ~ user.profilePicture) }}"
+                     class="profilepicture" alt="photo de profil">
             </div>
             <div class="col-6">
                 {{ form_start(profileForm) }}

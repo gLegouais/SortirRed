@@ -15,8 +15,7 @@ class SearchCampusType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Le nom contient:'
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

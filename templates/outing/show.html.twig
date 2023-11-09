@@ -19,8 +19,9 @@
                         <div class="col-3 infoCol">{{ outing.campus.name }}</div>
                     </div>
                     <div class="row">
-                        <div class="col-2 titleCol">RDV le </div>
-                        <div class="col-3 infoCol">{{ outing.startDate | date('d/m/y') }} à {{ outing.startDate | date('H:i') }}</div>
+                        <div class="col-2 titleCol">RDV le</div>
+                        <div class="col-3 infoCol">{{ outing.startDate | date('d/m/y') }}
+                            à {{ outing.startDate | date('H:i') }}</div>
                         <div class="col-2"></div>
                         <div class="col-2 titleCol">Lieu :</div>
                         <div class="col-3 infoCol">{{ outing.location.name }}</div>
@@ -47,15 +48,17 @@
                         <div class="col-3 infoCol">{{ outing.location.latitude }}</div>
                     </div>
                     <div class="row">
-                        <div class="col-2 titleCol">Organisée par </div>
-                        <div class="col-3 infoCol"><a href="{{ path('user_profile', {'id': outing.organizer.id}) }}">{{ outing.organizer.username }}</a></div>
+                        <div class="col-2 titleCol">Organisée par</div>
+                        <div class="col-3 infoCol"><a
+                                    href="{{ path('user_profile', {'id': outing.organizer.id}) }}">{{ outing.organizer.username }}</a>
+                        </div>
                         <div class="col-2"></div>
                         <div class="col-2 titleCol">Longitude :</div>
                         <div class="col-3 infoCol">{{ outing.location.longitude }}</div>
                     </div>
                     <div class="row">
                         <div class="col-2 titleCol">Description et infos :</div>
-                        <div class="col infoCol">{{ outing.description | nl2br}}</div>
+                        <div class="col infoCol">{{ outing.description | nl2br }}</div>
                     </div>
                 </div>
             </div>
@@ -82,7 +85,8 @@
                     <td>
                         {{ participant.firstname }} {{ participant.lastname }}
                         {% if participant.roles[0] == 'ROLE_ADMIN' %}
-                            <img src="{{ asset('asset/images/admin_icon.png') }}" alt="administrateur" class="icon-admin">
+                            <img src="{{ asset('asset/images/admin_icon.png') }}" alt="administrateur"
+                                 class="icon-admin">
                         {% endif %}
                     </td>
                 </tr>
@@ -92,25 +96,28 @@
     </div>
     <br>
     <div style="text-align: center">
-    {#{% if outing.organizer != app.user and  not isRegistered %}#}
-    {% if app.user != isRegistered and outing.status.label == 'Open'%}
-        <a href="{{ path('outing_inscription', {'id': outing.id}) }}" title="inscription" class="btn btnCenter">S'inscrire</a>
-    {% endif %}
+        {# {% if outing.organizer != app.user and  not isRegistered %} #}
+        {% if app.user != isRegistered and outing.status.label == 'Open' %}
+            <a href="{{ path('outing_inscription', {'id': outing.id}) }}" title="inscription" class="btn btnCenter">S'inscrire</a>
+        {% endif %}
 
-    {% if isRegistered and (outing.status.label =='Open' or outing.status.label == 'Closed')%}
-        <p>Vous êtes inscrits à la sortie ! </p>
-        <a href="{{ path('outing_withdrawal', {'id': outing.id}) }}" title="desistement" class="btn btnCenterCancel">Se désister</a>
-    {% endif %}
+        {% if isRegistered and (outing.status.label =='Open' or outing.status.label == 'Closed') %}
+            <p>Vous êtes inscrits à la sortie ! </p>
+            <a href="{{ path('outing_withdrawal', {'id': outing.id}) }}" title="desistement"
+               class="btn btnCenterCancel">Se désister</a>
+        {% endif %}
 
-    {% if (outing.organizer == app.user) and (outing.status.label == 'Open' or outing.status.label == 'Closed') %}
-        <a href="{{ path('outing_cancellation', {'id':outing.id}) }}" title="annulation" class="btn btnCenterCancel">Annuler la sortie</a>
-    {% endif %}
+        {% if (outing.organizer == app.user) and (outing.status.label == 'Open' or outing.status.label == 'Closed') %}
+            <a href="{{ path('outing_cancellation', {'id':outing.id}) }}" title="annulation"
+               class="btn btnCenterCancel">Annuler la sortie</a>
+        {% endif %}
 
-    {% if outing.organizer == app.user and outing.status.label == 'Created' %}
-        <a href="{{ path('outing_publication', {'id':outing.id}) }}" title="publication" class="btn btnCenter">Publier</a>
-        <a href="{{ path('outing_update', {'id': outing.id}) }}" title="modification" class="btn btnCenter">Modifier</a>
-        <a href="{{ path('delete_outing', {'id':outing.id}) }}" title="suppression" class="btn btnCenterCancel">Supprimer</a>
-    {% endif %}
+        {% if outing.organizer == app.user and outing.status.label == 'Created' %}
+            <a href="{{ path('outing_publication', {'id':outing.id}) }}" title="publication" class="btn btnCenter">Publier</a>
+            <a href="{{ path('outing_update', {'id': outing.id}) }}" title="modification"
+               class="btn btnCenter">Modifier</a>
+            <a href="{{ path('delete_outing', {'id':outing.id}) }}" title="suppression" class="btn btnCenterCancel">Supprimer</a>
+        {% endif %}
 
         <a href="{{ path('home_list') }}" title="Accueil" class="btn btnCenter">Retour à l'accueil</a>
     </div>

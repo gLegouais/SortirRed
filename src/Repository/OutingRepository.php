@@ -27,23 +27,23 @@ class OutingRepository extends ServiceEntityRepository
 
     public function findOutings(UserInterface $user): ?array
     {
-        $qb = $this -> createQueryBuilder('o');
-        $qb -> join('o.status', 's')
-            -> addSelect('s');
-        $qb -> join('o.location', 'l')
-            -> addSelect('l');
-        $qb -> join('o.organizer', 'org')
-            -> addSelect('org');
-        $qb -> leftJoin('o.participants', 'p')
-            -> addSelect('p');
-        $qb -> join('l.city', 'c')
+        $qb = $this->createQueryBuilder('o');
+        $qb->join('o.status', 's')
+            ->addSelect('s');
+        $qb->join('o.location', 'l')
+            ->addSelect('l');
+        $qb->join('o.organizer', 'org')
+            ->addSelect('org');
+        $qb->leftJoin('o.participants', 'p')
+            ->addSelect('p');
+        $qb->join('l.city', 'c')
             ->addSelect('c');
-        $qb -> andWhere('s.label != \'Created\'')
-            -> orWhere('org = :user')
-            -> setParameter(':user', $user->getId());
+        $qb->andWhere('s.label != \'Created\'')
+            ->orWhere('org = :user')
+            ->setParameter(':user', $user->getId());
 
-        $query = $qb -> getQuery();
-        return $query -> getResult();
+        $query = $qb->getQuery();
+        return $query->getResult();
     }
 
     public function filterOutings(SearchOutingFormModel $formModel, User $user): ?array
@@ -108,21 +108,21 @@ class OutingRepository extends ServiceEntityRepository
 
     public function findOutingsAndroid(): ?array
     {
-        $qb = $this -> createQueryBuilder('o');
-        $qb -> join('o.status', 's')
-            -> addSelect('s');
-        $qb -> join('o.location', 'l')
-            -> addSelect('l');
-        $qb -> join('l.city', 'c')
-            -> addSelect('c');
-        $qb -> join('o.campus', 'ca')
-            -> addSelect('ca');
-        $qb -> andWhere('o.campus = :userCampus')
-            -> setParameter(':userCampus', $this -> security -> getUser() -> getCampus())
-            -> andWhere('s.label != \'Created\'');
+        $qb = $this->createQueryBuilder('o');
+        $qb->join('o.status', 's')
+            ->addSelect('s');
+        $qb->join('o.location', 'l')
+            ->addSelect('l');
+        $qb->join('l.city', 'c')
+            ->addSelect('c');
+        $qb->join('o.campus', 'ca')
+            ->addSelect('ca');
+        $qb->andWhere('o.campus = :userCampus')
+            ->setParameter(':userCampus', $this->security->getUser()->getCampus())
+            ->andWhere('s.label != \'Created\'');
 
-        $query = $qb -> getQuery();
-        return $query -> getResult();
+        $query = $qb->getQuery();
+        return $query->getResult();
     }
 
 }

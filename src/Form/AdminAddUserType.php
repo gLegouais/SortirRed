@@ -25,7 +25,6 @@ class AdminAddUserType extends AbstractType
                 'required' => false,
                 'mapped' => false
             ])
-
             ->add('lastname', TextType::class, [
                 'label' => 'Nom : ',
                 'required' => true
@@ -37,7 +36,6 @@ class AdminAddUserType extends AbstractType
                 'label' => 'mail :',
                 'required' => true
             ])
-
             ->add('phone', TextType::class, [
                 'label' => 'Téléphone : ',
                 'required' => true

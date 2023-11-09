@@ -52,16 +52,18 @@
             <tr class="table-rows">
                 <td>{{ campus.name }}</td>
                 <td>
-                    <a href="" title="Modification d'un campus" id= {{"modify" ~ campus.id }}>Modifier</a>
-                     -
+                    <a href="" title="Modification d'un campus" id= {{ "modify" ~ campus.id }}>Modifier</a>
+                    -
                     <a href="{{ path('delete_campus', {'id':campus.id}) }}" title="Supression d'un campus">Supprimer</a>
                 </td>
             </tr>
         {% endfor %}
         <tr class="table-rows">
             {{ form_start(createCampusForm, {'action': path('manage_campus'), 'method': 'POST', 'id': 'updateCampus'}) }}
-                <td>{{ form_widget(createCampusForm) }}</td>
-                <td><button>Ajouter</button></td>
+            <td>{{ form_widget(createCampusForm) }}</td>
+            <td>
+                <button>Ajouter</button>
+            </td>
             {{ form_end(createCampusForm) }}
         </tr>
 

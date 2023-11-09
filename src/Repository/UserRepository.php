@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /**
  * @extends ServiceEntityRepository<User>
-* @implements PasswordUpgraderInterface<User>
+ * @implements PasswordUpgraderInterface<User>
  *
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
  * @method User|null findOneBy(array $criteria, array $orderBy = null)
@@ -41,35 +41,11 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     public function selectAllUsers(): ?array
     {
-        $qb = $this -> createQueryBuilder('u');
-        $qb -> join('u.campus', 'c')
-            -> addSelect('c');
-        $query = $qb -> getQuery();
-        return $query -> getResult();
+        $qb = $this->createQueryBuilder('u');
+        $qb->join('u.campus', 'c')
+            ->addSelect('c');
+        $query = $qb->getQuery();
+        return $query->getResult();
     }
 
-//    /** THIS IS AN EXAMPLE */
-//     * @return User[] Returns an array of User objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('u.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?User ALSO AN EXAMPLE
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

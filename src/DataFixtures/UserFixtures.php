@@ -9,8 +9,6 @@ use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-;
-
 class UserFixtures extends Fixture implements DependentFixtureInterface
 {
     public function __construct(private readonly UserPasswordHasherInterface $passwordHasher)
@@ -37,7 +35,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
         $admin->setCampus($campusList[mt_rand(0, 2)]);
         $admin->setProfilePicture('defaultAdminPicture.png');
         $manager->persist($admin);
-        $this -> addReference('gandalf', $admin);
+        $this->addReference('gandalf', $admin);
 
         $deletedUser = new User();
         $deletedUser->setRoles(['ROLE_USER']);
@@ -69,7 +67,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
             $guest->setProfilePicture('defaultProfilePicture.png');
             $manager->persist($guest);
 
-            $this -> addReference('user' . $i, $guest);
+            $this->addReference('user' . $i, $guest);
 
         }
         $manager->flush();
@@ -78,7 +76,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
     public function getDependencies()
     {
         return [
-          CampusFixtures::class
+            CampusFixtures::class
         ];
     }
 }

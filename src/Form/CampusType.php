@@ -15,8 +15,7 @@ class CampusType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'required' => false
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

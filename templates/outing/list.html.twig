@@ -4,7 +4,7 @@
     <div class="container">
         <div class="row">
             <div class="col">
-                <img src="asset/images/logo.png" alt="logo du site" class="enabled-smart" id="logo"/>
+                <img src="{{ asset('asset/images/logo.png') }}" alt="logo du site" class="enabled-smart" id="logo"/>
             </div>
             <div class="col block-dateUsername">
                 <div>Date du jour: {{ currentDate | date('d/m/y') }}</div>
@@ -46,7 +46,8 @@
         {{ form_end(searchForm) }}
     </div>
     <br>
-    <div style ="text-align: center"><a class="btn btnCenter" href="{{ path('outing_create') }}">Organiser une sortie</a></div>
+    <div style="text-align: center"><a class="btn btnCenter" href="{{ path('outing_create') }}">Organiser une sortie</a>
+    </div>
     <br>
     <h1>Liste des sorties</h1>
     <br>
@@ -72,7 +73,8 @@
                 {% set isRegistered = isRegistered or (participant == app.user) %}
             {% endfor %}
             <tr class="table-rows">
-                <td><a href="{{ path('outing_show', {'id':outing.id}) }}" title="Détail d'une sortie smartphone" class="link-smart">{{ outing.name }}</a></td>
+                <td><a href="{{ path('outing_show', {'id':outing.id}) }}" title="Détail d'une sortie smartphone"
+                       class="link-smart">{{ outing.name }}</a></td>
                 <td>{{ outing.startDate | date('d/m/y') }}</td>
                 <td class="hidden-smart">{{ outing.deadline | date('d/m/y') }}</td>
                 <td class="hidden-smart"> {{ outing.participants|length }}/ {{ outing.maxRegistered }}</td>
@@ -97,8 +99,9 @@
                         <a href="{{ path('outing_withdrawal', {'id': outing.id}) }}" title="desistement">Se désister</a>
                     {% endif %}
 
-                    {% if (outing.organizer == app.user or (is_granted("ROLE_ADMIN"))) and (outing.status.label =='Open' or outing.status.label == 'Closed')%}
-                        <a href="{{ path('outing_cancellation', {'id':outing.id}) }}" title="annulation">Annuler la sortie</a>
+                    {% if (outing.organizer == app.user or (is_granted("ROLE_ADMIN"))) and (outing.status.label =='Open' or outing.status.label == 'Closed') %}
+                        <a href="{{ path('outing_cancellation', {'id':outing.id}) }}" title="annulation">Annuler la
+                            sortie</a>
                     {% endif %}
 
                     {% if outing.organizer == app.user and outing.status.label == 'Created' %}

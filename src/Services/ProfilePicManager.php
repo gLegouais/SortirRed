@@ -14,7 +14,7 @@ class ProfilePicManager
 
     public function upload(UploadedFile $profilePicture): string
     {
-        $filename =uniqid() . $profilePicture->guessExtension();
+        $filename = uniqid() . $profilePicture->guessExtension();
 
         try {
             $profilePicture->move($this->getProfilePicDirectory(), $filename);

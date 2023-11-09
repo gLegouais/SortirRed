@@ -38,3 +38,11 @@ h1 {
 #sortir-footer {
     color: black;
 }
+
+#clippyImg {
+    width: 200px;
+    height: auto;
+}
+.clippyHidden {
+    display: none;
+}

@@ -8,8 +8,6 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 
-;
-
 class LocationFixtures extends Fixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
@@ -22,10 +20,10 @@ class LocationFixtures extends Fixture implements DependentFixtureInterface
             $fakeLocation->setName($faker->company());
             $fakeLocation->setCity($this->getReference('city' . mt_rand(1, 21)));
             $fakeLocation->setStreet($faker->streetAddress());
-            $fakeLocation->setLongitude($faker->randomFloat(5,-90,90));
-            $fakeLocation->setLatitude($faker->randomFloat(5,-90,90));
+            $fakeLocation->setLongitude($faker->randomFloat(5, -90, 90));
+            $fakeLocation->setLatitude($faker->randomFloat(5, -90, 90));
             $manager->persist($fakeLocation);
-            $this -> addReference('location' . $i, $fakeLocation);
+            $this->addReference('location' . $i, $fakeLocation);
 
         }
         $manager->flush();
@@ -34,7 +32,7 @@ class LocationFixtures extends Fixture implements DependentFixtureInterface
     public function getDependencies()
     {
         return [
-          CityFixtures::class
+            CityFixtures::class
         ];
     }
 }

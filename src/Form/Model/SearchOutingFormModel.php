@@ -48,12 +48,12 @@ class SearchOutingFormModel
 
     public function getEndDate(): ?DateTimeImmutable
     {
-        return $this -> endDate;
+        return $this->endDate;
     }
 
     public function setEndDate(?DateTimeImmutable $endDate): void
     {
-        $this -> endDate = $endDate;
+        $this->endDate = $endDate;
     }
 
     public function getOutingOrganizer(): bool

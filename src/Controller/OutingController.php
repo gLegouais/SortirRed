@@ -126,10 +126,13 @@ class OutingController extends AbstractController
     }
 
     #[Route('/enlistment/{id}', name: 'outing_inscription', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-    public function inscription(int $id, OutingRepository $outingRepository, EntityManagerInterface $em, Request $request): Response
+    public function inscription(
+        int                    $id,
+        OutingRepository       $outingRepository,
+        EntityManagerInterface $em,
+        Request                $request
+    ): Response
     {
-        //todo : ici, il faudrait vérifier que mon utilisateur ne soit pas déjà inscrit ?
-        //est-ce que quelqu'un peut "inscrire" quelqu'un d'autres à sa place ?
         $outing = $outingRepository->find($id);
         if ($outing->isParticipant($this->getUser())) {
             $this->addFlash('danger', 'Vous êtes déjà inscrit à cette sortie');
@@ -171,7 +174,8 @@ class OutingController extends AbstractController
             }
 
         } else {
-            $this->addFlash('danger', "Vous ne pouvez pas vous désinscrire, vous n'êtes pas sur la liste des participants.");
+            $this->addFlash(
+                'danger', "Vous ne pouvez pas vous désinscrire, vous n'êtes pas sur la liste des participants.");
             return $this->redirectToRoute('home_list'); //return différent car referer est null (accès via l'url)
         }
         $referer = $request->headers->get('referer');
@@ -224,15 +228,21 @@ class OutingController extends AbstractController
             $cancellationForm = $this->createForm(CancellationType::class, $cancellationTypeModel);
             $cancellationForm->handleRequest($request);
 
-            if (($cancellationForm->isSubmitted() && $cancellationForm->isValid()) && (($outing->getStatus()->getLabel() == 'Open') || ($outing->getStatus()->getLabel() == 'Closed'))) {
+            if (
+                ($cancellationForm->isSubmitted() && $cancellationForm->isValid())
+                && (($outing->getStatus()->getLabel() == 'Open') || ($outing->getStatus()->getLabel() == 'Closed'))
+            ) {
                 $outing->setStatus($statusRepository->findOneBy(['label' => 'Cancelled']));
                 $participants = $outing->getParticipants();
                 $participants->clear();
                 if (($this->getUser()) === ($outing->getOrganizer())) {
-                    $outing->setDescription("[ANNULÉ] : " . $cancellationTypeModel->getMotif() . "\n" . $outing->getDescription());
-                }
-                else if ($this->isGranted('ROLE_ADMIN')) {
-                    $outing->setDescription("[SORTIE ANNULÉE PAR LA MODERATION] : " . $cancellationTypeModel->getMotif() . "\n" . $outing->getDescription());
+                    $outing->setDescription(
+                        "[ANNULÉ] : " . $cancellationTypeModel->getMotif() . "\n" . $outing->getDescription()
+                    );
+                } elseif ($this->isGranted('ROLE_ADMIN')) {
+                    $outing->setDescription(
+                        "[ANNULÉE PAR ADMIN] : " . $cancellationTypeModel->getMotif() . "\n" . $outing->getDescription()
+                    );
                 }
                 $em->persist($outing);
                 $em->flush();

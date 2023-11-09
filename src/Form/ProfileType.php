@@ -51,9 +51,8 @@ class ProfileType extends AbstractType
                 'first_options' => ['label' => 'Mot de passe:'],
                 'second_options' => ['label' => 'Confirmation'],
                 'mapped' => false,
-                'attr' => ['autocomplete' => $this -> security -> getUser() -> getPassword()]
+                'attr' => ['autocomplete' => $this->security->getUser()->getPassword()]
             ])
-
             ->add('campus', EntityType::class, [
                 'label' => 'Campus:',
                 'class' => Campus::class,
@@ -76,11 +75,11 @@ class ProfileType extends AbstractType
                 ]
             ]);
 
-        $builder -> addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $events){
-            $user = $events -> getData();
-            if($user && $user -> getProfilePicture()){
-                $form = $events -> getForm();
-                $form -> add('deleteImage', CheckboxType::class, [
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $events) {
+            $user = $events->getData();
+            if ($user && $user->getProfilePicture()) {
+                $form = $events->getForm();
+                $form->add('deleteImage', CheckboxType::class, [
                     'label' => 'supprimer l\'image',
                     'required' => false,
                     'mapped' => false

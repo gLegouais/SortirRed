@@ -36,7 +36,11 @@ class AdminController extends AbstractController
 
 
     #[Route('/addUser', name: 'admin_addUser', methods: ['GET', 'POST'])]
-    public function addUserAdmin(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): Response
+    public function addUserAdmin(
+        Request                     $request,
+        EntityManagerInterface      $em,
+        UserPasswordHasherInterface $passwordHasher
+    ): Response
     {
         $user = new User();
 
@@ -77,9 +81,13 @@ class AdminController extends AbstractController
             if ($uploadedCSV->getCsv()->getClientOriginalExtension() === 'csv') {
                 $nbUsersAdded = $uploader->uploadUsers($uploadedCSV->getCsv());
                 if ($nbUsersAdded > 0) {
-                    $this->addFlash('success', 'Le fichier a bien été traité (' . $nbUsersAdded . ' utilisateurs ajoutés).');
+                    $this->addFlash(
+                        'success', 'Le fichier a bien été traité (' . $nbUsersAdded . ' utilisateurs ajoutés).'
+                    );
                 } else {
-                    $this->addFlash('danger', 'Échec lors de l\'importation du fichier. Vérifiez le format (.csv) et les données.');
+                    $this->addFlash(
+                        'danger', 'Échec lors de l\'importation du fichier. Vérifiez le format (.csv) et les données.'
+                    );
                 }
             }
         }
@@ -88,7 +96,11 @@ class AdminController extends AbstractController
     }
 
     #[Route('/managecampus', name: 'manage_campus', methods: ['GET', 'POST'])]
-    public function manageCampus(Request $request, CampusRepository $campusRepository, EntityManagerInterface $em): Response
+    public function manageCampus(
+        Request $request,
+        CampusRepository $campusRepository,
+        EntityManagerInterface $em
+    ): Response
     {
         $campusList = $campusRepository->findAll();
 
@@ -273,15 +285,16 @@ class AdminController extends AbstractController
 
     }
 
-    #[Route('/delete/{id}', name: 'delete_user', requirements: ['id'=> '\d+'], methods: ['GET', 'POST'])]
+    #[Route('/delete/{id}', name: 'delete_user', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
     public function deleteUser(
-        int $id,
-        UserRepository $userRepository,
-        OutingRepository $outingRepository,
+        int                    $id,
+        UserRepository         $userRepository,
+        OutingRepository       $outingRepository,
         EntityManagerInterface $manager): Response
     {
+        // TODO : export this functionality in a service
         $user = $userRepository->findOneBy(['id' => $id]);
-        $deletedUser = $userRepository->findOneBy(['username'=> 'Utilisateur supprimé']);
+        $deletedUser = $userRepository->findOneBy(['username' => 'Utilisateur supprimé']);
 
         $outings = $outingRepository->findOpenOutingsByParticipant($user);
         foreach ($outings as $outing) {
@@ -290,7 +303,7 @@ class AdminController extends AbstractController
         }
 
         $outingsOrganized = $outingRepository->findBy(['organizer' => $user]);
-        foreach($outingsOrganized as $outing) {
+        foreach ($outingsOrganized as $outing) {
             $outing->setOrganizer($deletedUser);
             $manager->persist($outing);
         }

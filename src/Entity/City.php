@@ -34,7 +34,7 @@ class City
     #[Assert\NotBlank(message: 'Le code postal ne peut être vide.')]
     #[Assert\Length(
         min: 1,
-        max:10,
+        max: 10,
         minMessage: 'Le code postal doit avoir un minimum de 4 caractères.',
         maxMessage: 'Le code postal ne peut dépasser 10 caractères'
     )]

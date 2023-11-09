@@ -11,24 +11,25 @@ class ChangeStatus
 {
 
     public function __construct(
-        private readonly OutingRepository $outingRepository,
-        private readonly StatusRepository $status,
-        private readonly  EntityManagerInterface $em,
-        private Security $security
-    ){
+        private readonly OutingRepository       $outingRepository,
+        private readonly StatusRepository       $status,
+        private readonly EntityManagerInterface $em,
+        private Security                        $security
+    )
+    {
     }
 
-    public function changeStatus():void
+    public function changeStatus(): void
     {
         $currentDate = new \DateTimeImmutable();
 
-        $outings = $this -> outingRepository->findOutings($this -> security -> getUser());
+        $outings = $this->outingRepository->findOutings($this->security->getUser());
 
-        $open = $this -> status->findOneBy(['label' => 'Open']);
-        $closed = $this -> status->findOneBy(['label' => 'Closed']);
-        $ongoing = $this -> status->findOneBy(['label' => 'Ongoing']);
-        $archived = $this -> status->findOneBy(['label' => 'Archived']);
-        $finished = $this -> status->findOneBy(['label' => 'Finished']);
+        $open = $this->status->findOneBy(['label' => 'Open']);
+        $closed = $this->status->findOneBy(['label' => 'Closed']);
+        $ongoing = $this->status->findOneBy(['label' => 'Ongoing']);
+        $archived = $this->status->findOneBy(['label' => 'Archived']);
+        $finished = $this->status->findOneBy(['label' => 'Finished']);
 
         foreach ($outings as $outing) {
             $deadline = $outing->getDeadline();
@@ -54,8 +55,8 @@ class ChangeStatus
                 } else {
                     $outing->setStatus($finished);
                 }
-                $this -> em->persist($outing);
-                $this -> em->flush();
+                $this->em->persist($outing);
+                $this->em->flush();
             }
         }
 

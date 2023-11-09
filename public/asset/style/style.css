@@ -6,6 +6,7 @@
     border-right: solid 2px black;
     border-bottom: solid 2px black;
 }
+
 #logo:hover {
     border-top: solid 2px black;
     border-left: solid 2px black;
@@ -34,9 +35,9 @@
     width: 150px;
 }
 
-.nav-item:hover > a, .searchButton:hover, .btnCenter:hover{
+.nav-item:hover > a, .searchButton:hover, .btnCenter:hover {
     background-color: #000080;
-    color:whitesmoke;
+    color: whitesmoke;
     border-top: solid 2px black;
     border-left: solid 2px black;
     border-right: solid 2px #F7F7F7;
@@ -83,13 +84,13 @@ table {
     border-bottom: solid 4px darkgray;
 }
 
-.link-smart{
+.link-smart {
     pointer-events: none;
     text-decoration: none;
     color: black;
 }
 
-.enabled-smart{
+.enabled-smart {
     display: none;
 }
 
@@ -105,7 +106,7 @@ label[for="city_postcode"] {
     display: none;
 }
 
-.block-dateUsername{
+.block-dateUsername {
     margin-right: 0;
     padding-right: 0;
     font-weight: bold;
@@ -115,7 +116,7 @@ label[for="city_postcode"] {
     flex-direction: column;
 }
 
-.searchButton{
+.searchButton {
     height: 80px;
     width: 125px;
     font-size: 17px;
@@ -126,7 +127,7 @@ label[for="city_postcode"] {
     border-bottom: solid 2px black;
 }
 
-.btnCenter{
+.btnCenter {
     border-radius: 0;
     border-top: solid 2px #F7F7F7;
     border-left: solid 2px #F7F7F7;
@@ -139,11 +140,11 @@ label[for="city_postcode"] {
     background-color: #C0C0C0;
 }
 
-.displayProfile{
+.displayProfile {
     font-size: 22px;
 }
 
-.centerTitle{
+.centerTitle {
     text-align: center;
     background-color: #000080;
     color: whitesmoke;
@@ -153,7 +154,7 @@ label[for="city_postcode"] {
     border-bottom: solid 2px darkgray;
 }
 
-.titleCol{
+.titleCol {
     background-color: #000080;
     color: whitesmoke;
     border-top: solid 2px #F7F7F7;
@@ -162,7 +163,7 @@ label[for="city_postcode"] {
     border-bottom: solid 2px darkgray;
 }
 
-.infoCol{
+.infoCol {
     background-color: #C0C0C0;
     color: black;
     border-top: solid 2px #F7F7F7;
@@ -171,7 +172,7 @@ label[for="city_postcode"] {
     border-bottom: solid 2px darkgray;
 }
 
-.profilepicture{
+.profilepicture {
     border-top: solid 2px #F7F7F7;
     border-left: solid 2px #F7F7F7;
     border-right: solid 2px darkgray;
@@ -180,7 +181,7 @@ label[for="city_postcode"] {
     max-width: 380px;
 }
 
-.btnCenterCancel{
+.btnCenterCancel {
     border-radius: 0;
     border-top: solid 2px #F7F7F7;
     border-left: solid 2px #F7F7F7;
@@ -193,20 +194,20 @@ label[for="city_postcode"] {
     background-color: #C0C0C0;
 }
 
-.btnCenterCancel:hover{
+.btnCenterCancel:hover {
     background-color: #800000;
-    color:whitesmoke;
+    color: whitesmoke;
     border-top: solid 2px black;
     border-left: solid 2px black;
     border-right: solid 2px #F7F7F7;
     border-bottom: solid 2px #F7F7F7;
 }
 
-.form-control{
+.form-control {
     border-radius: 0;
 }
 
-.form-select{
+.form-select {
     border-radius: 0;
 }
 
@@ -215,41 +216,125 @@ label[for="city_postcode"] {
     margin-right: auto;
 }
 
-.forgotMdp{
+.forgotMdp {
     color: #000080;
     font-size: 18px;
 }
 
-.forgotMdp:hover{
-    color:whitesmoke;
+.forgotMdp:hover {
+    color: whitesmoke;
 }
 
 @media screen and (max-width: 576px) {
     .navbar {
         display: none;
     }
-    .formContainer{
+
+    .formContainer {
         display: none;
     }
-    .link-smart{
+
+    .link-smart {
         pointer-events: auto;
         text-decoration: revert;
         color: revert;
     }
-    .hidden-smart{
+
+    .hidden-smart {
         display: none;
     }
-    .enabled-smart{
+
+    .enabled-smart {
         display: revert;
     }
-    #logo{
+
+    #logo {
         width: 40%;
     }
 }
 
-.alert{
+.alert {
     background: #a78bfa;
 }
+
+.alert-danger {
+    background: rgba(200, 0, 0, 75%);
+    color: whitesmoke;
+    border-radius: 0;
+    animation: blinkingAlertDanger 2s infinite;
+}
+
+@keyframes blinkingAlertDanger {
+    0% {
+        background-color: whitesmoke;
+        color: rgba(200, 0, 0, 75%)
+    }
+    25% {
+        background-color: whitesmoke;
+        color: rgba(200, 0, 0, 75%)
+    }
+    50% {
+        background-color: rgba(200, 0, 0, 75%);
+        color: whitesmoke
+    }
+    100% {
+        background-color: rgba(200, 0, 0, 75%);
+        color: whitesmoke
+    }
+}
+
+.alert-success {
+    background: rgba(0, 150, 0, 75%);
+    color: whitesmoke;
+    border-radius: 0;
+    animation: blinkingAlertSuccess 2s infinite;
+}
+
+@keyframes blinkingAlertSuccess {
+    0% {
+        background-color: whitesmoke;
+        color: rgba(0, 150, 0, 75%)
+    }
+    25% {
+        background-color: whitesmoke;
+        color: rgba(0, 150, 0, 75%)
+    }
+    50% {
+        background-color: rgba(0, 150, 0, 75%);
+        color: whitesmoke
+    }
+    100% {
+        background-color: rgba(0, 150, 0, 75%);
+        color: whitesmoke
+    }
+}
+
+.alert-warning {
+    background: darkorange;
+    color: whitesmoke;
+    border-radius: 0;
+    animation: blinkingAlertWarning 2s infinite;
+}
+
+@keyframes blinkingAlertWarning {
+    0% {
+        background-color: whitesmoke;
+        color: darkorange
+    }
+    25% {
+        background-color: whitesmoke;
+        color: darkorange
+    }
+    50% {
+        background-color: darkorange;
+        color: whitesmoke
+    }
+    100% {
+        background-color: darkorange;
+        color: whitesmoke
+    }
+}
+
 .icon-admin {
     width: 25px;
     height: auto;

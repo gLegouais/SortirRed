@@ -3,9 +3,10 @@ document.getElementsByTagName('main')[0].addEventListener('click', function () {
         icon.classList.remove('desk-icon-active');
         icon.querySelector('a').classList.remove('desk-link-active');
     })
+    document.getElementById('clippy').classList.add('clippyHidden');
 })
 document.querySelectorAll('.desk-icon').forEach((link) => {
-    link.addEventListener('click', function(event) {
+    link.addEventListener('click', function (event) {
         event.preventDefault();
         event.stopPropagation();
         document.querySelectorAll('.desk-icon').forEach((icon) => {
@@ -14,9 +15,9 @@ document.querySelectorAll('.desk-icon').forEach((link) => {
         })
         link.classList.add('desk-icon-active');
         link.querySelector('a').classList.add('desk-link-active');
-
+        document.getElementById('clippy').classList.remove('clippyHidden');
     })
-    link.addEventListener('dblclick', function() {
+    link.addEventListener('dblclick', function () {
         window.location = this.querySelector('a').href;
     })
 })

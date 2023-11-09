@@ -48,7 +48,7 @@ async function getRelatedLocations(element) {
         })
     });
 
-    if(updatedLocation) {
+    if (updatedLocation) {
         locationSelect.lastElementChild.selected = true;
         updatedLocation = false;
         locationSelect.dispatchEvent(eventChange)
@@ -115,6 +115,7 @@ async function getLocationLatAndLongitude(street, postcode) {
     return coordinates;
 
 }
+
 // Formatting a location street to match the API for latitude and longitude requirements
 function formatStreet(street) {
     let streetArray = street.split(' ');

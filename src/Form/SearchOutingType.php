@@ -25,7 +25,7 @@ class SearchOutingType extends AbstractType
                 'required' => false,
                 'placeholder' => 'Sélection du campus',
             ])
-            ->add('name', TextType::class,[
+            ->add('name', TextType::class, [
                 'label' => 'Le nom de la sortie contient : ',
                 'required' => false,
             ])
@@ -56,8 +56,7 @@ class SearchOutingType extends AbstractType
             ->add('outingFinished', CheckboxType::class, [
                 'label' => 'Sorties passées',
                 'required' => false
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

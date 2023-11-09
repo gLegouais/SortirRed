@@ -13,7 +13,7 @@ class CancellationTypeModel
         return $this->motif;
     }
 
-    public function setMotif(string $motif):void
+    public function setMotif(string $motif): void
     {
         $this->motif = $motif;
     }

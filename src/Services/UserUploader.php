@@ -12,9 +12,9 @@ use Symfony\Component\Serializer\SerializerInterface;
 class UserUploader
 {
     public function __construct(
-        private readonly SerializerInterface $serializer,
-        private readonly CampusRepository $campusRepository,
-        private readonly EntityManagerInterface $manager,
+        private readonly SerializerInterface         $serializer,
+        private readonly CampusRepository            $campusRepository,
+        private readonly EntityManagerInterface      $manager,
         private readonly UserPasswordHasherInterface $hasher
     )
     {

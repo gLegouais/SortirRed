@@ -1,6 +1,6 @@
 const updateUrl = document.getElementById('js-url-data').dataset.urlModify
-document.querySelectorAll("[id^='modify']").forEach((link)=>{
-    link.addEventListener('click', function (evt){
+document.querySelectorAll("[id^='modify']").forEach((link) => {
+    link.addEventListener('click', function (evt) {
         evt.preventDefault()
         let cityName = prompt("Nom de la ville:")
         document.getElementById('city_name').value = cityName

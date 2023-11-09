@@ -31,7 +31,7 @@ class OutingType extends AbstractType
 
     public function __construct(
         private readonly LocationRepository $locationRepository,
-        private readonly CityRepository $cityRepository
+        private readonly CityRepository     $cityRepository
     )
     {
     }
@@ -93,7 +93,8 @@ class OutingType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SUBMIT, array($this, 'onPreSubmit'));
     }
 
-    protected function addLocations(FormInterface $form, City $city = null, Location $location = null) {
+    protected function addLocations(FormInterface $form, City $city = null, Location $location = null)
+    {
 
 
         if ($city) {

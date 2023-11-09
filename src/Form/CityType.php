@@ -14,8 +14,7 @@ class CityType extends AbstractType
     {
         $builder
             ->add('name', TextType::class)
-            ->add('postcode', TextType::class)
-        ;
+            ->add('postcode', TextType::class);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
