@@ -3,39 +3,43 @@
 {% block title %}Bienvenue {{ user.username }} !{% endblock %}
 
 {% block body %}
-    <h1>{{ user.username }}</h1>
+    <h1 class="centerTitle">{{ user.username }}</h1>
+    <br>
     <div class="container">
         <div class="row">
-            <div class="col">
-                <img src="{{asset(app_profile_picture_directory ~ '/' ~ user.profilePicture)}}">
+            <div class="col-4">
+                <img src="{{asset(app_profile_picture_directory ~ '/' ~ user.profilePicture)}}" alt="profile picture" class="profilepicture">
             </div>
-            <div class="col">
+            <div class="col-6 displayProfile">
                 <div class="container">
                     <div class="row">
-                        <div class="col-2">Prénom:</div>
-                        <div class="col">{{ user.firstname }}</div>
+                        <div class="col-3 titleCol">Prénom:</div>
+                        <div class="col-5 infoCol">{{ user.firstname }}</div>
                     </div>
                     <div class="row">
-                        <div class="col-2">Nom:</div>
-                        <div class="col">{{ user.lastname }}</div>
+                        <div class="col-3 titleCol">Nom:</div>
+                        <div class="col-5 infoCol">{{ user.lastname }}</div>
                     </div>
                     <div class="row">
-                        <div class="col-2">Téléphone:</div>
-                        <div class="col">{{ user.phone }}</div>
+                        <div class="col-3 titleCol">Téléphone:</div>
+                        <div class="col-5 infoCol">{{ user.phone }}</div>
                     </div>
                     <div class="row">
-                        <div class="col-2">Email:</div>
-                        <div class="col">{{ user.email }}</div>
+                        <div class="col-3 titleCol">Email:</div>
+                        <div class="col-5 infoCol">{{ user.email }}</div>
                     </div>
                     <div class="row">
-                        <div class="col-2">Campus:</div>
-                        <div class="col">{{ user.campus.name }}</div>
+                        <div class="col-3 titleCol">Campus:</div>
+                        <div class="col-5 infoCol">{{ user.campus.name }}</div>
                     </div>
                 </div>
             </div>
+            <div class="col-2"></div>
         </div>
     </div>
     {% if app.user.id == user.id %}
-        <a href="{{ path('update_user', {'id': app.user.id}) }}">Modifier</a>
+        <div style="text-align: center">
+            <a href="{{ path('update_user', {'id': app.user.id}) }}" class="btn btnCenter">Modifier</a>
+        </div>
     {% endif %}
 {% endblock %}
