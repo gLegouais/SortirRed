@@ -77,7 +77,14 @@
                 <td class="hidden-smart"> {{ outing.participants|length }}/ {{ outing.maxRegistered }}</td>
                 <td class="hidden-smart">{{ outing.status.label }}</td>
                 <td class="hidden-smart">{% if isRegistered %}X{% endif %}</td>
-                <td class="hidden-smart"> <a href="{{ path('user_profile', {'id': outing.organizer.id}) }}">{{ outing.organizer.username }}</a></td>
+                <td class="hidden-smart">
+                    <a href="{{ path('user_profile', {'id': outing.organizer.id}) }}">
+                        {{ outing.organizer.username }}
+                    </a>
+                    {% if outing.organizer.roles[0] == 'ROLE_ADMIN' %}
+                        <img src="{{ asset('asset/images/admin_icon.png') }}" alt="administrateur" class="icon-admin">
+                    {% endif %}
+                </td>
                 <td class="hidden-smart">
                     <a href="{{ path('outing_show', {'id':outing.id}) }}" title="Détail d'une sortie">Afficher</a>
 
