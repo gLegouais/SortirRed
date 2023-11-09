@@ -238,3 +238,6 @@ label[for="city_postcode"] {
     }
 }
 
+.alert{
+    background: #a78bfa;
+}
