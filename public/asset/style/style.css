@@ -247,9 +247,49 @@ label[for="city_postcode"] {
     }
 }
 
-.alert{
+.alert {
     background: #a78bfa;
 }
+
+.alert-danger {
+    background: rgba(200, 0, 0, 75%);
+    color: whitesmoke;
+    border-radius: 0;
+    animation: blinkingAlertDanger 2s infinite;
+}
+@keyframes blinkingAlertDanger {
+    0% {background-color: whitesmoke; color: rgba(200, 0, 0, 75%)}
+    25% {background-color: whitesmoke; color: rgba(200, 0, 0, 75%)}
+    50% {background-color: rgba(200, 0, 0, 75%); color: whitesmoke}
+    100% {background-color: rgba(200, 0, 0, 75%); color: whitesmoke}
+}
+
+.alert-success {
+    background: rgba(0, 150, 0, 75%);
+    color: whitesmoke;
+    border-radius: 0;
+    animation: blinkingAlertSuccess 2s infinite;
+}
+@keyframes blinkingAlertSuccess {
+    0% {background-color: whitesmoke; color: rgba(0, 150, 0, 75%)}
+    25% {background-color: whitesmoke; color: rgba(0, 150, 0, 75%)}
+    50% {background-color: rgba(0, 150, 0, 75%); color: whitesmoke}
+    100% {background-color: rgba(0, 150, 0, 75%); color: whitesmoke}
+}
+
+.alert-warning {
+    background: darkorange;
+    color: whitesmoke;
+    border-radius: 0;
+    animation: blinkingAlertWarning 2s infinite;
+}
+@keyframes blinkingAlertWarning {
+    0% {background-color: whitesmoke; color: darkorange}
+    25% {background-color: whitesmoke; color: darkorange}
+    50% {background-color: darkorange; color: whitesmoke}
+    100% {background-color: darkorange; color: whitesmoke}
+}
+
 .icon-admin {
     width: 25px;
     height: auto;
