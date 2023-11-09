@@ -176,6 +176,8 @@ label[for="city_postcode"] {
     border-left: solid 2px #F7F7F7;
     border-right: solid 2px darkgray;
     border-bottom: solid 2px darkgray;
+    max-height: 400px;
+    max-width: 380px;
 }
 
 .btnCenterCancel{
@@ -206,6 +208,11 @@ label[for="city_postcode"] {
 
 .form-select{
     border-radius: 0;
+}
+
+.center {
+    margin-left: auto;
+    margin-right: auto;
 }
 
 @media screen and (max-width: 576px) {

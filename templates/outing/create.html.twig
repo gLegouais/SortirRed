@@ -13,8 +13,8 @@
 
 {% block body %}
 
-    <h1>Organiser une sortie</h1>
-
+    <h1 class="centerTitle">Organiser une sortie</h1>
+    <br>
     <div
             id="js-url-data"
             data-api-city-x-locations="{{ path('api_relatedLocation', {'cityId': 0}) }}"
@@ -43,11 +43,11 @@
             </button>
         </div>
     </div>
-    <input type="submit" value="Créer" name="save">
-    <input type="submit" value="Publier" name="publish">
-    <a href="{{ path('home_list') }}" class="btn btn-secondary">Annuler</a>
+    <input type="submit" value="Créer" name="save" class="btn btnCenter">
+    <input type="submit" value="Publier" name="publish" class="btn btnCenter">
+    <a href="{{ path('home_list') }}" class="btn btnCenterCancel">Annuler</a>
     {{ form_end(outingForm) }}
-
+    <br>
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -74,8 +74,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                        <button type="button" class="btn btn-primary" id="createLocation" data-bs-dismiss="modal">
+                        <button type="button" class="btn btnCenterCancel" data-bs-dismiss="modal">Annuler</button>
+                        <button type="button" class="btn btnCenter" id="createLocation" data-bs-dismiss="modal">
                             Créer
                         </button>
                     </div>
