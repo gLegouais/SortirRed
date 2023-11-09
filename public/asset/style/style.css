@@ -250,3 +250,8 @@ label[for="city_postcode"] {
 .alert{
     background: #a78bfa;
 }
+.icon-admin {
+    width: 25px;
+    height: auto;
+    margin-left: 10px;
+}
