@@ -15,6 +15,7 @@ use App\Repository\OutingRepository;
 use App\Repository\StatusRepository;
 use App\Services\ChangeStatus;
 use Doctrine\ORM\EntityManagerInterface;
+use phpDocumentor\Reflection\Types\This;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,6 +32,10 @@ class OutingController extends AbstractController
         Request          $request
     ): Response
     {
+        if ($this->isGranted('ROLE_INACTIVE')) {
+            return $this->redirectToRoute('app_logout');
+        }
+
         $currentDate = new \DateTimeImmutable();
 
         $searchOutingFormModel = new SearchOutingFormModel();
