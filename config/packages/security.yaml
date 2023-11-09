@@ -39,8 +39,13 @@ security:
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/login, roles: PUBLIC_ACCESS}
+        - { path: ^/logout, roles: ROLE_INACTIVE}
         - { path: ^/reset-password, roles: PUBLIC_ACCESS}
         - { path: ^/, roles: ROLE_USER }
+    role_hierarchy:
+        ROLE_INACTIVE: PUBLIC_ACCESS
+        ROLE_USER: ROLE_INACTIVE
+        ROLE_ADMIN: ROLE_USER
 
 when@test:
     security:

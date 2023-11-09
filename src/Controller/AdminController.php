@@ -270,6 +270,9 @@ class AdminController extends AbstractController
                 $outing->removeParticipant($user);
                 $manager->persist($outing);
             }
+            $user->setRoles(['ROLE_INACTIVE']);
+        } else {
+            $user->setRoles(['ROLE_USER']);
         }
 
         $user->setIsActive(!$user->isIsActive());
@@ -307,6 +310,7 @@ class AdminController extends AbstractController
             $outing->setOrganizer($deletedUser);
             $manager->persist($outing);
         }
+        $manager->flush();
 
         $manager->remove($user);
         $manager->flush();
