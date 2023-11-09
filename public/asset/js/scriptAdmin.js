@@ -13,3 +13,13 @@ document.querySelectorAll('.desk-icon').forEach((link) => {
         window.location = this.querySelector('a').href;
     })
 })
+
+document.getElementsByTagName('main')[0].addEventListener('click', function (event) {
+    event.stopPropagation();
+    document.querySelectorAll('.desk-icon').forEach((icon) => {
+        if (icon.classList.contains('desk-icon-active')) {
+            icon.classList.remove('desk-icon-active');
+            icon.querySelector('a').classList.remove('desk-link-active');
+        }
+    })
+})
