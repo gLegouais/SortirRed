@@ -1,0 +1,36 @@
+body {
+    background-image: url('../../asset/images/admin_background.png');
+    color: whitesmoke;
+    font-family: "Times New Roman", "Comic Sans MS", sans-serif;
+
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+h1 {
+    color: whitesmoke;
+}
+
+.desk-icon {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.desk-link {
+    padding-top: 10px;
+}
+
+.desk-icon:hover {
+    background-color: rgba(255, 255, 255, 25%);
+}
+.desk-link:hover {
+    color: whitesmoke;
+}
+
+.desk-icon-active {
+    background-color: rgba(255, 255, 255, 25%);
+    border: #000080 2px dotted;
+}
+.desk-link-active {
+    color: whitesmoke;
+}

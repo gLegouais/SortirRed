@@ -70,7 +70,7 @@ class OutingController extends AbstractController
         ]);
     }
 
-    #[Route('/sortie/{id}', name: 'outing_show', requirements: ['id' => '\d+'], methods: ['GET'])]
+    #[Route('/outing/{id}', name: 'outing_show', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function showOuting(int $id, OutingRepository $outingRepository): Response
     {
         $outing = $outingRepository->find($id);
@@ -125,7 +125,7 @@ class OutingController extends AbstractController
         ]);
     }
 
-    #[Route('/inscription/{id}', name: 'outing_inscription', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    #[Route('/enlistment/{id}', name: 'outing_inscription', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
     public function inscription(int $id, OutingRepository $outingRepository, EntityManagerInterface $em): Response
     {
         //todo : ici, il faudrait vérifier que mon utilisateur ne soit pas déjà inscrit ?
