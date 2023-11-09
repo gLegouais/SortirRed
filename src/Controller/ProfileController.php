@@ -41,7 +41,13 @@ class ProfileController extends AbstractController
                 {
                     $profilePic -> delete($user -> getProfilePicture(), $this -> getParameter('app.profile_picture_directory'));
                     if($image){
-                        $user -> setProfilePicture($profilePic -> upload($image));
+                        $imageName = $profilePic->upload($image);
+                        if ($imageName === 'FAILED') {
+                            $this->addFlash('warning', 'Erreur lors du chargement de l\'image');
+                            $user->setProfilePicture('defaultProfilePicture.png');
+                        }  else {
+                            $user -> setProfilePicture($imageName);
+                        }
                     }
                 }
 

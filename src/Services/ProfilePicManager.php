@@ -19,7 +19,7 @@ class ProfilePicManager
         try {
             $profilePicture->move($this->getProfilePicDirectory(), $filename);
         } catch (FileException $fe) {
-            // TODO Handle that horseshit.
+            return 'FAILED';
         }
         return $filename;
     }
