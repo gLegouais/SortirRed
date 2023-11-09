@@ -1,30 +1,92 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-     | {{ parent() }} {# c'est quoi le parent ici ? #}
+    | {{ parent() }} {# c'est quoi le parent ici ? #}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('asset/style/admin.css') }}" type="text/css">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('asset/js/scriptAdmin.js') }}" defer></script>
 {% endblock %}
 
 {% block body %}
-    <h1>ADMINISTRATION</h1>
+    <div class="align-text-bottom">
+        <h1>
+            <img src="{{ asset('asset/images/admin_agent.png') }}" alt="icône admin"/>
+            ADMINISTRATION
+            <img src="{{ asset('asset/images/admin_agent.png') }}" alt="icône admin"/>
+        </h1>
+    </div>
 
-    <table class="table-sm table-bordered mb-3">
-        <thead>
-            <tr class="table-top">
-                <th>Actions d'administration</th>
-            </tr>
-        </thead>
-        <tr class="table-rows">
-            <td><a href="{{ path('admin_addUser')}}" title="Admin_addUser">Ajouter un utilisateur</a></td>
-        </tr>
-        <tr class="table-rows">
-            <td><a href="{{ path('manage_city') }}" title="adminCity">Gérer les villes</a></td>
-        </tr>
-        <tr class="table-rows">
-            <td><a href="{{ path('manage_campus') }}" title="adminCampus">Gérer les campus</a></td>
-        </tr>
-        <tr class="table-rows">
-            <td><a href="{{ path('manage_users') }}" title="adminCampus">Gérer les utilisateurs</a></td>
-        </tr>
-    </table>
+    <div class="row mt-5 pt-5">
+        <div class="col-2 text-center desk-icon">
+            <a href="{{ path('admin_addUser') }}" title="Admin_addUser" class="desk-link">
+                <div>
+                    <img src="{{ asset('asset/images/add_user.png') }}"
+                         alt="Ajout utilisateur"
+                         class="admin-icon"
+                    />
+                    <p>
+                        Ajouter un
+                        utilisateur</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-2 text-center desk-icon">
+            <a href="{{ path('admin_upload') }}" title="Admin_addUser" class="desk-link">
+                <div>
+                    <img src="{{ asset('asset/images/import_users.png') }}"
+                         alt="Import utilisateurs"
+                         class="admin-icon"
+                    />
+                    <p>Importer des
+                        utilisateurs</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-2 text-center desk-icon">
+            <a href="{{ path('manage_city') }}" title="adminCity" class="desk-link">
+                <div>
+                    <img src="{{ asset('asset/images/manage_cities.png') }}"
+                         alt="Gestion villes"
+                         class="admin-icon"
+                    />
+                    <p>Gérer les villes</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-2 text-center desk-icon">
+            <a href="{{ path('manage_campus') }}" title="adminCampus" class="desk-link">
+                <div>
+                    <img src="{{ asset('asset/images/manage_campus.png') }}"
+                         alt="Gestion campus"
+                         class="admin-icon"
+                    />
+                    <p>Gérer les campus</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-2 text-center desk-icon">
+            <a href="{{ path('manage_users') }}" title="adminCampus" class="desk-link">
+                <div>
+                    <img src="{{ asset('asset/images/manage_users.png') }}"
+                         alt="Gestion utilisateurs"
+                         class="admin-icon"
+                    />
+                    <p>Gérer les utilisateurs</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
 
 {% endblock %}

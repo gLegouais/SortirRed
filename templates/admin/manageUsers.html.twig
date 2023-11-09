@@ -4,8 +4,20 @@
      | {{ parent() }} {# c'est quoi le parent ici ? #}
 {% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('asset/style/admin.css') }}" type="text/css">
+{% endblock %}
+
 {% block body %}
-    <h1>ADMINISTRATION DES UTILISATEURS</h1>
+
+    <div class="align-text-bottom">
+        <h1>
+            <img src="{{ asset('asset/images/admin_agent.png') }}" alt="icône admin"/>
+            GÉRER LES UTILISATEURS
+            <img src="{{ asset('asset/images/admin_agent.png') }}" alt="icône admin"/>
+        </h1>
+    </div>
 
     <table class="table-sm table-bordered mb-3">
         <thead>
