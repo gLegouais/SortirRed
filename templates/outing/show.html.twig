@@ -48,7 +48,7 @@
                     </div>
                     <div class="row">
                         <div class="col-2 titleCol">Organisée par </div>
-                        <div class="col-3 infoCol">{{ outing.organizer.username }}</div>
+                        <div class="col-3 infoCol"><a href="{{ path('user_profile', {'id': outing.organizer.id}) }}">{{ outing.organizer.username }}</a></div>
                         <div class="col-2"></div>
                         <div class="col-2 titleCol">Longitude :</div>
                         <div class="col-3 infoCol">{{ outing.location.longitude }}</div>
