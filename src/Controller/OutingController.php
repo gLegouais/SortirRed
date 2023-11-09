@@ -70,7 +70,7 @@ class OutingController extends AbstractController
         ]);
     }
 
-    #[Route('/sortie/{id}', name: 'outing_show', requirements: ['id' => '\d+'], methods: ['GET'])]
+    #[Route('/outing/{id}', name: 'outing_show', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function showOuting(int $id, OutingRepository $outingRepository): Response
     {
         $outing = $outingRepository->find($id);
@@ -125,7 +125,7 @@ class OutingController extends AbstractController
         ]);
     }
 
-    #[Route('/inscription/{id}', name: 'outing_inscription', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    #[Route('/enlistment/{id}', name: 'outing_inscription', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
     public function inscription(int $id, OutingRepository $outingRepository, EntityManagerInterface $em, Request $request): Response
     {
         //todo : ici, il faudrait vérifier que mon utilisateur ne soit pas déjà inscrit ?
@@ -179,8 +179,7 @@ class OutingController extends AbstractController
 
     }
 
-    #[
-        Route('/publication/{id}', name: 'outing_publication', requirements: ['id' => '\d+'], methods: ['GET'])]
+    #[Route('/publication/{id}', name: 'outing_publication', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function publication(
         int                    $id,
         OutingRepository       $outingRepository,
@@ -231,7 +230,8 @@ class OutingController extends AbstractController
                 $participants->clear();
                 if (($this->getUser()) === ($outing->getOrganizer())) {
                     $outing->setDescription("[ANNULÉ] : " . $cancellationTypeModel->getMotif() . "\n" . $outing->getDescription());
-                } else if ($this->isGranted('ROLE_ADMIN')) {
+                }
+                else if ($this->isGranted('ROLE_ADMIN')) {
                     $outing->setDescription("[SORTIE ANNULÉE PAR LA MODERATION] : " . $cancellationTypeModel->getMotif() . "\n" . $outing->getDescription());
                 }
                 $em->persist($outing);
