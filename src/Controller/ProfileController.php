@@ -41,7 +41,7 @@ class ProfileController extends AbstractController
 
         if ($coUser->getId() == $profileOwner) {
             if ($profileForm->isSubmitted() && $profileForm->isValid()) {
-                $user->setPassword($passwordHasher->hashPassword($user, $profileForm->get('password')->getData()));
+                $user->setPassword($passwordHasher->hashPassword($user, $profileForm->get('plainPassword')->getData()));
 
                 $image = $profileForm->get('profilePicture')->getData();
                 if (($profileForm->has('deleteImage') && $profileForm['deleteImage']->getData()) || $image) {

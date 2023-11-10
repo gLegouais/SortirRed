@@ -23,7 +23,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Unique(message: 'Votre pseudo doit être unique. Celui-ci est déjà utilisé.')]
     #[Length(
         min: 1,
         max: 180,

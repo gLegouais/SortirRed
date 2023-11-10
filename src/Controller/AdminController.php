@@ -51,7 +51,6 @@ class AdminController extends AbstractController
             $user->setPassword($passwordHasher->hashPassword($user, 'magique'));
 
             if ($adminAddUserForm->get('role')->getData()) {
-                var_dump('mon role est administrateur');
                 $user->setRoles(['ROLE_ADMIN']);
                 $user->setProfilePicture('defaultAdminPicture.png');
             } else {

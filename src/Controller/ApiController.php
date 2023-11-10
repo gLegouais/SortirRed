@@ -71,7 +71,7 @@ class ApiController extends AbstractController
         if (count($errors) == 0) {
             $manager->persist($location);
             $manager->flush();
-            $this->addFlash('sucess', 'Le lieu a été créé avec succès.');
+            $this->addFlash('success', 'Le lieu a été créé avec succès.');
             return new Response('success', Response::HTTP_OK);
         } else {
             $this->addFlash('danger', 'Impossible de créer le lieu.');
